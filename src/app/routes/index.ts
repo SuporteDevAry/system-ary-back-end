@@ -11,14 +11,20 @@ const routes = Router();
 //   console.log("Opaaaa!!", req);
 //   next();
 // });
-routes.post("/api/user", new UserController().create);
+
+// IN and OUT application
 routes.post("/api/login", new SessionController().login);
 routes.post("/api/reset-password", new SessionController().resetPassword);
 
+// CRUD USERS
+routes.post("/api/user", new UserController().create);
 routes.get("/api/users", new UserController().getUsers);
 routes.get("/api/users/:id", new UserController().getUserById);
+routes.patch("/api/user/:id", new UserController().updateUser);
+routes.delete("/api/user/:id", new UserController().deleteUser);
 routes.patch("/api/permission/:id", new PermissionController().update);
 
+// Routes protected
 routes.use(authMiddleware);
 routes.get("/api/profile", new UserController().getProfile);
 

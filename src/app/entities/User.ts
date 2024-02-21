@@ -1,4 +1,5 @@
 import {
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -33,9 +34,13 @@ export class User {
   @CreateDateColumn()
   created_at: Date;
 
-  @CreateDateColumn()
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP", onUpdate: "CURRENT_TIMESTAMP" })
   updated_at: Date;
 
+  @BeforeUpdate()
+  updateTimestamp() {
+    this.updated_at = new Date();
+  }
   constructor() {
     if (!this.id) {
       this.id = uuid();
