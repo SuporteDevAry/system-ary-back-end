@@ -53,6 +53,13 @@ var api_errors_1 = require("../helpers/api-errors");
 var ClienteController = /** @class */ (function () {
     function ClienteController() {
     }
+    ClienteController.prototype.getProfile = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, res.json(req.user)];
+            });
+        });
+    };
     ClienteController.prototype.getClientes = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
             var clientes;
@@ -61,6 +68,8 @@ var ClienteController = /** @class */ (function () {
                     case 0: return [4 /*yield*/, (0, ClienteRepository_1.getClientes)()];
                     case 1:
                         clientes = _a.sent();
+                        console.log("ClienteController");
+                        console.log(clientes);
                         return [2 /*return*/, res.status(200).json(clientes)];
                 }
             });
@@ -74,7 +83,7 @@ var ClienteController = /** @class */ (function () {
                     case 0:
                         cli_codigo = req.params.cli_codigo;
                         if (!cli_codigo) {
-                            throw new api_errors_1.BadRequestError("Cliente já existe");
+                            throw new api_errors_1.BadRequestError("Código do Cliente não informado.");
                         }
                         return [4 /*yield*/, ClienteRepository_1.clienteRepository.findOneBy({ cli_codigo: cli_codigo })];
                     case 1:
@@ -138,7 +147,7 @@ var ClienteController = /** @class */ (function () {
                         cli_codigo = req.params.cli_codigo;
                         _a = req.body, nome = _a.nome, endereco = _a.endereco, numero = _a.numero, complemento = _a.complemento, bairro = _a.bairro, cidade = _a.cidade, uf = _a.uf, cep = _a.cep, natureza = _a.natureza, cnpj = _a.cnpj, ins_est = _a.ins_est, ins_mun = _a.ins_mun, email = _a.email, telefone = _a.telefone, celular = _a.celular, situacao = _a.situacao;
                         if (!cli_codigo) {
-                            throw new api_errors_1.BadRequestError("ID do Cliente não informado.");
+                            throw new api_errors_1.BadRequestError("Código do Cliente não informado.");
                         }
                         return [4 /*yield*/, ClienteRepository_1.clienteRepository.findOneBy({ cli_codigo: cli_codigo })];
                     case 1:
@@ -195,7 +204,7 @@ var ClienteController = /** @class */ (function () {
                     case 0:
                         cli_codigo = req.params.cli_codigo;
                         if (!cli_codigo) {
-                            throw new api_errors_1.BadRequestError("ID do Cliente não informado.");
+                            throw new api_errors_1.BadRequestError("Código do Cliente não informado.");
                         }
                         return [4 /*yield*/, ClienteRepository_1.clienteRepository.findOneBy({ cli_codigo: cli_codigo })];
                     case 1:

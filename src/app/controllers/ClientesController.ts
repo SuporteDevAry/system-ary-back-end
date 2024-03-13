@@ -1,10 +1,15 @@
 import { Request, Response } from "express";
-import { clienteRepository, getClientes } from "../repositories/ClienteRepository";
+import { clientesRepository, getClientes } from "../repositories/ClientesRepository";
 import { BadRequestError } from "../helpers/api-errors";
 
-export class ClienteController {
+export class ClientesController {
+    async getProfile(req: Request, res: Response) {
+        return res.json(req.user);
+    }
+
     async getClientes(req: Request, res: Response) {
         const clientes = await getClientes();
+
         return res.status(200).json(clientes);
     }
 
@@ -15,7 +20,7 @@ export class ClienteController {
             throw new BadRequestError("Código do Cliente não informado.");
         }
 
-        const clienteSearched = await clienteRepository.findOneBy({ cli_codigo });
+        const clienteSearched = await clientesRepository.findOneBy({ cli_codigo });
 
         if (!clienteSearched) {
             throw new BadRequestError("Cliente pesquisado não existe!");
@@ -44,13 +49,13 @@ export class ClienteController {
             celular,
             situacao } = req.body;
 
-        const clienteExists = await clienteRepository.findOneBy({ cli_codigo });
+        const clienteExists = await clientesRepository.findOneBy({ cli_codigo });
 
         if (clienteExists) {
             throw new BadRequestError("Cliente já cadastrado.");
         }
 
-        const newCliente = clienteRepository.create({
+        const newCliente = clientesRepository.create({
             id,
             cli_codigo,
             nome,
@@ -71,11 +76,11 @@ export class ClienteController {
             situacao,
         });
 
-        await clienteRepository.save(newCliente);
+        await clientesRepository.save(newCliente);
 
-        const { ...cliente } = newCliente;
+        const { ...clientes } = newCliente;
 
-        return res.status(201).json(cliente);
+        return res.status(201).json(clientes);
     }
 
     async updateCliente(req: Request, res: Response) {
@@ -101,7 +106,7 @@ export class ClienteController {
             throw new BadRequestError("Código do Cliente não informado.");
         }
 
-        const clienteToUpdate = await clienteRepository.findOneBy({ cli_codigo });
+        const clienteToUpdate = await clientesRepository.findOneBy({ cli_codigo });
 
         if (!clienteToUpdate) {
             throw new BadRequestError("Cliente não encontrado");
@@ -124,7 +129,7 @@ export class ClienteController {
         if (celular) clienteToUpdate.celular = celular;
         if (situacao) clienteToUpdate.situacao = situacao;
 
-        await clienteRepository.save(clienteToUpdate);
+        await clientesRepository.save(clienteToUpdate);
 
         const { ...updatedCliente } = clienteToUpdate;
 
@@ -138,13 +143,13 @@ export class ClienteController {
             throw new BadRequestError("Código do Cliente não informado.");
         }
 
-        const clienteToDelete = await clienteRepository.findOneBy({ cli_codigo });
+        const clienteToDelete = await clientesRepository.findOneBy({ cli_codigo });
 
         if (!clienteToDelete) {
             throw new BadRequestError("Cliente não encontrado");
         }
 
-        await clienteRepository.remove(clienteToDelete);
+        await clientesRepository.remove(clienteToDelete);
 
         return res.status(204).send();
     }

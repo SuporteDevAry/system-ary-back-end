@@ -7,8 +7,8 @@ import {
 } from "typeorm";
 import { v4 as uuid } from "uuid";
 
-@Entity("cliente")
-export class Cliente {
+@Entity("clientes")
+export class Clientes {
 
     @PrimaryColumn()
     id: string;

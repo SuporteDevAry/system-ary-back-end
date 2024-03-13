@@ -3,7 +3,7 @@ import { UserController } from "../controllers/UserController";
 import { SessionController } from "../controllers/SessionController";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { PermissionController } from "../controllers/PermissionController";
-import { ClienteController } from "../controllers/ClienteController";
+import { ClientesController } from "../controllers/ClientesController";
 
 const routes = Router();
 
@@ -26,11 +26,11 @@ routes.delete("/api/user/:id", new UserController().deleteUser);
 routes.patch("/api/permission/:id", new PermissionController().update);
 
 // Clientes
-routes.post("/api/cliente", new ClienteController().create);
-routes.get("/api/clientes", new ClienteController().getClientes);
-routes.get("/api/clientes/:cli_codigo", new ClienteController().getClienteById);
-routes.patch("/api/cliente/:cli_codigo", new ClienteController().updateCliente);
-routes.delete("/api/cliente/:cli_codigo", new ClienteController().deleteCliente);
+routes.post("/api/cliente", new ClientesController().create);
+routes.get("/api/clientes", new ClientesController().getClientes);
+routes.get("/api/clientes/:cli_codigo", new ClientesController().getClienteById);
+routes.patch("/api/cliente/:cli_codigo", new ClientesController().updateCliente);
+routes.delete("/api/cliente/:cli_codigo", new ClientesController().deleteCliente);
 
 // Routes protected
 routes.use(authMiddleware);

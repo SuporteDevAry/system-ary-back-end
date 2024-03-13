@@ -1,8 +1,8 @@
 import { User } from "./User";
 import { Permission } from "./Permission";
-import { Cliente } from "./Cliente";
+import { Clientes } from "./Clientes";
 export const entitiesDir = {
   User,
   Permission,
-  Cliente,
+  Clientes,
 };

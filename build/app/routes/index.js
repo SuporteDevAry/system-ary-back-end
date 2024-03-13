@@ -25,9 +25,9 @@ routes.patch("/api/permission/:id", new PermissionController_1.PermissionControl
 // Clientes
 routes.post("/api/cliente", new ClienteController_1.ClienteController().create);
 routes.get("/api/clientes", new ClienteController_1.ClienteController().getClientes);
-routes.get("/api/clientes/:id", new ClienteController_1.ClienteController().getClienteById);
-routes.patch("/api/cliente/:id", new ClienteController_1.ClienteController().updateCliente);
-routes.delete("/api/cliente/:id", new ClienteController_1.ClienteController().deleteCliente);
+routes.get("/api/clientes/:cli_codigo", new ClienteController_1.ClienteController().getClienteById);
+routes.patch("/api/cliente/:cli_codigo", new ClienteController_1.ClienteController().updateCliente);
+routes.delete("/api/cliente/:cli_codigo", new ClienteController_1.ClienteController().deleteCliente);
 // Routes protected
 routes.use(authMiddleware_1.authMiddleware);
 routes.get("/api/profile", new UserController_1.UserController().getProfile);
