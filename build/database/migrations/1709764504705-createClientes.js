@@ -36,12 +36,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateClientes = void 0;
+exports.CreateClientes1709764504705 = void 0;
 var typeorm_1 = require("typeorm");
-var CreateClientes = /** @class */ (function () {
-    function CreateClientes() {
+var CreateClientes1709764504705 = /** @class */ (function () {
+    function CreateClientes1709764504705() {
     }
-    CreateClientes.prototype.up = function (queryRunner) {
+    CreateClientes1709764504705.prototype.up = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -69,37 +69,48 @@ var CreateClientes = /** @class */ (function () {
                                 {
                                     name: "numero",
                                     type: "varchar",
-                                }, {
+                                },
+                                {
                                     name: "complemento",
                                     type: "varchar",
-                                }, {
+                                },
+                                {
                                     name: "bairro",
                                     type: "varchar",
-                                }, {
+                                },
+                                {
                                     name: "cidade",
                                     type: "varchar",
-                                }, {
+                                },
+                                {
                                     name: "uf",
                                     type: "varchar",
-                                }, {
+                                },
+                                {
                                     name: "cep",
                                     type: "varchar",
-                                }, {
+                                },
+                                {
                                     name: "natureza",
                                     type: "varchar",
-                                }, {
+                                },
+                                {
                                     name: "cnpj",
                                     type: "varchar",
-                                }, {
+                                },
+                                {
                                     name: "ins_est",
                                     type: "varchar",
-                                }, {
+                                },
+                                {
                                     name: "ins_mun",
                                     type: "varchar",
-                                }, {
+                                },
+                                {
                                     name: "email",
                                     type: "varchar",
-                                }, {
+                                },
+                                {
                                     name: "telefone",
                                     type: "varchar",
                                 },
@@ -130,7 +141,7 @@ var CreateClientes = /** @class */ (function () {
             });
         });
     };
-    CreateClientes.prototype.down = function (queryRunner) {
+    CreateClientes1709764504705.prototype.down = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -142,7 +153,7 @@ var CreateClientes = /** @class */ (function () {
             });
         });
     };
-    return CreateClientes;
+    return CreateClientes1709764504705;
 }());
-exports.CreateClientes = CreateClientes;
+exports.CreateClientes1709764504705 = CreateClientes1709764504705;
 //# sourceMappingURL=1709764504705-createClientes.js.map
