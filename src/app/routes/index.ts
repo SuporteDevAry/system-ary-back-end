@@ -3,6 +3,7 @@ import { UserController } from "../controllers/UserController";
 import { SessionController } from "../controllers/SessionController";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { PermissionController } from "../controllers/PermissionController";
+import { ClientesController } from "../controllers/ClientesController";
 
 const routes = Router();
 
@@ -23,6 +24,13 @@ routes.get("/api/users/:id", new UserController().getUserById);
 routes.patch("/api/user/:id", new UserController().updateUser);
 routes.delete("/api/user/:id", new UserController().deleteUser);
 routes.patch("/api/permission/:id", new PermissionController().update);
+
+// Clientes
+routes.post("/api/cliente", new ClientesController().create);
+routes.get("/api/clientes", new ClientesController().getClientes);
+routes.get("/api/clientes/:cli_codigo", new ClientesController().getClienteById);
+routes.patch("/api/cliente/:cli_codigo", new ClientesController().updateCliente);
+routes.delete("/api/cliente/:cli_codigo", new ClientesController().deleteCliente);
 
 // Routes protected
 routes.use(authMiddleware);

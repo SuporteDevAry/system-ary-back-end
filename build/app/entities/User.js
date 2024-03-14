@@ -19,6 +19,9 @@ var User = /** @class */ (function () {
             this.id = (0, uuid_1.v4)();
         }
     }
+    User.prototype.updateTimestamp = function () {
+        this.updated_at = new Date();
+    };
     __decorate([
         (0, typeorm_1.PrimaryColumn)(),
         __metadata("design:type", String)
@@ -49,9 +52,15 @@ var User = /** @class */ (function () {
         __metadata("design:type", Date)
     ], User.prototype, "created_at", void 0);
     __decorate([
-        (0, typeorm_1.CreateDateColumn)(),
+        (0, typeorm_1.Column)({ type: "timestamp", default: function () { return "CURRENT_TIMESTAMP"; }, onUpdate: "CURRENT_TIMESTAMP" }),
         __metadata("design:type", Date)
     ], User.prototype, "updated_at", void 0);
+    __decorate([
+        (0, typeorm_1.BeforeUpdate)(),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", []),
+        __metadata("design:returntype", void 0)
+    ], User.prototype, "updateTimestamp", null);
     User = __decorate([
         (0, typeorm_1.Entity)("users"),
         __metadata("design:paramtypes", [])

@@ -58,41 +58,6 @@ var PermissionRepository_1 = require("../repositories/PermissionRepository");
 var UserController = /** @class */ (function () {
     function UserController() {
     }
-    UserController.prototype.create = function (req, res) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _a, name, email, password, userExists, hashPassword, newPermissions, newUser, _, user;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        _a = req.body, name = _a.name, email = _a.email, password = _a.password;
-                        return [4 /*yield*/, UserRepository_1.userRepository.findOneBy({ email: email })];
-                    case 1:
-                        userExists = _b.sent();
-                        if (userExists) {
-                            throw new api_errors_1.BadRequestError("E-mail já existe");
-                        }
-                        return [4 /*yield*/, bcrypt_1.default.hash(password, 10)];
-                    case 2:
-                        hashPassword = _b.sent();
-                        newPermissions = PermissionRepository_1.permissionRepository.create();
-                        return [4 /*yield*/, PermissionRepository_1.permissionRepository.save(newPermissions)];
-                    case 3:
-                        _b.sent();
-                        newUser = UserRepository_1.userRepository.create({
-                            name: name,
-                            email: email,
-                            password: hashPassword,
-                            permissions_id: newPermissions.id,
-                        });
-                        return [4 /*yield*/, UserRepository_1.userRepository.save(newUser)];
-                    case 4:
-                        _b.sent();
-                        _ = newUser.password, user = __rest(newUser, ["password"]);
-                        return [2 /*return*/, res.status(201).json(user)];
-                }
-            });
-        });
-    };
     UserController.prototype.getProfile = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -132,6 +97,97 @@ var UserController = /** @class */ (function () {
                         }
                         _ = userSearched.password, user = __rest(userSearched, ["password"]);
                         return [2 /*return*/, res.status(200).json(user)];
+                }
+            });
+        });
+    };
+    UserController.prototype.create = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, name, email, password, userExists, hashPassword, newPermissions, newUser, _, user;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = req.body, name = _a.name, email = _a.email, password = _a.password;
+                        return [4 /*yield*/, UserRepository_1.userRepository.findOneBy({ email: email })];
+                    case 1:
+                        userExists = _b.sent();
+                        if (userExists) {
+                            throw new api_errors_1.BadRequestError("E-mail já existe");
+                        }
+                        return [4 /*yield*/, bcrypt_1.default.hash(password, 10)];
+                    case 2:
+                        hashPassword = _b.sent();
+                        newPermissions = PermissionRepository_1.permissionRepository.create();
+                        return [4 /*yield*/, PermissionRepository_1.permissionRepository.save(newPermissions)];
+                    case 3:
+                        _b.sent();
+                        newUser = UserRepository_1.userRepository.create({
+                            name: name,
+                            email: email,
+                            password: hashPassword,
+                            permissions_id: newPermissions.id,
+                        });
+                        return [4 /*yield*/, UserRepository_1.userRepository.save(newUser)];
+                    case 4:
+                        _b.sent();
+                        _ = newUser.password, user = __rest(newUser, ["password"]);
+                        return [2 /*return*/, res.status(201).json(user)];
+                }
+            });
+        });
+    };
+    UserController.prototype.updateUser = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var id, _a, name, email, password, userToUpdate, _, updatedUser;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        id = req.params.id;
+                        _a = req.body, name = _a.name, email = _a.email, password = _a.password;
+                        if (!id) {
+                            throw new api_errors_1.BadRequestError("ID do usuário não fornecido");
+                        }
+                        return [4 /*yield*/, UserRepository_1.userRepository.findOneBy({ id: id })];
+                    case 1:
+                        userToUpdate = _b.sent();
+                        if (!userToUpdate) {
+                            throw new api_errors_1.BadRequestError("Usuário não encontrado");
+                        }
+                        if (name)
+                            userToUpdate.name = name;
+                        if (email)
+                            userToUpdate.email = email;
+                        if (password)
+                            userToUpdate.password = password;
+                        return [4 /*yield*/, UserRepository_1.userRepository.save(userToUpdate)];
+                    case 2:
+                        _b.sent();
+                        _ = userToUpdate.password, updatedUser = __rest(userToUpdate, ["password"]);
+                        return [2 /*return*/, res.status(200).json(updatedUser)];
+                }
+            });
+        });
+    };
+    UserController.prototype.deleteUser = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var id, userToDelete;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        id = req.params.id;
+                        if (!id) {
+                            throw new api_errors_1.BadRequestError("ID do usuário não fornecido");
+                        }
+                        return [4 /*yield*/, UserRepository_1.userRepository.findOneBy({ id: id })];
+                    case 1:
+                        userToDelete = _a.sent();
+                        if (!userToDelete) {
+                            throw new api_errors_1.BadRequestError("Usuário não encontrado");
+                        }
+                        return [4 /*yield*/, UserRepository_1.userRepository.remove(userToDelete)];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/, res.status(204).send()];
                 }
             });
         });
