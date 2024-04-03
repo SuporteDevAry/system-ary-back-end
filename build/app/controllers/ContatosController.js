@@ -96,21 +96,20 @@ var ContatosController = /** @class */ (function () {
     };
     ContatosController.prototype.getContatosClienteBySeq = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var cli_codigo, sequencia, contatosSearched;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var _a, cli_codigo, sequencia, contatosSearched;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        cli_codigo = req.params.cli_codigo;
-                        sequencia = req.params.sequencia;
+                        _a = req.params, cli_codigo = _a.cli_codigo, sequencia = _a.sequencia;
                         if (!cli_codigo) {
                             throw new api_errors_1.BadRequestError("Código do Cliente não informado.");
                         }
                         if (!sequencia) {
                             throw new api_errors_1.BadRequestError("Sequência do Contato não informada.");
                         }
-                        return [4 /*yield*/, ContatosRepository_1.contatosRepository.findOneBy({ cli_codigo: cli_codigo, sequencia: sequencia })];
+                        return [4 /*yield*/, ContatosRepository_1.contatosRepository.findBy({ cli_codigo: cli_codigo, sequencia: sequencia })];
                     case 1:
-                        contatosSearched = _a.sent();
+                        contatosSearched = _b.sent();
                         if (!contatosSearched) {
                             throw new api_errors_1.BadRequestError("Não encontrato Contato para o Cliente pesquisado!");
                         }
@@ -121,13 +120,18 @@ var ContatosController = /** @class */ (function () {
     };
     ContatosController.prototype.create = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, id, cli_codigo, sequencia, grupo, nome, cargo, email, telefone, celular, recebe_email, newContato, contatos;
+            var _a, id, cli_codigo, sequencia, grupo, nome, cargo, email, telefone, celular, recebe_email, contatosExists, newContato, contatos;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         _a = req.body, id = _a.id, cli_codigo = _a.cli_codigo, sequencia = _a.sequencia, grupo = _a.grupo, nome = _a.nome, cargo = _a.cargo, email = _a.email, telefone = _a.telefone, celular = _a.celular, recebe_email = _a.recebe_email;
+                        return [4 /*yield*/, ContatosRepository_1.contatosRepository.findOneBy({ cli_codigo: cli_codigo, sequencia: sequencia })];
+                    case 1:
+                        contatosExists = _b.sent();
+                        if (contatosExists) {
+                            throw new api_errors_1.BadRequestError("Contato já cadastrado.");
+                        }
                         newContato = ContatosRepository_1.contatosRepository.create({
-                            id: id,
                             cli_codigo: cli_codigo,
                             sequencia: sequencia,
                             grupo: grupo,
@@ -139,7 +143,7 @@ var ContatosController = /** @class */ (function () {
                             recebe_email: recebe_email,
                         });
                         return [4 /*yield*/, ContatosRepository_1.contatosRepository.save(newContato)];
-                    case 1:
+                    case 2:
                         _b.sent();
                         contatos = __rest(newContato, []);
                         return [2 /*return*/, res.status(201).json(contatos)];
@@ -192,12 +196,11 @@ var ContatosController = /** @class */ (function () {
     };
     ContatosController.prototype.deleteContato = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var cli_codigo, sequencia, contatoToDelete;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var _a, cli_codigo, sequencia, contatoToDelete;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        cli_codigo = req.params.cli_codigo;
-                        sequencia = req.params.sequencia;
+                        _a = req.params, cli_codigo = _a.cli_codigo, sequencia = _a.sequencia;
                         if (!cli_codigo) {
                             throw new api_errors_1.BadRequestError("Código do Cliente não informado.");
                         }
@@ -206,13 +209,13 @@ var ContatosController = /** @class */ (function () {
                         }
                         return [4 /*yield*/, ContatosRepository_1.contatosRepository.findOneBy({ cli_codigo: cli_codigo, sequencia: sequencia })];
                     case 1:
-                        contatoToDelete = _a.sent();
+                        contatoToDelete = _b.sent();
                         if (!contatoToDelete) {
                             throw new api_errors_1.BadRequestError("Contato não encontrado");
                         }
                         return [4 /*yield*/, ContatosRepository_1.contatosRepository.remove(contatoToDelete)];
                     case 2:
-                        _a.sent();
+                        _b.sent();
                         return [2 /*return*/, res.status(204).send()];
                 }
             });

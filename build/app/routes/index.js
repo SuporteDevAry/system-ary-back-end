@@ -30,11 +30,11 @@ routes.get("/api/clientes/:cli_codigo", new ClientesController_1.ClientesControl
 routes.patch("/api/cliente/:cli_codigo", new ClientesController_1.ClientesController().updateCliente);
 routes.delete("/api/cliente/:cli_codigo", new ClientesController_1.ClientesController().deleteCliente);
 // Contatos
-routes.post("/api/contatos", new ContatosController_1.ContatosController().create);
+routes.post("/api/contato", new ContatosController_1.ContatosController().create);
 routes.get("/api/contatos", new ContatosController_1.ContatosController().getContatos);
-routes.get("/api/contatos/:cli_codigo,:sequencia", new ContatosController_1.ContatosController().getContatosClienteBySeq);
-routes.patch("/api/contato/:cli_codigo,:sequencia", new ContatosController_1.ContatosController().updateContato);
-routes.delete("/api/contato/:cli_codigo,:sequencia", new ContatosController_1.ContatosController().deleteContato);
+routes.get("/api/contatos/:cli_codigo/:sequencia", new ContatosController_1.ContatosController().getContatosClienteBySeq);
+routes.patch("/api/contato/:cli_codigo/:sequencia", new ContatosController_1.ContatosController().updateContato);
+routes.delete("/api/contato/:cli_codigo/:sequencia", new ContatosController_1.ContatosController().deleteContato);
 // Routes protected
 routes.use(authMiddleware_1.authMiddleware);
 routes.get("/api/profile", new UserController_1.UserController().getProfile);
