@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getUsers, userRepository } from "../repositories/UserRepository";
-import { BadRequestError } from "../helpers/api-errors";
+import { BadRequestError, NotFoundError } from "../helpers/api-errors";
 import bcrypt from "bcrypt";
 import { permissionRepository } from "../repositories/PermissionRepository";
 
@@ -9,10 +9,34 @@ export class UserController {
     return res.json(req.user);
   }
 
+  async getPermissionsByEmail(req: Request, res: Response) {
+    const { email } = req.body;
+
+    const user = await userRepository.findOneBy({ email });
+
+    if (!user) {
+      throw new NotFoundError("Usuário não encontrado");
+    }
+
+    const permissions = await permissionRepository.findOneBy({
+      id: user.permissions_id,
+    });
+
+    if (!permissions) {
+      throw new NotFoundError("Permissões não encontradas");
+    }
+
+    return res.json(permissions);
+  }
+
   async getUsers(req: Request, res: Response) {
     const users = await getUsers();
 
     users.map((i) => delete i.password);
+
+    if (!users) {
+      throw new BadRequestError("Usuário pesquisado não existe!");
+    }
 
     return res.status(200).json(users);
   }
