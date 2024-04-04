@@ -6,6 +6,7 @@ var SessionController_1 = require("../controllers/SessionController");
 var authMiddleware_1 = require("../middlewares/authMiddleware");
 var PermissionController_1 = require("../controllers/PermissionController");
 var ClientesController_1 = require("../controllers/ClientesController");
+var ContatosController_1 = require("../controllers/ContatosController");
 var routes = (0, express_1.Router)();
 // Utilizar futuramente para criar métricas de chamadas
 // routes.use("/api", (req, res, next) => {
@@ -28,6 +29,12 @@ routes.get("/api/clientes", new ClientesController_1.ClientesController().getCli
 routes.get("/api/clientes/:cli_codigo", new ClientesController_1.ClientesController().getClienteById);
 routes.patch("/api/cliente/:cli_codigo", new ClientesController_1.ClientesController().updateCliente);
 routes.delete("/api/cliente/:cli_codigo", new ClientesController_1.ClientesController().deleteCliente);
+// Contatos
+routes.post("/api/contato", new ContatosController_1.ContatosController().create);
+routes.get("/api/contatos", new ContatosController_1.ContatosController().getContatos);
+routes.get("/api/contatos/:cli_codigo/:sequencia", new ContatosController_1.ContatosController().getContatosClienteBySeq);
+routes.patch("/api/contato/:cli_codigo/:sequencia", new ContatosController_1.ContatosController().updateContato);
+routes.delete("/api/contato/:cli_codigo/:sequencia", new ContatosController_1.ContatosController().deleteContato);
 // Routes protected
 routes.use(authMiddleware_1.authMiddleware);
 routes.get("/api/profile", new UserController_1.UserController().getProfile);

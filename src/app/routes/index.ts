@@ -4,6 +4,7 @@ import { SessionController } from "../controllers/SessionController";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { PermissionController } from "../controllers/PermissionController";
 import { ClientesController } from "../controllers/ClientesController";
+import { ContatosController } from "../controllers/ContatosController";
 
 const routes = Router();
 
@@ -41,6 +42,13 @@ routes.delete(
   "/api/cliente/:cli_codigo",
   new ClientesController().deleteCliente
 );
+
+// Contatos
+routes.post("/api/contato", new ContatosController().create);
+routes.get("/api/contatos", new ContatosController().getContatos);
+routes.get("/api/contatos/:cli_codigo/:sequencia", new ContatosController().getContatosClienteBySeq);
+routes.patch("/api/contato/:cli_codigo/:sequencia", new ContatosController().updateContato);
+routes.delete("/api/contato/:cli_codigo/:sequencia", new ContatosController().deleteContato);
 
 // Routes protected
 routes.use(authMiddleware);
