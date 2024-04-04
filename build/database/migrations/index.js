@@ -8,7 +8,7 @@ var _1710886127461_createContatos_1 = require("./1710886127461-createContatos");
 exports.migrationDir = {
     CreateUsers: _1694720577496_createUsers_1.CreateUsers1694720577496,
     CreatePermissions: _1697084968105_permissions_1.Permissions1697084968105,
-    CreateClientes: _1709764504705_createClientes_1.CreateClientes,
+    CreateClientes: _1709764504705_createClientes_1.CreateClientes1709764504705,
     CreateContatos: _1710886127461_createContatos_1.CreateContatos1710886127461,
 };
 //# sourceMappingURL=index.js.map
