@@ -55,7 +55,6 @@ var PermissionController = /** @class */ (function () {
                         if (!permission) {
                             return [2 /*return*/, res.status(404).json({ error: "Permissão não encontrada" })];
                         }
-                        // Atualize as regras
                         permission.rules = rules;
                         return [4 /*yield*/, PermissionRepository_1.permissionRepository.save(permission)];
                     case 2:
