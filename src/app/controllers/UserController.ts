@@ -10,9 +10,11 @@ export class UserController {
   }
 
   async getPermissionsByEmail(req: Request, res: Response) {
-    const { email } = req.body;
+    const { email } = req.query;
 
-    const user = await userRepository.findOneBy({ email });
+    const userEmail = email.toString();
+
+    const user = await userRepository.findOneBy({ email: userEmail });
 
     if (!user) {
       throw new NotFoundError("Usuário não encontrado");
@@ -104,7 +106,11 @@ export class UserController {
 
     if (name) userToUpdate.name = name;
     if (email) userToUpdate.email = email;
-    if (password) userToUpdate.password = password;
+
+    if (password) {
+      const hashPassword = await bcrypt.hash(password, 10);
+      userToUpdate.password = hashPassword;
+    }
 
     await userRepository.save(userToUpdate);
 

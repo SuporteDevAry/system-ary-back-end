@@ -46,9 +46,18 @@ routes.delete(
 // Contatos
 routes.post("/api/contato", new ContatosController().create);
 routes.get("/api/contatos", new ContatosController().getContatos);
-routes.get("/api/contatos/:cli_codigo/:sequencia", new ContatosController().getContatosClienteBySeq);
-routes.patch("/api/contato/:cli_codigo/:sequencia", new ContatosController().updateContato);
-routes.delete("/api/contato/:cli_codigo/:sequencia", new ContatosController().deleteContato);
+routes.get(
+  "/api/contatos/:cli_codigo/:sequencia",
+  new ContatosController().getContatosClienteBySeq
+);
+routes.patch(
+  "/api/contato/:cli_codigo/:sequencia",
+  new ContatosController().updateContato
+);
+routes.delete(
+  "/api/contato/:cli_codigo/:sequencia",
+  new ContatosController().deleteContato
+);
 
 // Routes protected
 routes.use(authMiddleware);
