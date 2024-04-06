@@ -23,6 +23,7 @@ routes.get("/api/users/:id", new UserController_1.UserController().getUserById);
 routes.patch("/api/user/:id", new UserController_1.UserController().updateUser);
 routes.delete("/api/user/:id", new UserController_1.UserController().deleteUser);
 routes.patch("/api/permission/:id", new PermissionController_1.PermissionController().update);
+routes.get("/api/user/permissions", new UserController_1.UserController().getPermissionsByEmail);
 // Clientes
 routes.post("/api/cliente", new ClientesController_1.ClientesController().create);
 routes.get("/api/clientes", new ClientesController_1.ClientesController().getClientes);

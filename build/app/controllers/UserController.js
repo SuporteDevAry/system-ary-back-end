@@ -65,6 +65,33 @@ var UserController = /** @class */ (function () {
             });
         });
     };
+    UserController.prototype.getPermissionsByEmail = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var email, userEmail, user, permissions;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        email = req.query.email;
+                        userEmail = email.toString();
+                        return [4 /*yield*/, UserRepository_1.userRepository.findOneBy({ email: userEmail })];
+                    case 1:
+                        user = _a.sent();
+                        if (!user) {
+                            throw new api_errors_1.NotFoundError("Usuário não encontrado");
+                        }
+                        return [4 /*yield*/, PermissionRepository_1.permissionRepository.findOneBy({
+                                id: user.permissions_id,
+                            })];
+                    case 2:
+                        permissions = _a.sent();
+                        if (!permissions) {
+                            throw new api_errors_1.NotFoundError("Permissões não encontradas");
+                        }
+                        return [2 /*return*/, res.json(permissions)];
+                }
+            });
+        });
+    };
     UserController.prototype.getUsers = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
             var users;
@@ -74,6 +101,9 @@ var UserController = /** @class */ (function () {
                     case 1:
                         users = _a.sent();
                         users.map(function (i) { return delete i.password; });
+                        if (!users) {
+                            throw new api_errors_1.BadRequestError("Usuário pesquisado não existe!");
+                        }
                         return [2 /*return*/, res.status(200).json(users)];
                 }
             });
@@ -138,7 +168,7 @@ var UserController = /** @class */ (function () {
     };
     UserController.prototype.updateUser = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var id, _a, name, email, password, userToUpdate, _, updatedUser;
+            var id, _a, name, email, password, userToUpdate, hashPassword, _, updatedUser;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -157,10 +187,14 @@ var UserController = /** @class */ (function () {
                             userToUpdate.name = name;
                         if (email)
                             userToUpdate.email = email;
-                        if (password)
-                            userToUpdate.password = password;
-                        return [4 /*yield*/, UserRepository_1.userRepository.save(userToUpdate)];
+                        if (!password) return [3 /*break*/, 3];
+                        return [4 /*yield*/, bcrypt_1.default.hash(password, 10)];
                     case 2:
+                        hashPassword = _b.sent();
+                        userToUpdate.password = hashPassword;
+                        _b.label = 3;
+                    case 3: return [4 /*yield*/, UserRepository_1.userRepository.save(userToUpdate)];
+                    case 4:
                         _b.sent();
                         _ = userToUpdate.password, updatedUser = __rest(userToUpdate, ["password"]);
                         return [2 /*return*/, res.status(200).json(updatedUser)];
