@@ -9,7 +9,7 @@ import {
 import { v4 as uuid } from "uuid";
 
 @Entity("clientes")
-@Index("unique_cli_codigo", ["cli_codigo"], { unique: true })
+@Index(["cli_codigo"], { unique: true })
 export class Clientes {
   @PrimaryColumn()
   id: string;
