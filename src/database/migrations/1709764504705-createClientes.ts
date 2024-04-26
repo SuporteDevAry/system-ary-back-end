@@ -15,6 +15,7 @@ export class CreateClientes1709764504705 implements MigrationInterface {
             name: "cli_codigo",
             type: "varchar",
             isUnique: true,
+            
           },
           {
             name: "nome",

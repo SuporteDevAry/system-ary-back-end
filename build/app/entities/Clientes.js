@@ -27,6 +27,7 @@ var Clientes = /** @class */ (function () {
     ], Clientes.prototype, "id", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
+        (0, typeorm_1.Index)({ unique: true }),
         __metadata("design:type", String)
     ], Clientes.prototype, "cli_codigo", void 0);
     __decorate([
@@ -113,7 +114,6 @@ var Clientes = /** @class */ (function () {
     ], Clientes.prototype, "updateTimestamp", null);
     Clientes = __decorate([
         (0, typeorm_1.Entity)("clientes"),
-        (0, typeorm_1.Index)(["cli_codigo"], { unique: true }),
         __metadata("design:paramtypes", [])
     ], Clientes);
     return Clientes;
