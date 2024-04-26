@@ -13,8 +13,8 @@ export class Clientes {
   @PrimaryColumn()
   id: string;
 
-  @Index({ unique: true })
   @Column({ type: "text" })
+  @Index({ unique: true })
   cli_codigo: string;
 
   @Column({ type: "text" })

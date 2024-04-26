@@ -26,8 +26,8 @@ var Clientes = /** @class */ (function () {
         __metadata("design:type", String)
     ], Clientes.prototype, "id", void 0);
     __decorate([
-        (0, typeorm_1.Index)({ unique: true }),
         (0, typeorm_1.Column)({ type: "text" }),
+        (0, typeorm_1.Index)({ unique: true }),
         __metadata("design:type", String)
     ], Clientes.prototype, "cli_codigo", void 0);
     __decorate([
