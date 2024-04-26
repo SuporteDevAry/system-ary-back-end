@@ -9,11 +9,11 @@ import {
 import { v4 as uuid } from "uuid";
 
 @Entity("clientes")
-@Index(["cli_codigo"], { unique: true })
 export class Clientes {
   @PrimaryColumn()
   id: string;
 
+  @Index({ unique: true })
   @Column({ type: "text" })
   cli_codigo: string;
 
