@@ -7,6 +7,7 @@ var authMiddleware_1 = require("../middlewares/authMiddleware");
 var PermissionController_1 = require("../controllers/PermissionController");
 var ClientesController_1 = require("../controllers/ClientesController");
 var ContatosController_1 = require("../controllers/ContatosController");
+var NotificationsController_1 = require("../controllers/NotificationsController");
 var routes = (0, express_1.Router)();
 // Utilizar futuramente para criar métricas de chamadas
 // routes.use("/api", (req, res, next) => {
@@ -39,5 +40,12 @@ routes.delete("/api/contato/:cli_codigo/:sequencia", new ContatosController_1.Co
 // Routes protected
 routes.use(authMiddleware_1.authMiddleware);
 routes.get("/api/profile", new UserController_1.UserController().getProfile);
+// Notification
+routes.post("/api/notification", new NotificationsController_1.NotificationController().create);
+routes.get("/api/notifications", new NotificationsController_1.NotificationController().getNotifications);
+routes.get("/api/notification/:id", new NotificationsController_1.NotificationController().getNotificationById);
+routes.get("/api/notifications/user/:user", new NotificationsController_1.NotificationController().getNotificationsByUser);
+routes.patch("/api/notification/:id", new NotificationsController_1.NotificationController().updateNotification);
+routes.delete("/api/notification/:id", new NotificationsController_1.NotificationController().deleteNotification);
 exports.default = routes;
 //# sourceMappingURL=index.js.map

@@ -5,6 +5,7 @@ import { authMiddleware } from "../middlewares/authMiddleware";
 import { PermissionController } from "../controllers/PermissionController";
 import { ClientesController } from "../controllers/ClientesController";
 import { ContatosController } from "../controllers/ContatosController";
+import { NotificationController } from "../controllers/NotificationsController";
 
 const routes = Router();
 
@@ -62,5 +63,13 @@ routes.delete(
 // Routes protected
 routes.use(authMiddleware);
 routes.get("/api/profile", new UserController().getProfile);
+
+// Notification
+routes.post("/api/notification", new NotificationController().create);
+routes.get("/api/notifications", new NotificationController().getNotifications);
+routes.get("/api/notification/:id", new NotificationController().getNotificationById);
+routes.get("/api/notifications/user/:user", new NotificationController().getNotificationsByUser);
+routes.patch("/api/notification/:id", new NotificationController().updateNotification);
+routes.delete("/api/notification/:id", new NotificationController().deleteNotification);
 
 export default routes;
