@@ -27,6 +27,7 @@ var Clientes = /** @class */ (function () {
     ], Clientes.prototype, "id", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
+        (0, typeorm_1.Index)({ unique: true }),
         __metadata("design:type", String)
     ], Clientes.prototype, "cli_codigo", void 0);
     __decorate([
@@ -98,7 +99,11 @@ var Clientes = /** @class */ (function () {
         __metadata("design:type", Date)
     ], Clientes.prototype, "created_at", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: "timestamp", default: function () { return "CURRENT_TIMESTAMP"; }, onUpdate: "CURRENT_TIMESTAMP" }),
+        (0, typeorm_1.Column)({
+            type: "timestamp",
+            default: function () { return "CURRENT_TIMESTAMP"; },
+            onUpdate: "CURRENT_TIMESTAMP",
+        }),
         __metadata("design:type", Date)
     ], Clientes.prototype, "updated_at", void 0);
     __decorate([

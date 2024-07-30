@@ -3,49 +3,55 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Generated,
   Index,
   PrimaryColumn,
 } from "typeorm";
 import { v4 as uuid } from "uuid";
 
-@Entity("clientes")
-export class Clientes {
+@Entity("client")
+export class Client {
   @PrimaryColumn()
   id: string;
 
-  @Column({ type: "text" })
   @Index({ unique: true })
-  cli_codigo: string;
+  @Generated("increment")
+  @Column({ type: "int" })
+  @Column()
+  code_client: number;
 
   @Column({ type: "text" })
-  nome: string;
+  nickname: string;
 
   @Column({ type: "text" })
-  endereco: string;
+  name: string;
 
   @Column({ type: "text" })
-  numero: string;
+  address: string;
 
   @Column({ type: "text" })
-  complemento: string;
+  number: string;
 
   @Column({ type: "text" })
-  bairro: string;
+  complement: string;
 
   @Column({ type: "text" })
-  cidade: string;
+  district: string;
 
   @Column({ type: "text" })
-  uf: string;
+  city: string;
 
   @Column({ type: "text" })
-  cep: string;
+  state: string;
 
   @Column({ type: "text" })
-  natureza: string;
+  zip_code: string;
 
   @Column({ type: "text" })
-  cnpj: string;
+  kind: string;
+
+  @Column({ type: "text" })
+  cnpj_cpf: string;
 
   @Column({ type: "text" })
   ins_est: string;
@@ -54,16 +60,13 @@ export class Clientes {
   ins_mun: string;
 
   @Column({ type: "text" })
-  email: string;
+  telephone: string;
 
   @Column({ type: "text" })
-  telefone: string;
+  cellphone: string;
 
   @Column({ type: "text" })
-  celular: string;
-
-  @Column({ type: "text" })
-  situacao: string;
+  situation: string;
 
   @CreateDateColumn()
   created_at: Date;
@@ -79,6 +82,7 @@ export class Clientes {
   updateTimestamp() {
     this.updated_at = new Date();
   }
+
   constructor() {
     if (!this.id) {
       this.id = uuid();
