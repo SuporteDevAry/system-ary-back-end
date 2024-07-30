@@ -5,6 +5,8 @@ import { authMiddleware } from "../middlewares/authMiddleware";
 import { PermissionController } from "../controllers/PermissionController";
 import { ClientesController } from "../controllers/ClientesController";
 import { ContatosController } from "../controllers/ContatosController";
+import { ClientController } from "../controllers/ClientController";
+import { ContactController } from "../controllers/ContactController";
 
 const routes = Router();
 
@@ -16,16 +18,6 @@ const routes = Router();
 
 // IN and OUT application
 routes.post("/api/login", new SessionController().login);
-routes.post("/api/reset-password", new SessionController().resetPassword);
-
-// CRUD USERS
-routes.post("/api/user", new UserController().create);
-routes.get("/api/users", new UserController().getUsers);
-routes.get("/api/users/:id", new UserController().getUserById);
-routes.patch("/api/user/:id", new UserController().updateUser);
-routes.delete("/api/user/:id", new UserController().deleteUser);
-routes.patch("/api/permission/:id", new PermissionController().update);
-routes.get("/api/user/permissions", new UserController().getPermissionsByEmail);
 
 // Clientes
 routes.post("/api/cliente", new ClientesController().create);
@@ -62,5 +54,34 @@ routes.delete(
 // Routes protected
 routes.use(authMiddleware);
 routes.get("/api/profile", new UserController().getProfile);
+routes.post("/api/reset-password", new SessionController().resetPassword);
+
+// CRUD USERS
+routes.post("/api/user", new UserController().create);
+routes.get("/api/users", new UserController().getUsers);
+routes.get("/api/users/:id", new UserController().getUserById);
+routes.patch("/api/user/:id", new UserController().updateUser);
+routes.delete("/api/user/:id", new UserController().deleteUser);
+routes.patch("/api/permission/:id", new PermissionController().update);
+routes.get("/api/user/permissions", new UserController().getPermissionsByEmail);
+
+// v2 Clients
+routes.post("/api/client", new ClientController().create);
+routes.get("/api/clients", new ClientController().getClients);
+routes.get(
+  "/api/client/client-by-id/:code_client",
+  new ClientController().getClientById
+);
+routes.patch("/api/client/:id", new ClientController().update);
+routes.delete("/api/client/:id", new ClientController().delete);
+
+// v2 Contatos
+routes.post("/api/contact", new ContactController().create);
+routes.get(
+  "/api/contact/:code_client",
+  new ContactController().getContactsByClient
+);
+routes.patch("/api/contact/:id", new ContactController().update);
+routes.delete("/api/contact/:id", new ContactController().delete);
 
 export default routes;

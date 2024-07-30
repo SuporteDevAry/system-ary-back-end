@@ -36,17 +36,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateContatos1710806673145 = void 0;
+exports.AddClientContactsRelation1720831489814 = void 0;
 var typeorm_1 = require("typeorm");
-var CreateContatos1710806673145 = /** @class */ (function () {
-    function CreateContatos1710806673145() {
+var AddClientContactsRelation1720831489814 = /** @class */ (function () {
+    function AddClientContactsRelation1720831489814() {
     }
-    CreateContatos1710806673145.prototype.up = function (queryRunner) {
+    AddClientContactsRelation1720831489814.prototype.up = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, queryRunner.createTable(new typeorm_1.Table({
-                            name: "contatos",
+                            name: "contact",
                             columns: [
                                 {
                                     name: "id",
@@ -54,35 +54,30 @@ var CreateContatos1710806673145 = /** @class */ (function () {
                                     isPrimary: true,
                                 },
                                 {
-                                    name: "cli_codigo",
+                                    name: "name",
                                     type: "varchar",
                                 },
                                 {
-                                    name: "sequencia",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "nome",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "cargo",
-                                    type: "varchar",
-                                }, {
-                                    name: "complemento",
-                                    type: "varchar",
-                                }, {
                                     name: "email",
                                     type: "varchar",
-                                }, {
-                                    name: "telefone",
+                                    isUnique: true,
+                                },
+                                {
+                                    name: "sector",
                                     type: "varchar",
-                                }, {
-                                    name: "celular",
+                                },
+                                {
+                                    name: "telephone",
                                     type: "varchar",
-                                }, {
-                                    name: "recebe_email",
+                                },
+                                {
+                                    name: "cellphone",
                                     type: "varchar",
+                                },
+                                {
+                                    name: "code_client",
+                                    type: "int",
+                                    isNullable: true,
                                 },
                                 {
                                     name: "created_at",
@@ -95,6 +90,14 @@ var CreateContatos1710806673145 = /** @class */ (function () {
                                     default: "now()",
                                 },
                             ],
+                            foreignKeys: [
+                                {
+                                    name: "fk_contact_client",
+                                    columnNames: ["code_client"],
+                                    referencedTableName: "client",
+                                    referencedColumnNames: ["code_client"],
+                                },
+                            ],
                         }))];
                     case 1:
                         _a.sent();
@@ -103,11 +106,11 @@ var CreateContatos1710806673145 = /** @class */ (function () {
             });
         });
     };
-    CreateContatos1710806673145.prototype.down = function (queryRunner) {
+    AddClientContactsRelation1720831489814.prototype.down = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.dropTable("contatos")];
+                    case 0: return [4 /*yield*/, queryRunner.dropTable("contact")];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
@@ -115,7 +118,7 @@ var CreateContatos1710806673145 = /** @class */ (function () {
             });
         });
     };
-    return CreateContatos1710806673145;
+    return AddClientContactsRelation1720831489814;
 }());
-exports.CreateContatos1710806673145 = CreateContatos1710806673145;
-//# sourceMappingURL=1710806673145-createContatos.js.map
+exports.AddClientContactsRelation1720831489814 = AddClientContactsRelation1720831489814;
+//# sourceMappingURL=1720831489814-AddClientContactsRelation.js.map

@@ -9,109 +9,116 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Cliente = void 0;
+exports.Client = void 0;
 var typeorm_1 = require("typeorm");
 var uuid_1 = require("uuid");
-var Cliente = /** @class */ (function () {
-    function Cliente() {
+var Client = /** @class */ (function () {
+    function Client() {
         if (!this.id) {
             this.id = (0, uuid_1.v4)();
         }
     }
-    Cliente.prototype.updateTimestamp = function () {
+    Client.prototype.updateTimestamp = function () {
         this.updated_at = new Date();
     };
     __decorate([
         (0, typeorm_1.PrimaryColumn)(),
         __metadata("design:type", String)
-    ], Cliente.prototype, "id", void 0);
+    ], Client.prototype, "id", void 0);
+    __decorate([
+        (0, typeorm_1.Index)({ unique: true }),
+        (0, typeorm_1.Generated)("increment"),
+        (0, typeorm_1.Column)({ type: "int" }),
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", Number)
+    ], Client.prototype, "code_client", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "cli_codigo", void 0);
+    ], Client.prototype, "nickname", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "nome", void 0);
+    ], Client.prototype, "name", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "endereco", void 0);
+    ], Client.prototype, "address", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "numero", void 0);
+    ], Client.prototype, "number", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "complemento", void 0);
+    ], Client.prototype, "complement", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "bairro", void 0);
+    ], Client.prototype, "district", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "cidade", void 0);
+    ], Client.prototype, "city", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "uf", void 0);
+    ], Client.prototype, "state", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "cep", void 0);
+    ], Client.prototype, "zip_code", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "natureza", void 0);
+    ], Client.prototype, "kind", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "cnpj", void 0);
+    ], Client.prototype, "cnpj_cpf", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "ins_est", void 0);
+    ], Client.prototype, "ins_est", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "ins_mun", void 0);
+    ], Client.prototype, "ins_mun", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "email", void 0);
+    ], Client.prototype, "telephone", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "telefone", void 0);
+    ], Client.prototype, "cellphone", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
-    ], Cliente.prototype, "celular", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], Cliente.prototype, "situacao", void 0);
+    ], Client.prototype, "situation", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)(),
         __metadata("design:type", Date)
-    ], Cliente.prototype, "created_at", void 0);
+    ], Client.prototype, "created_at", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: "timestamp", default: function () { return "CURRENT_TIMESTAMP"; }, onUpdate: "CURRENT_TIMESTAMP" }),
+        (0, typeorm_1.Column)({
+            type: "timestamp",
+            default: function () { return "CURRENT_TIMESTAMP"; },
+            onUpdate: "CURRENT_TIMESTAMP",
+        }),
         __metadata("design:type", Date)
-    ], Cliente.prototype, "updated_at", void 0);
+    ], Client.prototype, "updated_at", void 0);
     __decorate([
         (0, typeorm_1.BeforeUpdate)(),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", []),
         __metadata("design:returntype", void 0)
-    ], Cliente.prototype, "updateTimestamp", null);
-    Cliente = __decorate([
-        (0, typeorm_1.Entity)("cliente"),
+    ], Client.prototype, "updateTimestamp", null);
+    Client = __decorate([
+        (0, typeorm_1.Entity)("client"),
         __metadata("design:paramtypes", [])
-    ], Cliente);
-    return Cliente;
+    ], Client);
+    return Client;
 }());
-exports.Cliente = Cliente;
-//# sourceMappingURL=Cliente.js.map
+exports.Client = Client;
+//# sourceMappingURL=Client.js.map

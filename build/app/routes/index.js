@@ -7,6 +7,8 @@ var authMiddleware_1 = require("../middlewares/authMiddleware");
 var PermissionController_1 = require("../controllers/PermissionController");
 var ClientesController_1 = require("../controllers/ClientesController");
 var ContatosController_1 = require("../controllers/ContatosController");
+var ClientController_1 = require("../controllers/ClientController");
+var ContactController_1 = require("../controllers/ContactController");
 var routes = (0, express_1.Router)();
 // Utilizar futuramente para criar métricas de chamadas
 // routes.use("/api", (req, res, next) => {
@@ -15,15 +17,6 @@ var routes = (0, express_1.Router)();
 // });
 // IN and OUT application
 routes.post("/api/login", new SessionController_1.SessionController().login);
-routes.post("/api/reset-password", new SessionController_1.SessionController().resetPassword);
-// CRUD USERS
-routes.post("/api/user", new UserController_1.UserController().create);
-routes.get("/api/users", new UserController_1.UserController().getUsers);
-routes.get("/api/users/:id", new UserController_1.UserController().getUserById);
-routes.patch("/api/user/:id", new UserController_1.UserController().updateUser);
-routes.delete("/api/user/:id", new UserController_1.UserController().deleteUser);
-routes.patch("/api/permission/:id", new PermissionController_1.PermissionController().update);
-routes.get("/api/user/permissions", new UserController_1.UserController().getPermissionsByEmail);
 // Clientes
 routes.post("/api/cliente", new ClientesController_1.ClientesController().create);
 routes.get("/api/clientes", new ClientesController_1.ClientesController().getClientes);
@@ -39,5 +32,25 @@ routes.delete("/api/contato/:cli_codigo/:sequencia", new ContatosController_1.Co
 // Routes protected
 routes.use(authMiddleware_1.authMiddleware);
 routes.get("/api/profile", new UserController_1.UserController().getProfile);
+routes.post("/api/reset-password", new SessionController_1.SessionController().resetPassword);
+// CRUD USERS
+routes.post("/api/user", new UserController_1.UserController().create);
+routes.get("/api/users", new UserController_1.UserController().getUsers);
+routes.get("/api/users/:id", new UserController_1.UserController().getUserById);
+routes.patch("/api/user/:id", new UserController_1.UserController().updateUser);
+routes.delete("/api/user/:id", new UserController_1.UserController().deleteUser);
+routes.patch("/api/permission/:id", new PermissionController_1.PermissionController().update);
+routes.get("/api/user/permissions", new UserController_1.UserController().getPermissionsByEmail);
+// v2 Clients
+routes.post("/api/client", new ClientController_1.ClientController().create);
+routes.get("/api/clients", new ClientController_1.ClientController().getClients);
+routes.get("/api/client/client-by-id/:code_client", new ClientController_1.ClientController().getClientById);
+routes.patch("/api/client/:id", new ClientController_1.ClientController().update);
+routes.delete("/api/client/:id", new ClientController_1.ClientController().delete);
+// v2 Contatos
+routes.post("/api/contact", new ContactController_1.ContactController().create);
+routes.get("/api/contact/:code_client", new ContactController_1.ContactController().getContactsByClient);
+routes.patch("/api/contact/:id", new ContactController_1.ContactController().update);
+routes.delete("/api/contact/:id", new ContactController_1.ContactController().delete);
 exports.default = routes;
 //# sourceMappingURL=index.js.map

@@ -36,65 +36,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateContatos = void 0;
+exports.AddUniqueConstraintToCodeClient1721239748864 = void 0;
 var typeorm_1 = require("typeorm");
-var CreateContatos = /** @class */ (function () {
-    function CreateContatos() {
+var AddUniqueConstraintToCodeClient1721239748864 = /** @class */ (function () {
+    function AddUniqueConstraintToCodeClient1721239748864() {
     }
-    CreateContatos.prototype.up = function (queryRunner) {
+    AddUniqueConstraintToCodeClient1721239748864.prototype.up = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.createTable(new typeorm_1.Table({
-                            name: "contatos",
-                            columns: [
-                                {
-                                    name: "id",
-                                    type: "uuid",
-                                    isPrimary: true,
-                                },
-                                {
-                                    name: "cli_codigo",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "sequencia",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "nome",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "cargo",
-                                    type: "varchar",
-                                }, {
-                                    name: "complemento",
-                                    type: "varchar",
-                                }, {
-                                    name: "email",
-                                    type: "varchar",
-                                }, {
-                                    name: "telefone",
-                                    type: "varchar",
-                                }, {
-                                    name: "celular",
-                                    type: "varchar",
-                                }, {
-                                    name: "recebe_email",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "created_at",
-                                    type: "timestamp",
-                                    default: "now()",
-                                },
-                                {
-                                    name: "updated_at",
-                                    type: "timestamp",
-                                    default: "now()",
-                                },
-                            ],
+                    case 0: return [4 /*yield*/, queryRunner.createUniqueConstraint("client", new typeorm_1.TableUnique({
+                            columnNames: ["code_client"],
                         }))];
                     case 1:
                         _a.sent();
@@ -103,11 +55,11 @@ var CreateContatos = /** @class */ (function () {
             });
         });
     };
-    CreateContatos.prototype.down = function (queryRunner) {
+    AddUniqueConstraintToCodeClient1721239748864.prototype.down = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.dropTable("contatos")];
+                    case 0: return [4 /*yield*/, queryRunner.dropUniqueConstraint("client", "UQ_client_code_client")];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
@@ -115,7 +67,7 @@ var CreateContatos = /** @class */ (function () {
             });
         });
     };
-    return CreateContatos;
+    return AddUniqueConstraintToCodeClient1721239748864;
 }());
-exports.CreateContatos = CreateContatos;
-//# sourceMappingURL=1710803345183-createContatos.js.map
+exports.AddUniqueConstraintToCodeClient1721239748864 = AddUniqueConstraintToCodeClient1721239748864;
+//# sourceMappingURL=1721239748864-AddUniqueConstraintToCodeClient.js.map
