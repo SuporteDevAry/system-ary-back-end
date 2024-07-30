@@ -36,17 +36,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateClientes = void 0;
+exports.AddClientNew1720832053181 = void 0;
 var typeorm_1 = require("typeorm");
-var CreateClientes = /** @class */ (function () {
-    function CreateClientes() {
+var AddClientNew1720832053181 = /** @class */ (function () {
+    function AddClientNew1720832053181() {
     }
-    CreateClientes.prototype.up = function (queryRunner) {
+    AddClientNew1720832053181.prototype.up = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, queryRunner.createTable(new typeorm_1.Table({
-                            name: "clientes",
+                            name: "client",
                             columns: [
                                 {
                                     name: "id",
@@ -54,61 +54,71 @@ var CreateClientes = /** @class */ (function () {
                                     isPrimary: true,
                                 },
                                 {
-                                    name: "cli_codigo",
-                                    type: "varchar",
-                                    isUnique: true,
+                                    name: "code_client",
+                                    type: "int",
                                 },
                                 {
-                                    name: "nome",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "endereco",
+                                    name: "nickname",
                                     type: "varchar",
                                 },
                                 {
-                                    name: "numero",
+                                    name: "name",
                                     type: "varchar",
-                                }, {
-                                    name: "complemento",
+                                },
+                                {
+                                    name: "address",
                                     type: "varchar",
-                                }, {
-                                    name: "bairro",
+                                },
+                                {
+                                    name: "number",
                                     type: "varchar",
-                                }, {
-                                    name: "cidade",
+                                },
+                                {
+                                    name: "complement",
                                     type: "varchar",
-                                }, {
-                                    name: "uf",
+                                },
+                                {
+                                    name: "district",
                                     type: "varchar",
-                                }, {
-                                    name: "cep",
+                                },
+                                {
+                                    name: "city",
                                     type: "varchar",
-                                }, {
-                                    name: "natureza",
+                                },
+                                {
+                                    name: "state",
                                     type: "varchar",
-                                }, {
-                                    name: "cnpj",
+                                },
+                                {
+                                    name: "zip_code",
                                     type: "varchar",
-                                }, {
+                                },
+                                {
+                                    name: "kind",
+                                    type: "varchar",
+                                },
+                                {
+                                    name: "cnpj_cpf",
+                                    type: "varchar",
+                                },
+                                {
                                     name: "ins_est",
                                     type: "varchar",
-                                }, {
+                                },
+                                {
                                     name: "ins_mun",
                                     type: "varchar",
-                                }, {
-                                    name: "email",
-                                    type: "varchar",
-                                }, {
-                                    name: "telefone",
+                                },
+                                {
+                                    name: "telephone",
                                     type: "varchar",
                                 },
                                 {
-                                    name: "celular",
+                                    name: "cellphone",
                                     type: "varchar",
                                 },
                                 {
-                                    name: "situacao",
+                                    name: "situation",
                                     type: "varchar",
                                 },
                                 {
@@ -130,11 +140,11 @@ var CreateClientes = /** @class */ (function () {
             });
         });
     };
-    CreateClientes.prototype.down = function (queryRunner) {
+    AddClientNew1720832053181.prototype.down = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.dropTable("clientes")];
+                    case 0: return [4 /*yield*/, queryRunner.dropTable("client")];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
@@ -142,7 +152,7 @@ var CreateClientes = /** @class */ (function () {
             });
         });
     };
-    return CreateClientes;
+    return AddClientNew1720832053181;
 }());
-exports.CreateClientes = CreateClientes;
-//# sourceMappingURL=createClientes.js.map
+exports.AddClientNew1720832053181 = AddClientNew1720832053181;
+//# sourceMappingURL=1720832053181-AddClientNew.js.map
