@@ -5,6 +5,7 @@ import { CreateContatos1710886127461 as CreateContatos } from "./1710886127461-c
 import { AddClientNew1720832053181 as AddClientNew } from "./1720832053181-AddClientNew";
 import { AddUniqueConstraintToCodeClient1721239748864 as AddUniqueConstraintToCodeClient } from "./1721239748864-AddUniqueConstraintToCodeClient";
 import { AddClientContactsRelation1720831489814 as AddClientContactsRelation } from "./1720831489814-AddClientContactsRelation";
+import { Notifications1716314850943 as Notifications } from "./1716314850943-Notifications";
 
 export const migrationDir = {
   CreateUsers,
@@ -14,4 +15,5 @@ export const migrationDir = {
   AddClientNew,
   AddUniqueConstraintToCodeClient,
   AddClientContactsRelation,
+  Notifications
 };

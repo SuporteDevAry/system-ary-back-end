@@ -4,6 +4,7 @@ import { Clientes } from "./Clientes";
 import { Contatos } from "./Contatos";
 import { Client } from "./Client";
 import { Contact } from "./Contact";
+import { Notifications } from "./Notifications";
 
 export const entitiesDir = {
   User,
@@ -12,4 +13,5 @@ export const entitiesDir = {
   Contatos,
   Client,
   Contact,
+  Notifications
 };

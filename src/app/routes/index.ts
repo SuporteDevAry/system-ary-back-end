@@ -7,6 +7,7 @@ import { ClientesController } from "../controllers/ClientesController";
 import { ContatosController } from "../controllers/ContatosController";
 import { ClientController } from "../controllers/ClientController";
 import { ContactController } from "../controllers/ContactController";
+import { NotificationController } from "../controllers/NotificationsController";
 
 const routes = Router();
 
@@ -83,5 +84,13 @@ routes.get(
 );
 routes.patch("/api/contact/:id", new ContactController().update);
 routes.delete("/api/contact/:id", new ContactController().delete);
+
+// Notification
+routes.post("/api/notification", new NotificationController().create);
+routes.get("/api/notifications", new NotificationController().getNotifications);
+routes.get("/api/notification/:id", new NotificationController().getNotificationById);
+routes.get("/api/notifications/user/:user", new NotificationController().getNotificationsByUser);
+routes.patch("/api/notification/:id", new NotificationController().updateNotification);
+routes.delete("/api/notification/:id", new NotificationController().deleteNotification);
 
 export default routes;
