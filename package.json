@@ -11,6 +11,7 @@
       "start": "node build/server.js",
       "dev": "ts-node-dev src/server.ts",
       "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js",
+      "migration:create": "ts-node ./src/database/createMigration.ts",
       "migration:registry": "npm run typeorm -- -d ./src/database/data-source.ts migration:run",
       "migration:revert":"npm run typeorm -- -d ./src/database/data-source.ts migration:revert",
       "migrasave": "ts-node-dev ./node_modules/typeorm/cli.js -d ./src/database/data-source.ts migration:run",
