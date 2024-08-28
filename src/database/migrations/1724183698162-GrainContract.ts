@@ -17,19 +17,27 @@ export class GrainContract1724183698162 implements MigrationInterface {
           },
           {
             name: "seller",
-            type: "varchar",
+            type: "text",
+            isArray: true,
+            default: "'{}'::text[]",
           },
           {
             name: "buyer",
-            type: "varchar",
+            type: "text",
+            isArray: true,
+            default: "'{}'::text[]",
           },
           {
             name: "list_email_seller",
-            type: "varchar",
+            type: "text",
+            isArray: true,
+            default: "'{}'::text[]",
           },
           {
             name: "list_email_buyer",
-            type: "varchar",
+            type: "text",
+            isArray: true,
+            default: "'{}'::text[]",
           },
           {
             name: "product",
@@ -82,10 +90,12 @@ export class GrainContract1724183698162 implements MigrationInterface {
           {
             name: "commission_seller",
             type: "decimal",
+            isNullable: true,
           },
           {
             name: "commission_buyer",
             type: "decimal",
+            isNullable: true,
           },
           {
             name: "type_pickup",
@@ -112,11 +122,11 @@ export class GrainContract1724183698162 implements MigrationInterface {
             type: "varchar",
           },
           {
-            name: "owner_broker",
+            name: "owner_contract",
             type: "varchar",
           },
           {
-            name: "contract_value",
+            name: "total_contract_value",
             type: "decimal",
           },
           {

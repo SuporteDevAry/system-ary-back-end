@@ -3,7 +3,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
   PrimaryColumn,
 } from "typeorm";
 import { v4 as uuid } from "uuid";

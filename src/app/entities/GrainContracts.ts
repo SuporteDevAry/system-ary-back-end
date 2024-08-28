@@ -2,7 +2,6 @@ import {
   Entity,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
   PrimaryColumn,
   BeforeUpdate,
 } from "typeorm";
@@ -16,17 +15,17 @@ export class GrainContract {
   @Column()
   number_broker: string;
 
-  @Column()
-  seller: string;
+  @Column({ type: "jsonb", nullable: true, default: [] })
+  seller: string[];
 
-  @Column()
-  buyer: string;
+  @Column({ type: "jsonb", nullable: true, default: [] })
+  buyer: string[];
 
-  @Column()
-  list_email_seller: string;
+  @Column({ type: "jsonb", nullable: true, default: [] })
+  list_email_seller: string[];
 
-  @Column()
-  list_email_buyer: string;
+  @Column({ type: "jsonb", nullable: true, default: [] })
+  list_email_buyer: string[];
 
   @Column()
   product: string;
@@ -64,10 +63,10 @@ export class GrainContract {
   @Column()
   payment: string;
 
-  @Column("decimal")
+  @Column({ type: "decimal", nullable: true, default: 0 })
   commission_seller: number;
 
-  @Column("decimal")
+  @Column({ type: "decimal", nullable: true, default: 0 })
   commission_buyer: number;
 
   @Column()
@@ -89,10 +88,10 @@ export class GrainContract {
   number_contract: string;
 
   @Column()
-  owner_broker: string;
+  owner_contract: string;
 
   @Column("decimal")
-  contract_value: number;
+  total_contract_value: number;
 
   @CreateDateColumn()
   created_at: Date;

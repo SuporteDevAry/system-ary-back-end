@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
-import { grainContractRepository } from "../repositories/GrainContractRepository";
+import {
+  generateNumberContract,
+  grainContractRepository,
+} from "../repositories/GrainContractRepository";
 
 export class GrainContractController {
   getGrainContracts = async (
@@ -37,8 +40,15 @@ export class GrainContractController {
     res: Response
   ): Promise<Response> => {
     try {
-      const grainContract = grainContractRepository.create(req.body);
+      const numberContract = await generateNumberContract(req.body);
+
+      const grainContract = grainContractRepository.create({
+        ...req.body,
+        number_contract: numberContract,
+      });
+
       const result = await grainContractRepository.save(grainContract);
+
       return res.status(201).json(result);
     } catch (error) {
       return res.status(500).json({ message: error.message });
