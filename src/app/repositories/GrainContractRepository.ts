@@ -38,7 +38,7 @@ export const generateNumberContract = async (
     const formattedIncrement = nextIncrement.toString().padStart(2, "0"); // Formata com zero à esquerda
     const numberContract = `${product}.${number_broker}-${formattedIncrement}/${currentYear}`; // Novo número de contrato
 
-    return numberContract; // Retorna o número do contrato gerado
+    return numberContract;
   } catch (error) {
     console.error("Erro ao gerar o número do contrato:", error);
     throw new Error("Erro ao gerar o número do contrato.");

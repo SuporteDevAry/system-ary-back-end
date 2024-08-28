@@ -54,10 +54,12 @@ export class ClientController {
       situation,
     } = req.body;
 
-    const clientExists = await clientRepository.findOneBy({ cnpj_cpf });
+    if (kind !== "E") {
+      const clientExists = await clientRepository.findOneBy({ cnpj_cpf });
 
-    if (clientExists) {
-      throw new BadRequestError("Cliente já cadastrado.");
+      if (clientExists) {
+        throw new BadRequestError("Cliente já cadastrado.");
+      }
     }
 
     const newClient = clientRepository.create({
