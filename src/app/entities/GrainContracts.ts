@@ -93,6 +93,17 @@ export class GrainContract {
   @Column("decimal")
   total_contract_value: number;
 
+  @Column("jsonb", { nullable: true })
+  status: {
+    status_current: string;
+    history: {
+      date: string;
+      time: string;
+      status: string;
+      owner_change: string;
+    }[];
+  };
+
   @CreateDateColumn()
   created_at: Date;
 

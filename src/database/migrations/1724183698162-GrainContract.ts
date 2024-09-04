@@ -130,6 +130,12 @@ export class GrainContract1724183698162 implements MigrationInterface {
             type: "decimal",
           },
           {
+            name: "status",
+            type: "text",
+            isArray: true,
+            default: "'{}'::text[]",
+          },
+          {
             name: "created_at",
             type: "timestamp",
             default: "now()",
