@@ -79,11 +79,13 @@ export class GrainContractController {
   ): Promise<Response> => {
     const { id } = req.params;
     try {
-      const result = await grainContractRepository.delete(id);
-      if (result.affected === 0) {
+      let grainContract = await grainContractRepository.findOneBy({ id });
+      if (!grainContract) {
         return res.status(404).json({ message: "Contrato não encontrado" });
       }
-      return res.status(204).send();
+      grainContract = grainContractRepository.merge(grainContract, req.body);
+      const result = await grainContractRepository.save(grainContract);
+      return res.json(result);
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }

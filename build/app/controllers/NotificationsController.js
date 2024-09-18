@@ -83,7 +83,9 @@ var NotificationController = /** @class */ (function () {
                         if (!user) {
                             throw new api_errors_1.BadRequestError("Usuário não informado.");
                         }
-                        return [4 /*yield*/, NotificationsRepository_1.notificationsRepository.findBy({ user: user })];
+                        return [4 /*yield*/, NotificationsRepository_1.notificationsRepository.findBy({
+                                user: user,
+                            })];
                     case 1:
                         notificationsSearched = _a.sent();
                         return [2 /*return*/, res.status(200).json(notificationsSearched)];
@@ -101,7 +103,9 @@ var NotificationController = /** @class */ (function () {
                         if (!id) {
                             throw new api_errors_1.BadRequestError("ID de notificação não informado.");
                         }
-                        return [4 /*yield*/, NotificationsRepository_1.notificationsRepository.findOneBy({ id: id })];
+                        return [4 /*yield*/, NotificationsRepository_1.notificationsRepository.findOneBy({
+                                id: id,
+                            })];
                     case 1:
                         notificationsSearched = _a.sent();
                         if (!notificationsSearched) {
@@ -150,11 +154,16 @@ var NotificationController = /** @class */ (function () {
                         if (!id) {
                             throw new api_errors_1.BadRequestError("ID da notificação não informado.");
                         }
-                        return [4 /*yield*/, NotificationsRepository_1.notificationsRepository.findOneBy({ id: id })];
+                        return [4 /*yield*/, NotificationsRepository_1.notificationsRepository.findOneBy({
+                                id: id,
+                            })];
                     case 1:
                         notificationToUpdate = _a.sent();
                         if (!notificationToUpdate) {
                             throw new api_errors_1.BadRequestError("Notificação não encontrada.");
+                        }
+                        if (typeof read === "boolean") {
+                            notificationToUpdate.read = read;
                         }
                         if (read)
                             notificationToUpdate.read = read;
@@ -174,7 +183,9 @@ var NotificationController = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         id = req.params.id;
-                        return [4 /*yield*/, NotificationsRepository_1.notificationsRepository.findOneBy({ id: id })];
+                        return [4 /*yield*/, NotificationsRepository_1.notificationsRepository.findOneBy({
+                                id: id,
+                            })];
                     case 1:
                         notificationToDelete = _a.sent();
                         if (!notificationToDelete) {

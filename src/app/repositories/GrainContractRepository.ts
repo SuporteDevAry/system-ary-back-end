@@ -28,14 +28,14 @@ export const generateNumberContract = async (
       const lastNumberContract = result[0].number_contract;
 
       // Extrai o número entre '-' e '/' do último número de contrato usando regex
-      const match = lastNumberContract.match(/-(\d{2})\//);
+      const match = lastNumberContract.match(/-(\d{3})\//);
 
       if (match && match[1]) {
         nextIncrement = parseInt(match[1], 10) + 1; // Incrementa o número extraído
       }
     }
 
-    const formattedIncrement = nextIncrement.toString().padStart(2, "0"); // Formata com zero à esquerda
+    const formattedIncrement = nextIncrement.toString().padStart(3, "0"); // Formata com zero à esquerda
     const numberContract = `${product}.${number_broker}-${formattedIncrement}/${currentYear}`; // Novo número de contrato
 
     return numberContract;

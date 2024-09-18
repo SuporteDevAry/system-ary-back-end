@@ -22,8 +22,8 @@ exports.AppDataSource = new typeorm_1.DataSource({
     entities: entities_1.entitiesDir,
     migrations: migrations_1.migrationDir,
     subscribers: [],
-    //ssl: {
-    //  rejectUnauthorized: false,
-    //},
+    ssl: {
+        rejectUnauthorized: false,
+    },
 });
 //# sourceMappingURL=data-source.js.map

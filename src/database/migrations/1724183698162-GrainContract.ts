@@ -126,6 +126,14 @@ export class GrainContract1724183698162 implements MigrationInterface {
             type: "varchar",
           },
           {
+            name: "type_commission_seller",
+            type: "varchar",
+          },
+          {
+            name: "type_commission_buyer",
+            type: "varchar",
+          },
+          {
             name: "total_contract_value",
             type: "decimal",
           },

@@ -90,6 +90,12 @@ export class GrainContract {
   @Column()
   owner_contract: string;
 
+  @Column()
+  type_commission_seller: string;
+
+  @Column()
+  type_commission_buyer: string;
+
   @Column("decimal")
   total_contract_value: number;
 
