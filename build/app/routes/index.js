@@ -5,10 +5,10 @@ var UserController_1 = require("../controllers/UserController");
 var SessionController_1 = require("../controllers/SessionController");
 var authMiddleware_1 = require("../middlewares/authMiddleware");
 var PermissionController_1 = require("../controllers/PermissionController");
-var ClientesController_1 = require("../controllers/ClientesController");
-var ContatosController_1 = require("../controllers/ContatosController");
 var ClientController_1 = require("../controllers/ClientController");
 var ContactController_1 = require("../controllers/ContactController");
+var NotificationsController_1 = require("../controllers/NotificationsController");
+var GrainContractController_1 = require("../controllers/GrainContractController");
 var routes = (0, express_1.Router)();
 // Utilizar futuramente para criar métricas de chamadas
 // routes.use("/api", (req, res, next) => {
@@ -17,18 +17,6 @@ var routes = (0, express_1.Router)();
 // });
 // IN and OUT application
 routes.post("/api/login", new SessionController_1.SessionController().login);
-// Clientes
-routes.post("/api/cliente", new ClientesController_1.ClientesController().create);
-routes.get("/api/clientes", new ClientesController_1.ClientesController().getClientes);
-routes.get("/api/clientes/:cli_codigo", new ClientesController_1.ClientesController().getClienteById);
-routes.patch("/api/cliente/:cli_codigo", new ClientesController_1.ClientesController().updateCliente);
-routes.delete("/api/cliente/:cli_codigo", new ClientesController_1.ClientesController().deleteCliente);
-// Contatos
-routes.post("/api/contato", new ContatosController_1.ContatosController().create);
-routes.get("/api/contatos", new ContatosController_1.ContatosController().getContatos);
-routes.get("/api/contatos/:cli_codigo/:sequencia", new ContatosController_1.ContatosController().getContatosClienteBySeq);
-routes.patch("/api/contato/:cli_codigo/:sequencia", new ContatosController_1.ContatosController().updateContato);
-routes.delete("/api/contato/:cli_codigo/:sequencia", new ContatosController_1.ContatosController().deleteContato);
 // Routes protected
 routes.use(authMiddleware_1.authMiddleware);
 routes.get("/api/profile", new UserController_1.UserController().getProfile);
@@ -52,5 +40,18 @@ routes.post("/api/contact", new ContactController_1.ContactController().create);
 routes.get("/api/contact/:code_client", new ContactController_1.ContactController().getContactsByClient);
 routes.patch("/api/contact/:id", new ContactController_1.ContactController().update);
 routes.delete("/api/contact/:id", new ContactController_1.ContactController().delete);
+// Notification
+routes.post("/api/notification", new NotificationsController_1.NotificationController().create);
+routes.get("/api/notifications", new NotificationsController_1.NotificationController().getNotifications);
+routes.get("/api/notification/:id", new NotificationsController_1.NotificationController().getNotificationById);
+routes.get("/api/notifications/user/:user", new NotificationsController_1.NotificationController().getNotificationsByUser);
+routes.patch("/api/notification/:id", new NotificationsController_1.NotificationController().updateNotification);
+routes.delete("/api/notification/:id", new NotificationsController_1.NotificationController().deleteNotification);
+// Contracts
+routes.get("/api/grain-contracts", new GrainContractController_1.GrainContractController().getGrainContracts);
+routes.get("/api/grain-contracts/:id", new GrainContractController_1.GrainContractController().getGrainContractById);
+routes.post("/api/grain-contracts", new GrainContractController_1.GrainContractController().createGrainContract);
+routes.patch("/api/grain-contracts/:id", new GrainContractController_1.GrainContractController().updateGrainContract);
+routes.delete("/api/grain-contracts/:id", new GrainContractController_1.GrainContractController().deleteGrainContract);
 exports.default = routes;
 //# sourceMappingURL=index.js.map

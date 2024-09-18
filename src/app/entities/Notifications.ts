@@ -7,38 +7,26 @@ import {
 } from "typeorm";
 import { v4 as uuid } from "uuid";
 
-@Entity("contatos")
-export class Contatos {
+@Entity("notifications")
+export class Notifications {
 
     @PrimaryColumn()
     id: string;
 
     @Column({ type: "text" })
-    cli_codigo: string;
+    user: string;
+
+    @Column({ type: "boolean" })
+    read: boolean;
 
     @Column({ type: "text" })
-    sequencia: string;
+    content: string;
 
     @Column({ type: "text" })
-    grupo: string;
+    type: string;
 
-    @Column({ type: "text" })
-    nome: string;
-
-    @Column({ type: "text" })
-    cargo: string;
-
-    @Column({ type: "text" })
-    email: string;
-
-    @Column({ type: "text" })
-    telefone: string;
-
-    @Column({ type: "text" })
-    celular: string;
-
-    @Column({ type: "text" })
-    recebe_email: string;
+    @Column({ type: "boolean" })
+    isLoading: boolean;
 
     @CreateDateColumn()
     created_at: Date;

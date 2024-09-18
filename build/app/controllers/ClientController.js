@@ -104,12 +104,15 @@ var ClientController = /** @class */ (function () {
                 switch (_b.label) {
                     case 0:
                         _a = req.body, nickname = _a.nickname, name = _a.name, address = _a.address, number = _a.number, complement = _a.complement, district = _a.district, city = _a.city, state = _a.state, zip_code = _a.zip_code, kind = _a.kind, cnpj_cpf = _a.cnpj_cpf, ins_est = _a.ins_est, ins_mun = _a.ins_mun, telephone = _a.telephone, cellphone = _a.cellphone, situation = _a.situation;
+                        if (!(kind !== "E")) return [3 /*break*/, 2];
                         return [4 /*yield*/, ClientRepository_1.clientRepository.findOneBy({ cnpj_cpf: cnpj_cpf })];
                     case 1:
                         clientExists = _b.sent();
                         if (clientExists) {
                             throw new api_errors_1.BadRequestError("Cliente já cadastrado.");
                         }
+                        _b.label = 2;
+                    case 2:
                         newClient = ClientRepository_1.clientRepository.create({
                             name: name,
                             address: address,
@@ -129,7 +132,7 @@ var ClientController = /** @class */ (function () {
                             nickname: nickname,
                         });
                         return [4 /*yield*/, ClientRepository_1.clientRepository.save(newClient)];
-                    case 2:
+                    case 3:
                         _b.sent();
                         client = __rest(newClient, []);
                         return [2 /*return*/, res.status(201).json(client)];

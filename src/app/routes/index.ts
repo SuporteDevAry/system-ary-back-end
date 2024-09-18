@@ -3,11 +3,10 @@ import { UserController } from "../controllers/UserController";
 import { SessionController } from "../controllers/SessionController";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { PermissionController } from "../controllers/PermissionController";
-import { ClientesController } from "../controllers/ClientesController";
-import { ContatosController } from "../controllers/ContatosController";
 import { ClientController } from "../controllers/ClientController";
 import { ContactController } from "../controllers/ContactController";
-
+import { NotificationController } from "../controllers/NotificationsController";
+import { GrainContractController } from "../controllers/GrainContractController";
 const routes = Router();
 
 // Utilizar futuramente para criar métricas de chamadas
@@ -18,38 +17,6 @@ const routes = Router();
 
 // IN and OUT application
 routes.post("/api/login", new SessionController().login);
-
-// Clientes
-routes.post("/api/cliente", new ClientesController().create);
-routes.get("/api/clientes", new ClientesController().getClientes);
-routes.get(
-  "/api/clientes/:cli_codigo",
-  new ClientesController().getClienteById
-);
-routes.patch(
-  "/api/cliente/:cli_codigo",
-  new ClientesController().updateCliente
-);
-routes.delete(
-  "/api/cliente/:cli_codigo",
-  new ClientesController().deleteCliente
-);
-
-// Contatos
-routes.post("/api/contato", new ContatosController().create);
-routes.get("/api/contatos", new ContatosController().getContatos);
-routes.get(
-  "/api/contatos/:cli_codigo/:sequencia",
-  new ContatosController().getContatosClienteBySeq
-);
-routes.patch(
-  "/api/contato/:cli_codigo/:sequencia",
-  new ContatosController().updateContato
-);
-routes.delete(
-  "/api/contato/:cli_codigo/:sequencia",
-  new ContatosController().deleteContato
-);
 
 // Routes protected
 routes.use(authMiddleware);
@@ -83,5 +50,47 @@ routes.get(
 );
 routes.patch("/api/contact/:id", new ContactController().update);
 routes.delete("/api/contact/:id", new ContactController().delete);
+
+// Notification
+routes.post("/api/notification", new NotificationController().create);
+routes.get("/api/notifications", new NotificationController().getNotifications);
+routes.get(
+  "/api/notification/:id",
+  new NotificationController().getNotificationById
+);
+routes.get(
+  "/api/notifications/user/:user",
+  new NotificationController().getNotificationsByUser
+);
+routes.patch(
+  "/api/notification/:id",
+  new NotificationController().updateNotification
+);
+routes.delete(
+  "/api/notification/:id",
+  new NotificationController().deleteNotification
+);
+
+// Contracts
+routes.get(
+  "/api/grain-contracts",
+  new GrainContractController().getGrainContracts
+);
+routes.get(
+  "/api/grain-contracts/:id",
+  new GrainContractController().getGrainContractById
+);
+routes.post(
+  "/api/grain-contracts",
+  new GrainContractController().createGrainContract
+);
+routes.patch(
+  "/api/grain-contracts/:id",
+  new GrainContractController().updateGrainContract
+);
+routes.delete(
+  "/api/grain-contracts/:id",
+  new GrainContractController().deleteGrainContract
+);
 
 export default routes;
