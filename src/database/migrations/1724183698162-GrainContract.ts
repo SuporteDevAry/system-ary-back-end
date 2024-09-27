@@ -144,6 +144,46 @@ export class GrainContract1724183698162 implements MigrationInterface {
             default: "'{}'::text[]",
           },
           {
+            name: "contract_emission_date",
+            type: "varchar",
+          },
+          {
+            name: "destination",
+            type: "varchar",
+          },
+          {
+            name: "number_external_contract_buyer",
+            type: "varchar",
+          },
+          {
+            name: "number_external_contract_seller",
+            type: "varchar",
+          },
+          {
+            name: "day_exchange_rate",
+            type: "decimal",
+          },
+          {
+            name: "payment_date",
+            type: "varchar",
+          },
+          {
+            name: "farm_direct",
+            type: "varchar",
+          },
+          {
+            name: "initial_pickup_date",
+            type: "varchar",
+          },
+          {
+            name: "final_pickup_date",
+            type: "varchar",
+          },
+          {
+            name: "internal_communication",
+            type: "varchar",
+          },
+          {
             name: "created_at",
             type: "timestamp",
             default: "now()",

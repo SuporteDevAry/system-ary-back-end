@@ -7,11 +7,11 @@ import { Notifications1716314850943 as Notifications } from "./1716314850943-Not
 import { GrainContract1724183698162 as GrainContract } from "./1724183698162-GrainContract";
 
 export const migrationDir = {
-  CreateUsers,
-  CreatePermissions,
-  AddClientNew,
-  AddUniqueConstraintToCodeClient,
-  AddClientContactsRelation,
-  Notifications,
+  // CreateUsers,
+  // CreatePermissions,
+  // AddClientNew,
+  // AddUniqueConstraintToCodeClient,
+  // AddClientContactsRelation,
+  // Notifications,
   GrainContract,
 };

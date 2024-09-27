@@ -110,6 +110,36 @@ export class GrainContract {
     }[];
   };
 
+  @Column()
+  contract_emission_date: string;
+
+  @Column()
+  destination: string;
+
+  @Column()
+  number_external_contract_buyer: string;
+
+  @Column()
+  number_external_contract_seller: string;
+
+  @Column("decimal")
+  day_exchange_rate: number;
+
+  @Column()
+  payment_date: string;
+
+  @Column()
+  farm_direct: string;
+
+  @Column()
+  initial_pickup_date: string;
+
+  @Column()
+  final_pickup_date: string;
+
+  @Column()
+  internal_communication: string;
+
   @CreateDateColumn()
   created_at: Date;
 
