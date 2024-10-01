@@ -161,7 +161,7 @@ export class GrainContract1724183698162 implements MigrationInterface {
           },
           {
             name: "day_exchange_rate",
-            type: "decimal",
+            type: "varchar",
           },
           {
             name: "payment_date",

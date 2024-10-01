@@ -122,8 +122,8 @@ export class GrainContract {
   @Column()
   number_external_contract_seller: string;
 
-  @Column("decimal")
-  day_exchange_rate: number;
+  @Column()
+  day_exchange_rate: string;
 
   @Column()
   payment_date: string;
