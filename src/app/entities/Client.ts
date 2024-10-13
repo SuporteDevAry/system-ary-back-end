@@ -68,6 +68,9 @@ export class Client {
   @Column({ type: "text" })
   situation: string;
 
+  @Column({ type: "jsonb", nullable: true, default: [] })
+  account: string[];
+
   @CreateDateColumn()
   created_at: Date;
 

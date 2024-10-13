@@ -5,6 +5,7 @@ import { AddUniqueConstraintToCodeClient1721239748864 as AddUniqueConstraintToCo
 import { AddClientContactsRelation1720831489814 as AddClientContactsRelation } from "./1720831489814-AddClientContactsRelation";
 import { Notifications1716314850943 as Notifications } from "./1716314850943-Notifications";
 import { GrainContract1724183698162 as GrainContract } from "./1724183698162-GrainContract";
+import { AddAccountFieldToClient1727823800099 as AddAccountFieldToClient } from "./1727823800099-AddAccountFieldToClient";
 
 export const migrationDir = {
   CreateUsers,
@@ -14,4 +15,5 @@ export const migrationDir = {
   AddClientContactsRelation,
   Notifications,
   GrainContract,
+  AddAccountFieldToClient
 };
