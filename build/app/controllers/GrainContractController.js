@@ -46,6 +46,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GrainContractController = void 0;
 var GrainContractRepository_1 = require("../repositories/GrainContractRepository");
@@ -116,11 +127,12 @@ var GrainContractController = /** @class */ (function () {
             });
         }); };
         this.updateGrainContract = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var id, grainContract, result, error_4;
+            var id, otherFields, grainContract, validNumberContract, match, currentProduct, currentBroker, currentIncrement, currentYear, isProductDifferent, isBrokerDifferent, updatedProduct, updatedBroker, updatedGrainContract, result, error_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         id = req.params.id;
+                        otherFields = __rest(req.body, []);
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 4, , 5]);
@@ -130,8 +142,33 @@ var GrainContractController = /** @class */ (function () {
                         if (!grainContract) {
                             return [2 /*return*/, res.status(404).json({ message: "Contrato não encontrado" })];
                         }
-                        grainContract = GrainContractRepository_1.grainContractRepository.merge(grainContract, req.body);
-                        return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.save(grainContract)];
+                        validNumberContract = /^([A-Z]+)\.(\d+)-(\d{3})\/(\d{2})$/;
+                        match = grainContract.number_contract.match(validNumberContract);
+                        if (match) {
+                            currentProduct = match[1], currentBroker = match[2], currentIncrement = match[3], currentYear = match[4];
+                            isProductDifferent = otherFields.product && otherFields.product !== currentProduct;
+                            isBrokerDifferent = otherFields.number_broker &&
+                                otherFields.number_broker !== currentBroker;
+                            if (isProductDifferent || isBrokerDifferent) {
+                                updatedProduct = isProductDifferent
+                                    ? otherFields.product
+                                    : currentProduct;
+                                updatedBroker = isBrokerDifferent
+                                    ? otherFields.number_broker
+                                    : currentBroker;
+                                // Mantém o radical e o ano, alterando apenas o prefixo e sufixo
+                                grainContract.number_contract = "".concat(updatedProduct, ".").concat(updatedBroker, "-").concat(currentIncrement, "/").concat(currentYear);
+                                grainContract.number_broker = updatedBroker;
+                                grainContract.product = updatedProduct;
+                            }
+                        }
+                        else {
+                            return [2 /*return*/, res
+                                    .status(400)
+                                    .json({ message: "Formato do número do contrato inválido" })];
+                        }
+                        updatedGrainContract = __assign(__assign({}, otherFields), { number_contract: grainContract.number_contract, number_broker: grainContract.number_broker, product: grainContract.product });
+                        return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.save(updatedGrainContract)];
                     case 3:
                         result = _a.sent();
                         return [2 /*return*/, res.json(result)];

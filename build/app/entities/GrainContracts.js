@@ -94,12 +94,12 @@ var GrainContract = /** @class */ (function () {
         __metadata("design:type", String)
     ], GrainContract.prototype, "payment", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: "decimal", nullable: true, default: 0 }),
-        __metadata("design:type", Number)
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
     ], GrainContract.prototype, "commission_seller", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: "decimal", nullable: true, default: 0 }),
-        __metadata("design:type", Number)
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
     ], GrainContract.prototype, "commission_buyer", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
@@ -118,7 +118,7 @@ var GrainContract = /** @class */ (function () {
         __metadata("design:type", String)
     ], GrainContract.prototype, "inspection", void 0);
     __decorate([
-        (0, typeorm_1.Column)(),
+        (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", String)
     ], GrainContract.prototype, "observation", void 0);
     __decorate([
@@ -145,6 +145,46 @@ var GrainContract = /** @class */ (function () {
         (0, typeorm_1.Column)("jsonb", { nullable: true }),
         __metadata("design:type", Object)
     ], GrainContract.prototype, "status", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "contract_emission_date", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "destination", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "number_external_contract_buyer", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "number_external_contract_seller", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "day_exchange_rate", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "payment_date", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "farm_direct", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "initial_pickup_date", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "final_pickup_date", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "internal_communication", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)(),
         __metadata("design:type", Date)
