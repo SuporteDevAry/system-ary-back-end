@@ -15,5 +15,5 @@ export const migrationDir = {
   AddClientContactsRelation,
   Notifications,
   GrainContract,
-  AddAccountFieldToClient
+  AddAccountFieldToClient,
 };
