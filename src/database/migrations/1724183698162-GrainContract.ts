@@ -172,6 +172,7 @@ export class GrainContract1724183698162 implements MigrationInterface {
           {
             name: "payment_date",
             type: "varchar",
+            isNullable: true,
           },
           {
             name: "farm_direct",
