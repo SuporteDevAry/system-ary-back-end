@@ -194,6 +194,7 @@ var GrainContract1724183698162 = /** @class */ (function () {
                                 {
                                     name: "destination",
                                     type: "varchar",
+                                    isNullable: true,
                                 },
                                 {
                                     name: "number_external_contract_buyer",
