@@ -152,6 +152,7 @@ export class GrainContract1724183698162 implements MigrationInterface {
           {
             name: "destination",
             type: "varchar",
+            isNullable: true,
           },
           {
             name: "number_external_contract_buyer",
