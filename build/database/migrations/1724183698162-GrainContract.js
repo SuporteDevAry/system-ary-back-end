@@ -224,6 +224,7 @@ var GrainContract1724183698162 = /** @class */ (function () {
                                 {
                                     name: "initial_pickup_date",
                                     type: "varchar",
+                                    isNullable: true,
                                 },
                                 {
                                     name: "final_pickup_date",

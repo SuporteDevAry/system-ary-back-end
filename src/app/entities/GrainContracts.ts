@@ -131,7 +131,7 @@ export class GrainContract {
   @Column({ nullable: true })
   farm_direct: string;
 
-  @Column()
+  @Column({ nullable: true })
   initial_pickup_date: string;
 
   @Column({ nullable: true })

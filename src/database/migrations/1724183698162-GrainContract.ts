@@ -182,6 +182,7 @@ export class GrainContract1724183698162 implements MigrationInterface {
           {
             name: "initial_pickup_date",
             type: "varchar",
+            isNullable: true,
           },
           {
             name: "final_pickup_date",
