@@ -174,7 +174,7 @@ var GrainContract = /** @class */ (function () {
         __metadata("design:type", String)
     ], GrainContract.prototype, "farm_direct", void 0);
     __decorate([
-        (0, typeorm_1.Column)(),
+        (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", String)
     ], GrainContract.prototype, "initial_pickup_date", void 0);
     __decorate([
