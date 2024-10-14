@@ -125,7 +125,7 @@ export class GrainContract {
   @Column({ nullable: true })
   day_exchange_rate: string;
 
-  @Column()
+  @Column({ nullable: true })
   payment_date: string;
 
   @Column({ nullable: true })
