@@ -214,6 +214,7 @@ var GrainContract1724183698162 = /** @class */ (function () {
                                 {
                                     name: "payment_date",
                                     type: "varchar",
+                                    isNullable: true,
                                 },
                                 {
                                     name: "farm_direct",
