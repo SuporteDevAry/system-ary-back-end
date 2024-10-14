@@ -63,11 +63,11 @@ export class GrainContract {
   @Column()
   payment: string;
 
-  @Column({ type: "decimal", nullable: true, default: 0 })
-  commission_seller: number;
+  @Column({ nullable: true })
+  commission_seller: string;
 
-  @Column({ type: "decimal", nullable: true, default: 0 })
-  commission_buyer: number;
+  @Column({ nullable: true })
+  commission_buyer: string;
 
   @Column()
   type_pickup: string;
@@ -81,7 +81,7 @@ export class GrainContract {
   @Column()
   inspection: string;
 
-  @Column()
+  @Column({ nullable: true })
   observation: string;
 
   @Column()
@@ -109,6 +109,36 @@ export class GrainContract {
       owner_change: string;
     }[];
   };
+
+  @Column({ nullable: true })
+  contract_emission_date: string;
+
+  @Column()
+  destination: string;
+
+  @Column({ nullable: true })
+  number_external_contract_buyer: string;
+
+  @Column({ nullable: true })
+  number_external_contract_seller: string;
+
+  @Column({ nullable: true })
+  day_exchange_rate: string;
+
+  @Column()
+  payment_date: string;
+
+  @Column({ nullable: true })
+  farm_direct: string;
+
+  @Column()
+  initial_pickup_date: string;
+
+  @Column({ nullable: true })
+  final_pickup_date: string;
+
+  @Column({ nullable: true })
+  internal_communication: string;
 
   @CreateDateColumn()
   created_at: Date;

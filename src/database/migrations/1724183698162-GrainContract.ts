@@ -89,12 +89,12 @@ export class GrainContract1724183698162 implements MigrationInterface {
           },
           {
             name: "commission_seller",
-            type: "decimal",
+            type: "varchar",
             isNullable: true,
           },
           {
             name: "commission_buyer",
-            type: "decimal",
+            type: "varchar",
             isNullable: true,
           },
           {
@@ -116,6 +116,7 @@ export class GrainContract1724183698162 implements MigrationInterface {
           {
             name: "observation",
             type: "varchar",
+            isNullable: true,
           },
           {
             name: "number_contract",
@@ -142,6 +143,53 @@ export class GrainContract1724183698162 implements MigrationInterface {
             type: "text",
             isArray: true,
             default: "'{}'::text[]",
+          },
+          {
+            name: "contract_emission_date",
+            type: "varchar",
+            isNullable: true,
+          },
+          {
+            name: "destination",
+            type: "varchar",
+          },
+          {
+            name: "number_external_contract_buyer",
+            type: "varchar",
+            isNullable: true,
+          },
+          {
+            name: "number_external_contract_seller",
+            type: "varchar",
+            isNullable: true,
+          },
+          {
+            name: "day_exchange_rate",
+            type: "varchar",
+            isNullable: true,
+          },
+          {
+            name: "payment_date",
+            type: "varchar",
+          },
+          {
+            name: "farm_direct",
+            type: "varchar",
+            isNullable: true,
+          },
+          {
+            name: "initial_pickup_date",
+            type: "varchar",
+          },
+          {
+            name: "final_pickup_date",
+            type: "varchar",
+            isNullable: true,
+          },
+          {
+            name: "internal_communication",
+            type: "varchar",
+            isNullable: true,
           },
           {
             name: "created_at",
