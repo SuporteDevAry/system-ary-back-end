@@ -113,7 +113,7 @@ export class GrainContract {
   @Column({ nullable: true })
   contract_emission_date: string;
 
-  @Column()
+  @Column({ nullable: true })
   destination: string;
 
   @Column({ nullable: true })
