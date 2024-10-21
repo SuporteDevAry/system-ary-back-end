@@ -53,6 +53,7 @@ export class ClientController {
       cellphone,
       situation,
       account,
+      cnpj_pagto,
     } = req.body;
 
     if (kind !== "E") {
@@ -81,6 +82,7 @@ export class ClientController {
       situation,
       nickname,
       account,
+      cnpj_pagto,
     });
 
     await clientRepository.save(newClient);
@@ -110,6 +112,7 @@ export class ClientController {
       cellphone,
       situation,
       account,
+      cnpj_pagto,
     } = req.body;
 
     if (!id) {
@@ -139,6 +142,7 @@ export class ClientController {
     if (cellphone) clientToUpdate.cellphone = cellphone;
     if (situation) clientToUpdate.situation = situation;
     if (account) clientToUpdate.account = account;
+    if (cnpj_pagto) clientToUpdate.cnpj_pagto = cnpj_pagto;
 
     await clientRepository.save(clientToUpdate);
 
