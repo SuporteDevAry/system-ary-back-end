@@ -126,22 +126,22 @@ export class ClientController {
     }
 
     if (nickname !== undefined) clientToUpdate.nickname = nickname;
-    if (name) clientToUpdate.name = name;
-    if (address) clientToUpdate.address = address;
-    if (number) clientToUpdate.number = number;
-    if (complement) clientToUpdate.complement = complement;
-    if (district) clientToUpdate.district = district;
-    if (city) clientToUpdate.city = city;
-    if (state) clientToUpdate.state = state;
-    if (zip_code) clientToUpdate.zip_code = zip_code;
-    if (kind) clientToUpdate.kind = kind;
-    if (cnpj_cpf) clientToUpdate.cnpj_cpf = cnpj_cpf;
+    if (name !== undefined) clientToUpdate.name = name;
+    if (address !== undefined) clientToUpdate.address = address;
+    if (number !== undefined) clientToUpdate.number = number;
+    if (complement !== undefined) clientToUpdate.complement = complement;
+    if (district !== undefined) clientToUpdate.district = district;
+    if (city !== undefined) clientToUpdate.city = city;
+    if (state !== undefined) clientToUpdate.state = state;
+    if (zip_code !== undefined) clientToUpdate.zip_code = zip_code;
+    if (kind !== undefined) clientToUpdate.kind = kind;
+    if (cnpj_cpf !== undefined) clientToUpdate.cnpj_cpf = cnpj_cpf;
     if (ins_est !== undefined) clientToUpdate.ins_est = ins_est;
     if (ins_mun !== undefined) clientToUpdate.ins_mun = ins_mun;
     if (telephone !== undefined) clientToUpdate.telephone = telephone;
     if (cellphone !== undefined) clientToUpdate.cellphone = cellphone;
-    if (situation) clientToUpdate.situation = situation;
-    if (account) clientToUpdate.account = account;
+    if (situation !== undefined) clientToUpdate.situation = situation;
+    if (account !== undefined) clientToUpdate.account = account;
     if (cnpj_pagto !== undefined) clientToUpdate.cnpj_pagto = cnpj_pagto;
 
     await clientRepository.save(clientToUpdate);
