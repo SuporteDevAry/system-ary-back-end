@@ -125,7 +125,7 @@ export class ClientController {
       throw new BadRequestError("Cliente não encontrado");
     }
 
-    if (nickname) clientToUpdate.nickname = nickname;
+    if (nickname !== undefined) clientToUpdate.nickname = nickname;
     if (name) clientToUpdate.name = name;
     if (address) clientToUpdate.address = address;
     if (number) clientToUpdate.number = number;
@@ -136,13 +136,13 @@ export class ClientController {
     if (zip_code) clientToUpdate.zip_code = zip_code;
     if (kind) clientToUpdate.kind = kind;
     if (cnpj_cpf) clientToUpdate.cnpj_cpf = cnpj_cpf;
-    if (ins_est) clientToUpdate.ins_est = ins_est;
-    if (ins_mun) clientToUpdate.ins_mun = ins_mun;
-    if (telephone) clientToUpdate.telephone = telephone;
-    if (cellphone) clientToUpdate.cellphone = cellphone;
+    if (ins_est !== undefined) clientToUpdate.ins_est = ins_est;
+    if (ins_mun !== undefined) clientToUpdate.ins_mun = ins_mun;
+    if (telephone !== undefined) clientToUpdate.telephone = telephone;
+    if (cellphone !== undefined) clientToUpdate.cellphone = cellphone;
     if (situation) clientToUpdate.situation = situation;
     if (account) clientToUpdate.account = account;
-    if (cnpj_pagto) clientToUpdate.cnpj_pagto = cnpj_pagto;
+    if (cnpj_pagto !== undefined) clientToUpdate.cnpj_pagto = cnpj_pagto;
 
     await clientRepository.save(clientToUpdate);
 
