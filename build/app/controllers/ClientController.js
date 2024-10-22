@@ -99,11 +99,11 @@ var ClientController = /** @class */ (function () {
     };
     ClientController.prototype.create = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, nickname, name, address, number, complement, district, city, state, zip_code, kind, cnpj_cpf, ins_est, ins_mun, telephone, cellphone, situation, account, clientExists, newClient, client;
+            var _a, nickname, name, address, number, complement, district, city, state, zip_code, kind, cnpj_cpf, ins_est, ins_mun, telephone, cellphone, situation, account, cnpj_pagto, clientExists, newClient, client;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        _a = req.body, nickname = _a.nickname, name = _a.name, address = _a.address, number = _a.number, complement = _a.complement, district = _a.district, city = _a.city, state = _a.state, zip_code = _a.zip_code, kind = _a.kind, cnpj_cpf = _a.cnpj_cpf, ins_est = _a.ins_est, ins_mun = _a.ins_mun, telephone = _a.telephone, cellphone = _a.cellphone, situation = _a.situation, account = _a.account;
+                        _a = req.body, nickname = _a.nickname, name = _a.name, address = _a.address, number = _a.number, complement = _a.complement, district = _a.district, city = _a.city, state = _a.state, zip_code = _a.zip_code, kind = _a.kind, cnpj_cpf = _a.cnpj_cpf, ins_est = _a.ins_est, ins_mun = _a.ins_mun, telephone = _a.telephone, cellphone = _a.cellphone, situation = _a.situation, account = _a.account, cnpj_pagto = _a.cnpj_pagto;
                         if (!(kind !== "E")) return [3 /*break*/, 2];
                         return [4 /*yield*/, ClientRepository_1.clientRepository.findOneBy({ cnpj_cpf: cnpj_cpf })];
                     case 1:
@@ -131,6 +131,7 @@ var ClientController = /** @class */ (function () {
                             situation: situation,
                             nickname: nickname,
                             account: account,
+                            cnpj_pagto: cnpj_pagto,
                         });
                         return [4 /*yield*/, ClientRepository_1.clientRepository.save(newClient)];
                     case 3:
@@ -143,12 +144,12 @@ var ClientController = /** @class */ (function () {
     };
     ClientController.prototype.update = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var id, _a, nickname, name, address, number, complement, district, city, state, zip_code, kind, cnpj_cpf, ins_est, ins_mun, telephone, cellphone, situation, account, clientToUpdate, updatedCliente;
+            var id, _a, nickname, name, address, number, complement, district, city, state, zip_code, kind, cnpj_cpf, ins_est, ins_mun, telephone, cellphone, situation, account, cnpj_pagto, clientToUpdate, updatedCliente;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         id = req.params.id;
-                        _a = req.body, nickname = _a.nickname, name = _a.name, address = _a.address, number = _a.number, complement = _a.complement, district = _a.district, city = _a.city, state = _a.state, zip_code = _a.zip_code, kind = _a.kind, cnpj_cpf = _a.cnpj_cpf, ins_est = _a.ins_est, ins_mun = _a.ins_mun, telephone = _a.telephone, cellphone = _a.cellphone, situation = _a.situation, account = _a.account;
+                        _a = req.body, nickname = _a.nickname, name = _a.name, address = _a.address, number = _a.number, complement = _a.complement, district = _a.district, city = _a.city, state = _a.state, zip_code = _a.zip_code, kind = _a.kind, cnpj_cpf = _a.cnpj_cpf, ins_est = _a.ins_est, ins_mun = _a.ins_mun, telephone = _a.telephone, cellphone = _a.cellphone, situation = _a.situation, account = _a.account, cnpj_pagto = _a.cnpj_pagto;
                         if (!id) {
                             throw new api_errors_1.BadRequestError("Código do Cliente não informado.");
                         }
@@ -158,40 +159,42 @@ var ClientController = /** @class */ (function () {
                         if (!clientToUpdate) {
                             throw new api_errors_1.BadRequestError("Cliente não encontrado");
                         }
-                        if (nickname)
+                        if (nickname !== undefined)
                             clientToUpdate.nickname = nickname;
-                        if (name)
+                        if (name !== undefined)
                             clientToUpdate.name = name;
-                        if (address)
+                        if (address !== undefined)
                             clientToUpdate.address = address;
-                        if (number)
+                        if (number !== undefined)
                             clientToUpdate.number = number;
-                        if (complement)
+                        if (complement !== undefined)
                             clientToUpdate.complement = complement;
-                        if (district)
+                        if (district !== undefined)
                             clientToUpdate.district = district;
-                        if (city)
+                        if (city !== undefined)
                             clientToUpdate.city = city;
-                        if (state)
+                        if (state !== undefined)
                             clientToUpdate.state = state;
-                        if (zip_code)
+                        if (zip_code !== undefined)
                             clientToUpdate.zip_code = zip_code;
-                        if (kind)
+                        if (kind !== undefined)
                             clientToUpdate.kind = kind;
-                        if (cnpj_cpf)
+                        if (cnpj_cpf !== undefined)
                             clientToUpdate.cnpj_cpf = cnpj_cpf;
-                        if (ins_est)
+                        if (ins_est !== undefined)
                             clientToUpdate.ins_est = ins_est;
-                        if (ins_mun)
+                        if (ins_mun !== undefined)
                             clientToUpdate.ins_mun = ins_mun;
-                        if (telephone)
+                        if (telephone !== undefined)
                             clientToUpdate.telephone = telephone;
-                        if (cellphone)
+                        if (cellphone !== undefined)
                             clientToUpdate.cellphone = cellphone;
-                        if (situation)
+                        if (situation !== undefined)
                             clientToUpdate.situation = situation;
-                        if (account)
+                        if (account !== undefined)
                             clientToUpdate.account = account;
+                        if (cnpj_pagto !== undefined)
+                            clientToUpdate.cnpj_pagto = cnpj_pagto;
                         return [4 /*yield*/, ClientRepository_1.clientRepository.save(clientToUpdate)];
                     case 2:
                         _b.sent();

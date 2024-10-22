@@ -71,6 +71,9 @@ export class Client {
   @Column({ type: "jsonb", nullable: true, default: [] })
   account: string[];
 
+  @Column({ type: "text", nullable: true, default: "" })
+  cnpj_pagto: string | null;
+
   @CreateDateColumn()
   created_at: Date;
 

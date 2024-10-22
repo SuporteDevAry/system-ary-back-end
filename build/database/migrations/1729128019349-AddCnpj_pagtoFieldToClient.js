@@ -36,65 +36,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateContatos1710886127461 = void 0;
+exports.AddCnpjPagtoFieldToClient1729128019349 = void 0;
 var typeorm_1 = require("typeorm");
-var CreateContatos1710886127461 = /** @class */ (function () {
-    function CreateContatos1710886127461() {
+var AddCnpjPagtoFieldToClient1729128019349 = /** @class */ (function () {
+    function AddCnpjPagtoFieldToClient1729128019349() {
     }
-    CreateContatos1710886127461.prototype.up = function (queryRunner) {
+    AddCnpjPagtoFieldToClient1729128019349.prototype.up = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.createTable(new typeorm_1.Table({
-                            name: "contatos",
-                            columns: [
-                                {
-                                    name: "id",
-                                    type: "uuid",
-                                    isPrimary: true,
-                                },
-                                {
-                                    name: "cli_codigo",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "sequencia",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "nome",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "cargo",
-                                    type: "varchar",
-                                }, {
-                                    name: "complemento",
-                                    type: "varchar",
-                                }, {
-                                    name: "email",
-                                    type: "varchar",
-                                }, {
-                                    name: "telefone",
-                                    type: "varchar",
-                                }, {
-                                    name: "celular",
-                                    type: "varchar",
-                                }, {
-                                    name: "recebe_email",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "created_at",
-                                    type: "timestamp",
-                                    default: "now()",
-                                },
-                                {
-                                    name: "updated_at",
-                                    type: "timestamp",
-                                    default: "now()",
-                                },
-                            ],
+                    case 0: return [4 /*yield*/, queryRunner.addColumn("client", new typeorm_1.TableColumn({
+                            name: "cnpj_pagto",
+                            type: "varchar",
+                            isNullable: true,
                         }))];
                     case 1:
                         _a.sent();
@@ -103,11 +57,11 @@ var CreateContatos1710886127461 = /** @class */ (function () {
             });
         });
     };
-    CreateContatos1710886127461.prototype.down = function (queryRunner) {
+    AddCnpjPagtoFieldToClient1729128019349.prototype.down = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.dropTable("contatos")];
+                    case 0: return [4 /*yield*/, queryRunner.dropColumn("client", "cnpj_pagto")];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
@@ -115,7 +69,7 @@ var CreateContatos1710886127461 = /** @class */ (function () {
             });
         });
     };
-    return CreateContatos1710886127461;
+    return AddCnpjPagtoFieldToClient1729128019349;
 }());
-exports.CreateContatos1710886127461 = CreateContatos1710886127461;
-//# sourceMappingURL=1710886127461-createContatos.js.map
+exports.AddCnpjPagtoFieldToClient1729128019349 = AddCnpjPagtoFieldToClient1729128019349;
+//# sourceMappingURL=1729128019349-AddCnpj_pagtoFieldToClient.js.map

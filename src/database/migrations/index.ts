@@ -6,6 +6,8 @@ import { AddClientContactsRelation1720831489814 as AddClientContactsRelation } f
 import { Notifications1716314850943 as Notifications } from "./1716314850943-Notifications";
 import { GrainContract1724183698162 as GrainContract } from "./1724183698162-GrainContract";
 import { AddAccountFieldToClient1727823800099 as AddAccountFieldToClient } from "./1727823800099-AddAccountFieldToClient";
+import { AddCnpjPagtoFieldToClient1729128019349 as AddCnpjPagtoFieldToClient } from "./1729128019349-AddCnpj_pagtoFieldToClient";
+import { UpdateCnpjPagto1729553171137 as UpdateCnpjPagto } from "./1729553171137-updateCnpj_pagto";
 
 export const migrationDir = {
   CreateUsers,
@@ -16,4 +18,6 @@ export const migrationDir = {
   Notifications,
   GrainContract,
   AddAccountFieldToClient,
+  AddCnpjPagtoFieldToClient,
+  UpdateCnpjPagto,
 };
