@@ -101,7 +101,7 @@ var Client = /** @class */ (function () {
         __metadata("design:type", Array)
     ], Client.prototype, "account", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ nullable: true }),
+        (0, typeorm_1.Column)({ type: "text", nullable: true, default: "" }),
         __metadata("design:type", String)
     ], Client.prototype, "cnpj_pagto", void 0);
     __decorate([

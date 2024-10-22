@@ -47,7 +47,7 @@ var AddCnpjPagtoFieldToClient1729128019349 = /** @class */ (function () {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, queryRunner.addColumn("client", new typeorm_1.TableColumn({
                             name: "cnpj_pagto",
-                            type: "text",
+                            type: "varchar",
                             isNullable: true,
                         }))];
                     case 1:

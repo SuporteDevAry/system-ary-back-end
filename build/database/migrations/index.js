@@ -10,6 +10,7 @@ var _1716314850943_Notifications_1 = require("./1716314850943-Notifications");
 var _1724183698162_GrainContract_1 = require("./1724183698162-GrainContract");
 var _1727823800099_AddAccountFieldToClient_1 = require("./1727823800099-AddAccountFieldToClient");
 var _1729128019349_AddCnpj_pagtoFieldToClient_1 = require("./1729128019349-AddCnpj_pagtoFieldToClient");
+var _1729553171137_updateCnpj_pagto_1 = require("./1729553171137-updateCnpj_pagto");
 exports.migrationDir = {
     CreateUsers: _1694720577496_createUsers_1.CreateUsers1694720577496,
     CreatePermissions: _1697084968105_permissions_1.Permissions1697084968105,
@@ -19,6 +20,7 @@ exports.migrationDir = {
     Notifications: _1716314850943_Notifications_1.Notifications1716314850943,
     GrainContract: _1724183698162_GrainContract_1.GrainContract1724183698162,
     AddAccountFieldToClient: _1727823800099_AddAccountFieldToClient_1.AddAccountFieldToClient1727823800099,
-    AddCnpjPagtoFieldToClient: _1729128019349_AddCnpj_pagtoFieldToClient_1.AddCnpjPagtoFieldToClient1729128019349
+    AddCnpjPagtoFieldToClient: _1729128019349_AddCnpj_pagtoFieldToClient_1.AddCnpjPagtoFieldToClient1729128019349,
+    UpdateCnpjPagto: _1729553171137_updateCnpj_pagto_1.UpdateCnpjPagto1729553171137,
 };
 //# sourceMappingURL=index.js.map

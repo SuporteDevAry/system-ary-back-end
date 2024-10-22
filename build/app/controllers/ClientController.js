@@ -131,7 +131,7 @@ var ClientController = /** @class */ (function () {
                             situation: situation,
                             nickname: nickname,
                             account: account,
-                            cnpj_pagto: cnpj_pagto
+                            cnpj_pagto: cnpj_pagto,
                         });
                         return [4 /*yield*/, ClientRepository_1.clientRepository.save(newClient)];
                     case 3:
@@ -159,41 +159,41 @@ var ClientController = /** @class */ (function () {
                         if (!clientToUpdate) {
                             throw new api_errors_1.BadRequestError("Cliente não encontrado");
                         }
-                        if (nickname)
+                        if (nickname !== undefined)
                             clientToUpdate.nickname = nickname;
-                        if (name)
+                        if (name !== undefined)
                             clientToUpdate.name = name;
-                        if (address)
+                        if (address !== undefined)
                             clientToUpdate.address = address;
-                        if (number)
+                        if (number !== undefined)
                             clientToUpdate.number = number;
-                        if (complement)
+                        if (complement !== undefined)
                             clientToUpdate.complement = complement;
-                        if (district)
+                        if (district !== undefined)
                             clientToUpdate.district = district;
-                        if (city)
+                        if (city !== undefined)
                             clientToUpdate.city = city;
-                        if (state)
+                        if (state !== undefined)
                             clientToUpdate.state = state;
-                        if (zip_code)
+                        if (zip_code !== undefined)
                             clientToUpdate.zip_code = zip_code;
-                        if (kind)
+                        if (kind !== undefined)
                             clientToUpdate.kind = kind;
-                        if (cnpj_cpf)
+                        if (cnpj_cpf !== undefined)
                             clientToUpdate.cnpj_cpf = cnpj_cpf;
-                        if (ins_est)
+                        if (ins_est !== undefined)
                             clientToUpdate.ins_est = ins_est;
-                        if (ins_mun)
+                        if (ins_mun !== undefined)
                             clientToUpdate.ins_mun = ins_mun;
-                        if (telephone)
+                        if (telephone !== undefined)
                             clientToUpdate.telephone = telephone;
-                        if (cellphone)
+                        if (cellphone !== undefined)
                             clientToUpdate.cellphone = cellphone;
-                        if (situation)
+                        if (situation !== undefined)
                             clientToUpdate.situation = situation;
-                        if (account)
+                        if (account !== undefined)
                             clientToUpdate.account = account;
-                        if (cnpj_pagto)
+                        if (cnpj_pagto !== undefined)
                             clientToUpdate.cnpj_pagto = cnpj_pagto;
                         return [4 /*yield*/, ClientRepository_1.clientRepository.save(clientToUpdate)];
                     case 2:
