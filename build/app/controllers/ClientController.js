@@ -131,10 +131,6 @@ var ClientController = /** @class */ (function () {
                             situation: situation,
                             nickname: nickname,
                             account: account,
-<<<<<<< Updated upstream
-                            cnpj_pagto: cnpj_pagto,
-=======
->>>>>>> Stashed changes
                         });
                         return [4 /*yield*/, ClientRepository_1.clientRepository.save(newClient)];
                     case 3:
@@ -196,11 +192,6 @@ var ClientController = /** @class */ (function () {
                             clientToUpdate.situation = situation;
                         if (account !== undefined)
                             clientToUpdate.account = account;
-<<<<<<< Updated upstream
-                        if (cnpj_pagto !== undefined)
-                            clientToUpdate.cnpj_pagto = cnpj_pagto;
-=======
->>>>>>> Stashed changes
                         return [4 /*yield*/, ClientRepository_1.clientRepository.save(clientToUpdate)];
                     case 2:
                         _b.sent();
