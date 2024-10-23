@@ -43,77 +43,89 @@ var AddClientContactsRelation1720831489814 = /** @class */ (function () {
     }
     AddClientContactsRelation1720831489814.prototype.up = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
+            var hasTable;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.createTable(new typeorm_1.Table({
-                            name: "contact",
-                            columns: [
-                                {
-                                    name: "id",
-                                    type: "uuid",
-                                    isPrimary: true,
-                                },
-                                {
-                                    name: "name",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "email",
-                                    type: "varchar",
-                                    isUnique: true,
-                                },
-                                {
-                                    name: "sector",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "telephone",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "cellphone",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "code_client",
-                                    type: "int",
-                                    isNullable: true,
-                                },
-                                {
-                                    name: "created_at",
-                                    type: "timestamp",
-                                    default: "now()",
-                                },
-                                {
-                                    name: "updated_at",
-                                    type: "timestamp",
-                                    default: "now()",
-                                },
-                            ],
-                            foreignKeys: [
-                                {
-                                    name: "fk_contact_client",
-                                    columnNames: ["code_client"],
-                                    referencedTableName: "client",
-                                    referencedColumnNames: ["code_client"],
-                                },
-                            ],
-                        }))];
+                    case 0: return [4 /*yield*/, queryRunner.hasTable("contact")];
                     case 1:
+                        hasTable = _a.sent();
+                        if (!!hasTable) return [3 /*break*/, 3];
+                        return [4 /*yield*/, queryRunner.createTable(new typeorm_1.Table({
+                                name: "contact",
+                                columns: [
+                                    {
+                                        name: "id",
+                                        type: "uuid",
+                                        isPrimary: true,
+                                    },
+                                    {
+                                        name: "name",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "email",
+                                        type: "varchar",
+                                        isUnique: true,
+                                    },
+                                    {
+                                        name: "sector",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "telephone",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "cellphone",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "code_client",
+                                        type: "int",
+                                        isNullable: true,
+                                    },
+                                    {
+                                        name: "created_at",
+                                        type: "timestamp",
+                                        default: "now()",
+                                    },
+                                    {
+                                        name: "updated_at",
+                                        type: "timestamp",
+                                        default: "now()",
+                                    },
+                                ],
+                                foreignKeys: [
+                                    {
+                                        name: "fk_contact_client",
+                                        columnNames: ["code_client"],
+                                        referencedTableName: "client",
+                                        referencedColumnNames: ["code_client"],
+                                    },
+                                ],
+                            }))];
+                    case 2:
                         _a.sent();
-                        return [2 /*return*/];
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
                 }
             });
         });
     };
     AddClientContactsRelation1720831489814.prototype.down = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
+            var hasTable;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.dropTable("contact")];
+                    case 0: return [4 /*yield*/, queryRunner.hasTable("contact")];
                     case 1:
+                        hasTable = _a.sent();
+                        if (!hasTable) return [3 /*break*/, 3];
+                        return [4 /*yield*/, queryRunner.dropTable("contact")];
+                    case 2:
                         _a.sent();
-                        return [2 /*return*/];
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
                 }
             });
         });

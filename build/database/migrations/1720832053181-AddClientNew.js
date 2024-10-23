@@ -43,111 +43,136 @@ var AddClientNew1720832053181 = /** @class */ (function () {
     }
     AddClientNew1720832053181.prototype.up = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
+            var hasTable;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.createTable(new typeorm_1.Table({
-                            name: "client",
-                            columns: [
-                                {
-                                    name: "id",
-                                    type: "uuid",
-                                    isPrimary: true,
-                                },
-                                {
-                                    name: "code_client",
-                                    type: "int",
-                                },
-                                {
-                                    name: "nickname",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "name",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "address",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "number",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "complement",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "district",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "city",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "state",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "zip_code",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "kind",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "cnpj_cpf",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "ins_est",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "ins_mun",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "telephone",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "cellphone",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "situation",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "created_at",
-                                    type: "timestamp",
-                                    default: "now()",
-                                },
-                                {
-                                    name: "updated_at",
-                                    type: "timestamp",
-                                    default: "now()",
-                                },
-                            ],
-                        }))];
+                    case 0: return [4 /*yield*/, queryRunner.hasTable("client")];
                     case 1:
+                        hasTable = _a.sent();
+                        if (!!hasTable) return [3 /*break*/, 3];
+                        return [4 /*yield*/, queryRunner.createTable(new typeorm_1.Table({
+                                name: "client",
+                                columns: [
+                                    {
+                                        name: "id",
+                                        type: "uuid",
+                                        isPrimary: true,
+                                    },
+                                    {
+                                        name: "code_client",
+                                        type: "int",
+                                    },
+                                    {
+                                        name: "nickname",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "name",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "address",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "number",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "complement",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "district",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "city",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "state",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "zip_code",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "kind",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "cnpj_cpf",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "ins_est",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "ins_mun",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "telephone",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "cellphone",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "situation",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "account",
+                                        type: "text",
+                                        isArray: true,
+                                        default: "'{}'::text[]",
+                                    },
+                                    {
+                                        name: "created_at",
+                                        type: "timestamp",
+                                        default: "now()",
+                                    },
+                                    {
+                                        name: "updated_at",
+                                        type: "timestamp",
+                                        default: "now()",
+                                    },
+                                ],
+                                uniques: [
+                                    // Correção do nome para `uniqueConstraints`
+                                    {
+                                        name: "UQ_client_code_client",
+                                        columnNames: ["code_client"], // Colunas que têm a restrição única
+                                    },
+                                ],
+                            }))];
+                    case 2:
                         _a.sent();
-                        return [2 /*return*/];
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
                 }
             });
         });
     };
     AddClientNew1720832053181.prototype.down = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
+            var hasTable;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.dropTable("client")];
+                    case 0: return [4 /*yield*/, queryRunner.hasTable("client")];
                     case 1:
+                        hasTable = _a.sent();
+                        if (!hasTable) return [3 /*break*/, 3];
+                        return [4 /*yield*/, queryRunner.dropTable("client")];
+                    case 2:
                         _a.sent();
-                        return [2 /*return*/];
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
                 }
             });
         });

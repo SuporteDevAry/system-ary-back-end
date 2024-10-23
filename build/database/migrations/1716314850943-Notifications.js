@@ -43,58 +43,77 @@ var Notifications1716314850943 = /** @class */ (function () {
     }
     Notifications1716314850943.prototype.up = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
+            var hasTable;
             return __generator(this, function (_a) {
-                new typeorm_1.Table({
-                    name: "notifications",
-                    columns: [
-                        {
-                            name: "id",
-                            type: "uuid",
-                            isPrimary: true,
-                        },
-                        {
-                            name: "user",
-                            type: "varchar",
-                        },
-                        {
-                            name: "read",
-                            type: "boolean",
-                        },
-                        {
-                            name: "content",
-                            type: "varchar",
-                        },
-                        {
-                            name: "type",
-                            type: "varchar",
-                        }, {
-                            name: "isLoading",
-                            type: "boolean",
-                        },
-                        {
-                            name: "created_at",
-                            type: "timestamp",
-                            default: "now()",
-                        },
-                        {
-                            name: "updated_at",
-                            type: "timestamp",
-                            default: "now()",
-                        },
-                    ],
-                });
-                return [2 /*return*/];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, queryRunner.hasTable("notifications")];
+                    case 1:
+                        hasTable = _a.sent();
+                        if (!!hasTable) return [3 /*break*/, 3];
+                        return [4 /*yield*/, queryRunner.createTable(new typeorm_1.Table({
+                                name: "notifications",
+                                columns: [
+                                    {
+                                        name: "id",
+                                        type: "uuid",
+                                        isPrimary: true,
+                                    },
+                                    {
+                                        name: "user",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "read",
+                                        type: "boolean",
+                                        default: false, // Valor padrão para 'read'
+                                    },
+                                    {
+                                        name: "content",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "type",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "isLoading",
+                                        type: "boolean",
+                                        default: false, // Valor padrão para 'isLoading'
+                                    },
+                                    {
+                                        name: "created_at",
+                                        type: "timestamp",
+                                        default: "now()",
+                                    },
+                                    {
+                                        name: "updated_at",
+                                        type: "timestamp",
+                                        default: "now()",
+                                    },
+                                ],
+                            }))];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
+                }
             });
         });
     };
     Notifications1716314850943.prototype.down = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
+            var hasTable;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.dropTable("notifications")];
+                    case 0: return [4 /*yield*/, queryRunner.hasTable("notifications")];
                     case 1:
+                        hasTable = _a.sent();
+                        if (!hasTable) return [3 /*break*/, 3];
+                        return [4 /*yield*/, queryRunner.dropTable("notifications")];
+                    case 2:
                         _a.sent();
-                        return [2 /*return*/];
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
                 }
             });
         });
