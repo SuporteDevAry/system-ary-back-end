@@ -1,1 +1,5 @@
+<<<<<<< Updated upstream
 {"version":3,"file":"index.js","sourceRoot":"","sources":["../../../src/database/migrations/index.ts"],"names":[],"mappings":";;;AAAA,0EAAsF;AACtF,0EAA4F;AAC5F,4EAAyF;AACzF,kHAAkJ;AAClJ,sGAAgI;AAChI,8EAA4F;AAC5F,8EAA4F;AAC5F,kGAA0H;AAC1H,wGAAiI;AACjI,oFAAmG;AAEtF,QAAA,YAAY,GAAG;IAC1B,WAAW,uDAAA;IACX,iBAAiB,uDAAA;IACjB,YAAY,yDAAA;IACZ,+BAA+B,+FAAA;IAC/B,yBAAyB,mFAAA;IACzB,aAAa,2DAAA;IACb,aAAa,2DAAA;IACb,uBAAuB,+EAAA;IACvB,yBAAyB,oFAAA;IACzB,eAAe,gEAAA;CAChB,CAAC"}
+=======
+{"version":3,"file":"index.js","sourceRoot":"","sources":["../../../src/database/migrations/index.ts"],"names":[],"mappings":";;;AAAA,0EAAsF;AACtF,0EAA4F;AAC5F,4EAAyF;AACzF,sGAAgI;AAChI,8EAA4F;AAC5F,8EAA4F;AAE/E,QAAA,YAAY,GAAG;IAC1B,iBAAiB,uDAAA;IACjB,WAAW,uDAAA;IACX,YAAY,yDAAA;IACZ,yBAAyB,mFAAA;IACzB,aAAa,2DAAA;IACb,aAAa,2DAAA;CACd,CAAC"}
+>>>>>>> Stashed changes

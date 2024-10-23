@@ -43,49 +43,61 @@ var Permissions1697084968105 = /** @class */ (function () {
     }
     Permissions1697084968105.prototype.up = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
+            var hasTable;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.createTable(new typeorm_1.Table({
-                            name: "permissions",
-                            columns: [
-                                {
-                                    name: "id",
-                                    type: "uuid",
-                                    isPrimary: true,
-                                },
-                                {
-                                    name: "rules",
-                                    type: "text",
-                                    isArray: true,
-                                    default: "'{}'::text[]",
-                                },
-                                {
-                                    name: "created_at",
-                                    type: "timestamp",
-                                    default: "now()",
-                                },
-                                {
-                                    name: "updated_at",
-                                    type: "timestamp",
-                                    default: "now()",
-                                },
-                            ],
-                        }))];
+                    case 0: return [4 /*yield*/, queryRunner.hasTable("permissions")];
                     case 1:
+                        hasTable = _a.sent();
+                        if (!!hasTable) return [3 /*break*/, 3];
+                        return [4 /*yield*/, queryRunner.createTable(new typeorm_1.Table({
+                                name: "permissions",
+                                columns: [
+                                    {
+                                        name: "id",
+                                        type: "uuid",
+                                        isPrimary: true,
+                                    },
+                                    {
+                                        name: "rules",
+                                        type: "text",
+                                        isArray: true,
+                                        default: "'{}'::text[]",
+                                    },
+                                    {
+                                        name: "created_at",
+                                        type: "timestamp",
+                                        default: "now()",
+                                    },
+                                    {
+                                        name: "updated_at",
+                                        type: "timestamp",
+                                        default: "now()",
+                                    },
+                                ],
+                            }))];
+                    case 2:
                         _a.sent();
-                        return [2 /*return*/];
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
                 }
             });
         });
     };
     Permissions1697084968105.prototype.down = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
+            var hasTable;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.dropTable("permissions")];
+                    case 0: return [4 /*yield*/, queryRunner.hasTable("permissions")];
                     case 1:
+                        hasTable = _a.sent();
+                        if (!hasTable) return [3 /*break*/, 3];
+                        return [4 /*yield*/, queryRunner.dropTable("permissions")];
+                    case 2:
                         _a.sent();
-                        return [2 /*return*/];
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
                 }
             });
         });

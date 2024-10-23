@@ -43,69 +43,81 @@ var CreateUsers1694720577496 = /** @class */ (function () {
     }
     CreateUsers1694720577496.prototype.up = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
+            var hasTable;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.createTable(new typeorm_1.Table({
-                            name: "users",
-                            columns: [
-                                {
-                                    name: "id",
-                                    type: "uuid",
-                                    isPrimary: true,
-                                },
-                                {
-                                    name: "name",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "email",
-                                    type: "varchar",
-                                    isUnique: true,
-                                },
-                                {
-                                    name: "password",
-                                    type: "varchar",
-                                },
-                                {
-                                    name: "permissions_id",
-                                    type: "uuid",
-                                    isNullable: true,
-                                },
-                                {
-                                    name: "created_at",
-                                    type: "timestamp",
-                                    default: "now()",
-                                },
-                                {
-                                    name: "updated_at",
-                                    type: "timestamp",
-                                    default: "now()",
-                                },
-                            ],
-                            foreignKeys: [
-                                {
-                                    name: "fk_user_permissions",
-                                    columnNames: ["permissions_id"],
-                                    referencedTableName: "permissions",
-                                    referencedColumnNames: ["id"],
-                                },
-                            ],
-                        }))];
+                    case 0: return [4 /*yield*/, queryRunner.hasTable("users")];
                     case 1:
+                        hasTable = _a.sent();
+                        if (!!hasTable) return [3 /*break*/, 3];
+                        return [4 /*yield*/, queryRunner.createTable(new typeorm_1.Table({
+                                name: "users",
+                                columns: [
+                                    {
+                                        name: "id",
+                                        type: "uuid",
+                                        isPrimary: true,
+                                    },
+                                    {
+                                        name: "name",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "email",
+                                        type: "varchar",
+                                        isUnique: true,
+                                    },
+                                    {
+                                        name: "password",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "permissions_id",
+                                        type: "uuid",
+                                        isNullable: true,
+                                    },
+                                    {
+                                        name: "created_at",
+                                        type: "timestamp",
+                                        default: "now()",
+                                    },
+                                    {
+                                        name: "updated_at",
+                                        type: "timestamp",
+                                        default: "now()",
+                                    },
+                                ],
+                                foreignKeys: [
+                                    {
+                                        name: "fk_user_permissions",
+                                        columnNames: ["permissions_id"],
+                                        referencedTableName: "permissions",
+                                        referencedColumnNames: ["id"],
+                                    },
+                                ],
+                            }))];
+                    case 2:
                         _a.sent();
-                        return [2 /*return*/];
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
                 }
             });
         });
     };
     CreateUsers1694720577496.prototype.down = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
+            var hasTable;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.dropTable("users")];
+                    case 0: return [4 /*yield*/, queryRunner.hasTable("users")];
                     case 1:
+                        hasTable = _a.sent();
+                        if (!hasTable) return [3 /*break*/, 3];
+                        return [4 /*yield*/, queryRunner.dropTable("users")];
+                    case 2:
                         _a.sent();
-                        return [2 /*return*/];
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
                 }
             });
         });
