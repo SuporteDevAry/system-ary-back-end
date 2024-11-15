@@ -19,7 +19,7 @@ const routes = Router();
 routes.post("/api/login", new SessionController().login);
 
 // Routes protected
-//routes.use(authMiddleware);
+routes.use(authMiddleware);
 routes.get("/api/profile", new UserController().getProfile);
 routes.post("/api/reset-password", new SessionController().resetPassword);
 
