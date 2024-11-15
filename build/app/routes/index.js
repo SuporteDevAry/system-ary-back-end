@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = require("express");
 var UserController_1 = require("../controllers/UserController");
 var SessionController_1 = require("../controllers/SessionController");
+var authMiddleware_1 = require("../middlewares/authMiddleware");
 var PermissionController_1 = require("../controllers/PermissionController");
 var ClientController_1 = require("../controllers/ClientController");
 var ContactController_1 = require("../controllers/ContactController");
@@ -17,7 +18,7 @@ var routes = (0, express_1.Router)();
 // IN and OUT application
 routes.post("/api/login", new SessionController_1.SessionController().login);
 // Routes protected
-//routes.use(authMiddleware);
+routes.use(authMiddleware_1.authMiddleware);
 routes.get("/api/profile", new UserController_1.UserController().getProfile);
 routes.post("/api/reset-password", new SessionController_1.SessionController().resetPassword);
 // CRUD USERS
