@@ -10,6 +10,7 @@ var typeorm_1 = require("typeorm");
 var migrations_1 = require("./migrations");
 var entities_1 = require("../app/entities");
 dotenv_1.default.config({ path: ".env" });
+var SSL_VALUE = process.env.TYPEORM_SSL === "false" ? false : { rejectUnauthorized: false };
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "postgres",
     host: process.env.TYPEORM_HOST,
@@ -22,6 +23,6 @@ exports.AppDataSource = new typeorm_1.DataSource({
     entities: entities_1.entitiesDir,
     migrations: migrations_1.migrationDir,
     subscribers: [],
-    ssl: process.env.TYPEORM_SSL === "true" ? { rejectUnauthorized: false } : false,
+    ssl: SSL_VALUE,
 });
 //# sourceMappingURL=data-source.js.map
