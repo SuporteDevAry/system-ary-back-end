@@ -18,7 +18,6 @@ export const AppDataSource = new DataSource({
   entities: entitiesDir,
   migrations: migrationDir,
   subscribers: [],
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ssl:
+    process.env.TYPEORM_SSL === "true" ? { rejectUnauthorized: false } : false,
 });

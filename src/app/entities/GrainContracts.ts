@@ -117,6 +117,9 @@ export class GrainContract {
   destination: string;
 
   @Column({ nullable: true })
+  complement_destination: string;
+
+  @Column({ nullable: true })
   number_external_contract_buyer: string;
 
   @Column({ nullable: true })
