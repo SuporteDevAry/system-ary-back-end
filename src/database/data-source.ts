@@ -7,7 +7,7 @@ import { entitiesDir } from "../app/entities";
 dotenv.config({ path: ".env" });
 
 const SSL_VALUE =
-  process.env.TYPEORM_SSL === "true" ? { rejectUnauthorized: false } : false;
+  process.env.TYPEORM_SSL === "false" ? false : { rejectUnauthorized: false };
 
 export const AppDataSource = new DataSource({
   type: "postgres",
