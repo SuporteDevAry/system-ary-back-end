@@ -51,9 +51,10 @@ var error_1 = require("./app/middlewares/error");
 var port = process.env.SERVER_PORT;
 var app = (0, express_1.default)();
 app.use((0, cors_1.default)());
-app.use(express_1.default.json());
+app.use(express_1.default.json({ limit: "100mb" }));
 app.use(routes_1.default);
 app.use(error_1.errorMiddleware);
+app.use(express_1.default.urlencoded({ limit: "100mb", extended: true }));
 data_source_1.AppDataSource.initialize().then(function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         app.listen(port, function () {

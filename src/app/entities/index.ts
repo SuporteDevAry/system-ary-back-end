@@ -4,6 +4,7 @@ import { Client } from "./Client";
 import { Contact } from "./Contact";
 import { Notifications } from "./Notifications";
 import { GrainContract } from "./GrainContracts";
+import { EmailLog } from "./EmailLog";
 
 export const entitiesDir = {
   User,
@@ -12,4 +13,5 @@ export const entitiesDir = {
   Contact,
   Notifications,
   GrainContract,
+  EmailLog,
 };

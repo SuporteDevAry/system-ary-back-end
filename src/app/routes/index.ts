@@ -7,6 +7,8 @@ import { ClientController } from "../controllers/ClientController";
 import { ContactController } from "../controllers/ContactController";
 import { NotificationController } from "../controllers/NotificationsController";
 import { GrainContractController } from "../controllers/GrainContractController";
+import { EmailController } from "../controllers/EmailController";
+
 const routes = Router();
 
 // Utilizar futuramente para criar métricas de chamadas
@@ -92,5 +94,7 @@ routes.delete(
   "/api/grain-contracts/:id",
   new GrainContractController().deleteGrainContract
 );
+
+routes.post("/api/send-emails", new EmailController().SendEmails);
 
 export default routes;

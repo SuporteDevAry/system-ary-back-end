@@ -36,40 +36,70 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AddCnpjPagtoFieldToClient1729128019349 = void 0;
+exports.EmailLogs1733888615818 = void 0;
 var typeorm_1 = require("typeorm");
-var AddCnpjPagtoFieldToClient1729128019349 = /** @class */ (function () {
-    function AddCnpjPagtoFieldToClient1729128019349() {
+var EmailLogs1733888615818 = /** @class */ (function () {
+    function EmailLogs1733888615818() {
     }
-    AddCnpjPagtoFieldToClient1729128019349.prototype.up = function (queryRunner) {
+    EmailLogs1733888615818.prototype.up = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
+            var hasTable;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.addColumn("client", new typeorm_1.TableColumn({
-                            name: "cnpj_pagto",
-                            type: "varchar",
-                            isNullable: true,
-                        }))];
+                    case 0: return [4 /*yield*/, queryRunner.hasTable("email_logs")];
                     case 1:
+                        hasTable = _a.sent();
+                        if (!!hasTable) return [3 /*break*/, 3];
+                        return [4 /*yield*/, queryRunner.createTable(new typeorm_1.Table({
+                                name: "email_logs",
+                                columns: [
+                                    {
+                                        name: "id",
+                                        type: "uuid",
+                                        isPrimary: true,
+                                    },
+                                    {
+                                        name: "email_sender",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "number_contract",
+                                        type: "varchar",
+                                    },
+                                    {
+                                        name: "sent_at",
+                                        type: "timestamp",
+                                        default: "now()",
+                                    },
+                                ],
+                            }))];
+                    case 2:
                         _a.sent();
-                        return [2 /*return*/];
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    AddCnpjPagtoFieldToClient1729128019349.prototype.down = function (queryRunner) {
+    EmailLogs1733888615818.prototype.down = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
+            var hasTable;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.dropColumn("client", "cnpj_pagto")];
+                    case 0: return [4 /*yield*/, queryRunner.hasTable("email_logs")];
                     case 1:
+                        hasTable = _a.sent();
+                        if (!hasTable) return [3 /*break*/, 3];
+                        return [4 /*yield*/, queryRunner.dropTable("email_logs")];
+                    case 2:
                         _a.sent();
-                        return [2 /*return*/];
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    return AddCnpjPagtoFieldToClient1729128019349;
+    return EmailLogs1733888615818;
 }());
-exports.AddCnpjPagtoFieldToClient1729128019349 = AddCnpjPagtoFieldToClient1729128019349;
-//# sourceMappingURL=1729128019349-AddCnpj_pagtoFieldToClient.js.map
+exports.EmailLogs1733888615818 = EmailLogs1733888615818;
+//# sourceMappingURL=1733888615818-EmailLogs.js.map
