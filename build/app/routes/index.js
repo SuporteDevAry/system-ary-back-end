@@ -9,6 +9,7 @@ var ClientController_1 = require("../controllers/ClientController");
 var ContactController_1 = require("../controllers/ContactController");
 var NotificationsController_1 = require("../controllers/NotificationsController");
 var GrainContractController_1 = require("../controllers/GrainContractController");
+var EmailController_1 = require("../controllers/EmailController");
 var routes = (0, express_1.Router)();
 // Utilizar futuramente para criar métricas de chamadas
 // routes.use("/api", (req, res, next) => {
@@ -53,5 +54,6 @@ routes.get("/api/grain-contracts/:id", new GrainContractController_1.GrainContra
 routes.post("/api/grain-contracts", new GrainContractController_1.GrainContractController().createGrainContract);
 routes.patch("/api/grain-contracts/:id", new GrainContractController_1.GrainContractController().updateGrainContract);
 routes.delete("/api/grain-contracts/:id", new GrainContractController_1.GrainContractController().deleteGrainContract);
+routes.post("/api/send-emails", new EmailController_1.EmailController().SendEmails);
 exports.default = routes;
 //# sourceMappingURL=index.js.map
