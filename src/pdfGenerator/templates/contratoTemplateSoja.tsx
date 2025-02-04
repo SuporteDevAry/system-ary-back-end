@@ -19,11 +19,13 @@ const logoBase64 = `data:image/jpeg;base64,${fs
 
 interface ContratoTemplateProps {
   data: any;
+  typeContract: "Vendedor" | "Comprador";
   modeSave: boolean;
 }
 
 const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
   data,
+  typeContract,
   modeSave,
 }) => {
   const today = new Date();
@@ -109,6 +111,21 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
       .join("");
   }
 
+  let formattedSafra =
+    data.product === "O" || data.product === "F"
+      ? ` `
+      : ` - Safra: ${data.crop}`;
+
+  let formattedMetrica =
+    data.product === "O" || data.product === "F"
+      ? ` toneladas métricas`
+      : ` quilos`;
+
+  let formattedPreco =
+    data.product === "O" || data.product === "F"
+      ? ` por tonelada métrica.`
+      : ` por saca de 60(sessenta) quilos,`;
+
   return (
     <div id="contrato">
       <div style={{ margin: 0, textAlign: "center" }}>
@@ -176,7 +193,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
           <span>
             <strong>
               {" - "}
-              Safra: <span>{crop}</span>
+              <span>{formattedSafra}</span>
             </strong>
           </span>
         </div>
@@ -196,7 +213,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
         <strong>
           {formattedQtd} {formattedExtenso}
         </strong>{" "}
-        quilos.
+        {formattedMetrica}
       </div>
       <br />
 
@@ -205,7 +222,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
       </div>
       <div style={{ textAlign: "justify" }}>
         <strong>{formatCurrency(price, data.type_currency, modeSave)}</strong>{" "}
-        por saca de 60(sessenta) quilos,{" "}
+        {formattedPreco}
         <strong>
           (
           {complement_destination
@@ -269,7 +286,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
       </div>
       <br />
 
-      {formattedCSeller ? (
+      {typeContract === "Vendedor" && formattedCSeller ? (
         <div style={{ textAlign: "justify" }}>
           <strong>===</strong>
           <br />
@@ -285,7 +302,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
         ""
       )}
 
-      {formattedCBuyer ? (
+      {typeContract === "Comprador" && formattedCBuyer ? (
         <div style={{ textAlign: "justify" }}>
           <strong>===</strong>
           <br />
