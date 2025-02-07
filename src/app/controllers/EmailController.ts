@@ -49,7 +49,7 @@ export class EmailController {
         text: `Segue o contrato ${number_contract} em anexo.`,
         html: ` 
           <div style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;">
-            <p>Prezado ${contractData.buyer.name}</p>
+            <p>Prezado ${contractData.seller.name}</p>
             <p>Segue anexo uma (01) cópia de nossa confirmação, solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve possível.</p>
 
             <p>Agradecemos e nos colocamos a sua disposição.</p>
@@ -75,7 +75,7 @@ export class EmailController {
         text: `Segue o contrato ${number_contract} em anexo.`,
         html: `
           <div style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;">
-            <p>Prezado ${contractData.seller.name}</p>
+            <p>Prezado ${contractData.buyer.name}</p>
             <p>Segue anexo uma (01) cópia de nossa confirmação, solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve possível.</p>
 
             <p>Agradecemos e nos colocamos a sua disposição.</p>
