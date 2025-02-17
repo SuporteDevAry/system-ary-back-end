@@ -57,7 +57,10 @@ const PdfGeneratorNew = async ({
     `;
 
     // Configuração do Puppeteer para gerar o PDF
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
     const page = await browser.newPage();
 
     // Configurar o conteúdo da página
