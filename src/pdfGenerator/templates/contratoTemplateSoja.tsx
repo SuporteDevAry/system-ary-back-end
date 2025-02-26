@@ -192,7 +192,6 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
           <span>{name_product}</span>
           <span>
             <strong>
-              {" - "}
               <span>{formattedSafra}</span>
             </strong>
           </span>
@@ -221,7 +220,11 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
         <strong>Preço:</strong>
       </div>
       <div style={{ textAlign: "justify" }}>
-        <strong>{formatCurrency(price, data.type_currency, modeSave)}</strong>{" "}
+        <strong>
+          {data.type_currency === "Dólar"
+            ? `${"US"}${formatCurrency(price, data.type_currency, modeSave)}`
+            : formatCurrency(price, data.type_currency, modeSave)}
+        </strong>{" "}
         {formattedPreco}
         <strong>
           (
