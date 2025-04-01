@@ -45,6 +45,9 @@ export class Contact {
   @Column({ type: "int" })
   code_client: number;
 
+  @Column({ type: "text", default: "false" })
+  receive_email: string;
+
   constructor() {
     if (!this.id) {
       this.id = uuid();

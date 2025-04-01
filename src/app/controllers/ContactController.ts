@@ -27,7 +27,15 @@ export class ContactController {
   }
 
   async create(req: Request, res: Response) {
-    const { name, email, sector, telephone, cellphone, code_client } = req.body;
+    const {
+      name,
+      email,
+      sector,
+      telephone,
+      cellphone,
+      code_client,
+      receive_email,
+    } = req.body;
 
     const contactExists = await contactRepository.findOneBy({
       email,
@@ -45,6 +53,7 @@ export class ContactController {
       telephone,
       cellphone,
       code_client,
+      receive_email,
     });
 
     await contactRepository.save(newContato);
@@ -56,7 +65,8 @@ export class ContactController {
 
   async update(req: Request, res: Response) {
     const { id } = req.params;
-    const { name, email, sector, telephone, cellphone } = req.body;
+    const { name, email, sector, telephone, cellphone, receive_email } =
+      req.body;
 
     if (!id) {
       throw new BadRequestError("Código do Cliente não informado.");
@@ -75,6 +85,7 @@ export class ContactController {
     if (sector) contactToUpdate.sector = sector;
     if (telephone) contactToUpdate.telephone = telephone;
     if (cellphone) contactToUpdate.cellphone = cellphone;
+    if (receive_email) contactToUpdate.receive_email = receive_email;
 
     await contactRepository.save(contactToUpdate);
 
