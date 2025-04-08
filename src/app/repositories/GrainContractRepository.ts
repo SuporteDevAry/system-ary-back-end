@@ -9,7 +9,8 @@ type ProductGroup = keyof typeof productGroups;
 // Definição dos grupos
 const productGroups = {
   group1: ["S", "T", "SG", "CN"],
-  group2: ["O", "F"],
+  group2: ["O", "F", "OC", "OA", "SB", "EP"],
+  group3: ["F"],
 } as const;
 
 // Função para determinar a qual grupo um produto pertence
@@ -43,6 +44,11 @@ export const generateNumberContract = async (
   // Obtém os produtos do grupo correspondente
   const productsInGroup = productGroups[productGroup];
 
+  // Só iremos remover essa regra das siglas, caso o cliente aceite a sugestão da reunião do dia 09/04/2025
+  const listProducts = ["O", "OC", "OA", "SB", "EP"];
+  const validProducts = listProducts.includes(product);
+  const siglaProduct = validProducts ? "O" : product;
+
   // Query para pegar o último número do contrato baseado no grupo
   const query = `
       SELECT number_contract
@@ -74,7 +80,7 @@ export const generateNumberContract = async (
 
     // Formatar o número do contrato
     const formattedIncrement = nextIncrement.toString().padStart(3, "0");
-    const numberContract = `${product}.${number_broker}-${formattedIncrement}/${currentYear}`;
+    const numberContract = `${siglaProduct}.${number_broker}-${formattedIncrement}/${currentYear}`;
 
     return numberContract;
   } catch (error) {

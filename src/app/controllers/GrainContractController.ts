@@ -92,8 +92,14 @@ export class GrainContractController {
             ? otherFields.number_broker
             : currentBroker;
 
+          // Só iremos remover essa regra das siglas, caso o cliente aceite a sugestão da reunião do dia 09/04/2025
+          const listProducts = ["O", "OC", "OA", "SB", "EP"];
+          const siglaProduct = listProducts.includes(updatedProduct)
+            ? "O"
+            : updatedProduct;
+
           // Mantém o radical e o ano, alterando apenas o prefixo e sufixo
-          grainContract.number_contract = `${updatedProduct}.${updatedBroker}-${currentIncrement}/${currentYear}`;
+          grainContract.number_contract = `${siglaProduct}.${updatedBroker}-${currentIncrement}/${currentYear}`;
           grainContract.number_broker = updatedBroker;
           grainContract.product = updatedProduct;
         }
