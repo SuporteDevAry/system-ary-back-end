@@ -9,7 +9,7 @@ type ProductGroup = keyof typeof productGroups;
 // Definição dos grupos
 const productGroups = {
   group1: ["S", "T", "SG", "CN"],
-  group2: ["O", "F", "OC", "OA", "SB", "EP"],
+  group2: ["O", "OC", "OA", "SB", "EP"],
   group3: ["F"],
 } as const;
 
