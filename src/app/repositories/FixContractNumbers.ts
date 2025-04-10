@@ -4,7 +4,8 @@ import { GrainContract } from "../entities/GrainContracts";
 // Definição dos grupos de produtos
 const productGroups = {
   group1: ["S", "T", "SG", "CN"],
-  group2: ["O", "F"],
+  group2: ["O"],
+  group3: ["F"],
 } as const;
 
 type ProductGroup = keyof typeof productGroups;
