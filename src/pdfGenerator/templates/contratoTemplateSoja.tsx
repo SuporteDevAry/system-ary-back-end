@@ -111,20 +111,22 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
       .join("");
   }
 
-  let formattedSafra =
-    data.product === "O" || data.product === "F"
-      ? ` `
-      : ` - Safra: ${data.crop}`;
+  const listProductsForMetricTon = ["O", "F", "OC", "OA", "SB", "EP"];
+  const validProductsForMetricTon = listProductsForMetricTon.includes(
+    data.product
+  );
 
-  let formattedMetrica =
-    data.product === "O" || data.product === "F"
-      ? ` toneladas métricas`
-      : ` quilos`;
+  let formattedSafra = validProductsForMetricTon
+    ? ` `
+    : ` - Safra: ${data.crop}`;
 
-  let formattedPreco =
-    data.product === "O" || data.product === "F"
-      ? ` por tonelada métrica.`
-      : ` por saca de 60(sessenta) quilos,`;
+  let formattedMetrica = validProductsForMetricTon
+    ? ` toneladas métricas`
+    : ` quilos`;
+
+  let formattedPreco = validProductsForMetricTon
+    ? ` por tonelada métrica.`
+    : ` por saca de 60(sessenta) quilos,`;
 
   return (
     <div id="contrato">
