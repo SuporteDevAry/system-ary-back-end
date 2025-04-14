@@ -228,14 +228,18 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
             : formatCurrency(price, data.type_currency, modeSave)}
         </strong>{" "}
         {formattedPreco}
-        <strong>
-          (
-          {complement_destination
-            ? `${destination} ${complement_destination}`
-            : destination}
-          )
-        </strong>
-        .
+        {destination && (
+          <span>
+            <strong>
+              (
+              {complement_destination
+                ? `${destination} ${complement_destination}`
+                : destination}
+              )
+            </strong>
+            .
+          </span>
+        )}
       </div>
       <br />
 

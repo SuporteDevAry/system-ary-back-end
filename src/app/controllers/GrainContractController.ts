@@ -69,7 +69,7 @@ export class GrainContractController {
       }
 
       // Regex para capturar as partes do número do contrato (prefixo, corretor, radical e ano)
-      const validNumberContract = /^([A-Z]+)\.(\d+)-(\d{3})\/(\d{2})$/;
+      const validNumberContract = /^([A-Z]+)\.([A-Z0-9]+)-(\d{3})\/(\d{2})$/;
       const match = grainContract.number_contract.match(validNumberContract);
 
       if (match) {
