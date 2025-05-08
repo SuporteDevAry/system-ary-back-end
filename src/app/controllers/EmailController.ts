@@ -13,6 +13,31 @@ export class EmailController {
         return;
       }
 
+      // Extração da sigla
+      const sigla = number_contract.split(".")[0].toUpperCase();
+
+      // Grupos de siglas
+      const group1 = ["S", "T", "SG", "CN"];
+      const group2 = ["O", "OC", "OA", "SB", "EP"];
+      const group3 = ["F"];
+
+      let fromEmail = process.env.SMTP_USER as string;
+      let bccEmails: string[] = [];
+
+      if (group1.includes(sigla)) {
+        fromEmail = process.env.SMTP_SOY_TABLE!;
+        bccEmails = [
+          "exec-mi@aryoleofar.com.br",
+          "evandro@aryoleofar.com.br",
+          "gilberto@aryoleofar.com.br",
+          "jhony@aryoleofar.com.br",
+          "talita@aryoleofar.com.br",
+        ];
+      } else if (group2.includes(sigla) || group3.includes(sigla)) {
+        fromEmail = process.env.SMTP_OIL_TABLE!;
+        bccEmails = ["ary@aryoleofar.com.br"];
+      }
+
       // Gerar o PDF para o vendedor
       const pdfSeller = await PdfGeneratorNew({
         data: contractData,
@@ -44,6 +69,7 @@ export class EmailController {
         to: [contractData.list_email_seller],
         bcc: [
           "'Contrato Enviado do Sistema - Vendedor' <suportearyoleofar@gmail.com>",
+          ...bccEmails,
         ],
         subject: `Contrato ${number_contract} - Vendedor`,
         text: `Segue o contrato ${number_contract} em anexo.`,
@@ -70,6 +96,7 @@ export class EmailController {
         to: [contractData.list_email_buyer],
         bcc: [
           "'Contrato Enviado do Sistema - Comprador' <suportearyoleofar@gmail.com>",
+          ...bccEmails,
         ],
         subject: `Contrato ${number_contract} - Comprador`,
         text: `Segue o contrato ${number_contract} em anexo.`,
