@@ -65,7 +65,7 @@ export class EmailController {
 
       // Enviar e-mail para o vendedor
       await transporter.sendMail({
-        from: process.env.SMTP_USER,
+        from: fromEmail,
         to: [contractData.list_email_seller],
         bcc: [
           "'Contrato Enviado do Sistema - Vendedor' <suportearyoleofar@gmail.com>",
@@ -92,7 +92,7 @@ export class EmailController {
 
       // Enviar e-mail para o comprador
       await transporter.sendMail({
-        from: process.env.SMTP_USER,
+        from: fromEmail,
         to: [contractData.list_email_buyer],
         bcc: [
           "'Contrato Enviado do Sistema - Comprador' <suportearyoleofar@gmail.com>",
