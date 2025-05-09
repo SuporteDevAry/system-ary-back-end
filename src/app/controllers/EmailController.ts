@@ -32,6 +32,7 @@ export class EmailController {
           "gilberto@aryoleofar.com.br",
           "jhony@aryoleofar.com.br",
           "talita@aryoleofar.com.br",
+          "elcio@aryoleofar.com.br",
         ];
       } else if (group2.includes(sigla) || group3.includes(sigla)) {
         fromEmail = process.env.SMTP_OIL_TABLE!;
