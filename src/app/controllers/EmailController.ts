@@ -33,10 +33,11 @@ export class EmailController {
           "jhony@aryoleofar.com.br",
           "talita@aryoleofar.com.br",
           "elcio@aryoleofar.com.br",
+          "lelis@aryoleofar.com.br",
         ];
       } else if (group2.includes(sigla) || group3.includes(sigla)) {
         fromEmail = process.env.SMTP_OIL_TABLE!;
-        bccEmails = ["ary@aryoleofar.com.br"];
+        bccEmails = ["ary@aryoleofar.com.br", "lelis@aryoleofar.com.br"];
       }
 
       // Gerar o PDF para o vendedor
