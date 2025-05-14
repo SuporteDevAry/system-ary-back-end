@@ -21,11 +21,11 @@ export class EmailController {
       const group2 = ["O", "OC", "OA", "SB", "EP"];
       const group3 = ["F"];
 
-      let fromEmail = process.env.SMTP_USER as string;
+      //let fromEmail = process.env.SMTP_USER as string;
       let bccEmails: string[] = [];
 
       if (group1.includes(sigla)) {
-        fromEmail = process.env.SMTP_SOY_TABLE!;
+        //fromEmail = process.env.SMTP_SOY_TABLE!;
         bccEmails = [
           "exec-mi@aryoleofar.com.br",
           "evandro@aryoleofar.com.br",
@@ -36,7 +36,7 @@ export class EmailController {
           "lelis@aryoleofar.com.br",
         ];
       } else if (group2.includes(sigla) || group3.includes(sigla)) {
-        fromEmail = process.env.SMTP_OIL_TABLE!;
+        //fromEmail = process.env.SMTP_OIL_TABLE!;
         bccEmails = ["ary@aryoleofar.com.br", "lelis@aryoleofar.com.br"];
       }
 
@@ -67,7 +67,7 @@ export class EmailController {
 
       // Enviar e-mail para o vendedor
       await transporter.sendMail({
-        from: fromEmail,
+        from: process.env.SMTP_USER,
         to: [contractData.list_email_seller],
         bcc: [
           "'Contrato Enviado do Sistema - Vendedor' <suportearyoleofar@gmail.com>",
@@ -94,7 +94,7 @@ export class EmailController {
 
       // Enviar e-mail para o comprador
       await transporter.sendMail({
-        from: fromEmail,
+        from: process.env.SMTP_USER,
         to: [contractData.list_email_buyer],
         bcc: [
           "'Contrato Enviado do Sistema - Comprador' <suportearyoleofar@gmail.com>",
