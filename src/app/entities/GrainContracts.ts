@@ -39,6 +39,9 @@ export class GrainContract {
   @Column()
   quality: string;
 
+  @Column({ nullable: true })
+  type_quantity: string;
+
   @Column("decimal")
   quantity: number;
 

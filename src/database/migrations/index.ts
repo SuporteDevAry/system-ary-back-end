@@ -7,6 +7,7 @@ import { GrainContract1724183698162 as GrainContract } from "./1724183698162-Gra
 import { AddComplementationDestination1732715196786 as AddComplementationDestination } from "./1732715196786-AddComplementationDestination";
 import { EmailLogs1733888615818 as EmailLog } from "./1733888615818-EmailLogs";
 import { AddReceiveEmailInContacts1742958762694 as AddReceiveEmailInContacts } from "./1742958762694-AddReceiveEmailInContacts";
+import { AddTypeQuantity1747783875290 as AddTypeQuantity } from "./1747783875290-addTypeQuantity";
 
 export const migrationDir = {
   CreatePermissions,
@@ -18,4 +19,5 @@ export const migrationDir = {
   AddComplementationDestination,
   EmailLog,
   AddReceiveEmailInContacts,
+  AddTypeQuantity,
 };

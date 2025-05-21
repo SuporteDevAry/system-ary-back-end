@@ -59,7 +59,10 @@ var PdfGeneratorNew = function (_a) {
                         throw new Error("Template \"".concat(template, "\" n\u00E3o encontrado."));
                     }
                     populatedTemplate = "\n      <html>\n        <head>\n          <style>\n            /* Adicione aqui os estilos globais para o PDF */\n            body {\n              font-family: Arial, sans-serif;\n            }\n              #contrato {\n              width: 210mm; /* Largura fixa para A4 */\n              height: 297mm; /* Altura fixa para A4 */\n              page-break-inside: avoid; /* Evitar quebras internas */\n              page-break-before: auto; /* Evitar quebras antes */\n              page-break-after: auto; /* Evitar quebras depois */\n              word-wrap: break-word; /* Quebra palavras longas */\n              word-break: break-word; /* Quebra de palavras */\n             \n            }\n             \n          </style>\n        </head>\n        <body>\n          <div id=\"contrato\">\n            ".concat(server_1.default.renderToStaticMarkup(react_1.default.createElement(TemplateComponent, { data: data, typeContract: typeContract })), "\n          </div>\n        </body>\n      </html>\n    ");
-                    return [4 /*yield*/, puppeteer_1.default.launch({ headless: true })];
+                    return [4 /*yield*/, puppeteer_1.default.launch({
+                            headless: true,
+                            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+                        })];
                 case 1:
                     browser = _d.sent();
                     return [4 /*yield*/, browser.newPage()];

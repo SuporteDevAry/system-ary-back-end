@@ -21,23 +21,29 @@ export class EmailController {
       const group2 = ["O", "OC", "OA", "SB", "EP"];
       const group3 = ["F"];
 
+      const blockEmailsLocal = process.env.BLOCK_SENDER_EMAIL_LOCAL === "true";
+
       //let fromEmail = process.env.SMTP_USER as string;
       let bccEmails: string[] = [];
 
-      if (group1.includes(sigla)) {
-        //fromEmail = process.env.SMTP_SOY_TABLE!;
-        bccEmails = [
-          "exec-mi@aryoleofar.com.br",
-          "evandro@aryoleofar.com.br",
-          "gilberto@aryoleofar.com.br",
-          "jhony@aryoleofar.com.br",
-          "talita@aryoleofar.com.br",
-          "elcio@aryoleofar.com.br",
-          "lelis@aryoleofar.com.br",
-        ];
-      } else if (group2.includes(sigla) || group3.includes(sigla)) {
-        //fromEmail = process.env.SMTP_OIL_TABLE!;
-        bccEmails = ["ary@aryoleofar.com.br", "lelis@aryoleofar.com.br"];
+      if (!blockEmailsLocal) {
+        if (group1.includes(sigla)) {
+          //fromEmail = process.env.SMTP_SOY_TABLE!;
+          bccEmails = [
+            "exec-mi@aryoleofar.com.br",
+            "evandro@aryoleofar.com.br",
+            "gilberto@aryoleofar.com.br",
+            "jhony@aryoleofar.com.br",
+            "talita@aryoleofar.com.br",
+            "elcio@aryoleofar.com.br",
+            "lelis@aryoleofar.com.br",
+          ];
+        } else if (group2.includes(sigla) || group3.includes(sigla)) {
+          //fromEmail = process.env.SMTP_OIL_TABLE!;
+          bccEmails = ["ary@aryoleofar.com.br", "lelis@aryoleofar.com.br"];
+        }
+      } else {
+        console.log("🚫 Emails de grupo bloqueados no ambiente local");
       }
 
       // Gerar o PDF para o vendedor

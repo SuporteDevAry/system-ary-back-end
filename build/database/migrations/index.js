@@ -9,6 +9,8 @@ var _1716314850943_Notifications_1 = require("./1716314850943-Notifications");
 var _1724183698162_GrainContract_1 = require("./1724183698162-GrainContract");
 var _1732715196786_AddComplementationDestination_1 = require("./1732715196786-AddComplementationDestination");
 var _1733888615818_EmailLogs_1 = require("./1733888615818-EmailLogs");
+var _1742958762694_AddReceiveEmailInContacts_1 = require("./1742958762694-AddReceiveEmailInContacts");
+var _1747783875290_addTypeQuantity_1 = require("./1747783875290-addTypeQuantity");
 exports.migrationDir = {
     CreatePermissions: _1697084968105_permissions_1.Permissions1697084968105,
     CreateUsers: _1694720577496_createUsers_1.CreateUsers1694720577496,
@@ -18,5 +20,7 @@ exports.migrationDir = {
     GrainContract: _1724183698162_GrainContract_1.GrainContract1724183698162,
     AddComplementationDestination: _1732715196786_AddComplementationDestination_1.AddComplementationDestination1732715196786,
     EmailLog: _1733888615818_EmailLogs_1.EmailLogs1733888615818,
+    AddReceiveEmailInContacts: _1742958762694_AddReceiveEmailInContacts_1.AddReceiveEmailInContacts1742958762694,
+    AddTypeQuantity: _1747783875290_addTypeQuantity_1.AddTypeQuantity1747783875290,
 };
 //# sourceMappingURL=index.js.map
