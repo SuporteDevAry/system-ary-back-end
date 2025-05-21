@@ -21,7 +21,6 @@ var ContratoTemplateSoja = function (_a) {
     }
     // Extraindo as propriedades necessárias de data
     var seller = data.seller, buyer = data.buyer, number_contract = data.number_contract, product = data.product, number_broker = data.number_broker, quantity = data.quantity, commission_seller = data.commission_seller, commission_buyer = data.commission_buyer, quality = data.quality, price = data.price, type_currency = data.type_currency, complement_destination = data.complement_destination, destination = data.destination, icms = data.icms, payment = data.payment, pickup = data.pickup, pickup_location = data.pickup_location, inspection = data.inspection, observation = data.observation, crop = data.crop, name_product = data.name_product, type_commission_seller = data.type_commission_seller, type_commission_buyer = data.type_commission_buyer, type_pickup = data.type_pickup;
-    console.log("data:", data.type_quantity);
     // Lógica de formatação
     var quantity_aux = modeSave
         ? !quantity.match(/,/g)
