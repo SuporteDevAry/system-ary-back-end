@@ -12,7 +12,7 @@ var logoBase64 = "data:image/jpeg;base64,".concat(fs_1.default
     .readFileSync(logoContrato)
     .toString("base64"));
 var ContratoTemplateSoja = function (_a) {
-    var data = _a.data, modeSave = _a.modeSave;
+    var data = _a.data, typeContract = _a.typeContract, modeSave = _a.modeSave;
     var today = new Date();
     var currentYear = today.getFullYear().toString().substr(-2);
     // Verifique se data é válida e contém as propriedades necessárias
@@ -21,6 +21,7 @@ var ContratoTemplateSoja = function (_a) {
     }
     // Extraindo as propriedades necessárias de data
     var seller = data.seller, buyer = data.buyer, number_contract = data.number_contract, product = data.product, number_broker = data.number_broker, quantity = data.quantity, commission_seller = data.commission_seller, commission_buyer = data.commission_buyer, quality = data.quality, price = data.price, type_currency = data.type_currency, complement_destination = data.complement_destination, destination = data.destination, icms = data.icms, payment = data.payment, pickup = data.pickup, pickup_location = data.pickup_location, inspection = data.inspection, observation = data.observation, crop = data.crop, name_product = data.name_product, type_commission_seller = data.type_commission_seller, type_commission_buyer = data.type_commission_buyer, type_pickup = data.type_pickup;
+    console.log("data:", data.type_quantity);
     // Lógica de formatação
     var quantity_aux = modeSave
         ? !quantity.match(/,/g)
@@ -62,6 +63,17 @@ var ContratoTemplateSoja = function (_a) {
         })
             .join("");
     }
+    var listProductsForMetricTon = ["O", "F", "OC", "OA", "SB", "EP"];
+    var validProductsForMetricTon = listProductsForMetricTon.includes(data.product);
+    var formattedSafra = validProductsForMetricTon
+        ? " "
+        : " - Safra: ".concat(data.crop);
+    var formattedMetrica = data.type_quantity === "toneladas métricas"
+        ? " toneladas m\u00E9tricas"
+        : " quilos";
+    var formattedPreco = data.type_quantity === "toneladas métricas"
+        ? " por tonelada m\u00E9trica."
+        : " por saca de 60(sessenta) quilos,";
     return (react_1.default.createElement("div", { id: "contrato" },
         react_1.default.createElement("div", { style: { margin: 0, textAlign: "center" } },
             react_1.default.createElement("img", { src: logoBase64, alt: "logo Ary Completo", width: 300 })),
@@ -135,9 +147,7 @@ var ContratoTemplateSoja = function (_a) {
                 react_1.default.createElement("span", null, name_product),
                 react_1.default.createElement("span", null,
                     react_1.default.createElement("strong", null,
-                        " - ",
-                        "Safra: ",
-                        react_1.default.createElement("span", null, crop))))),
+                        react_1.default.createElement("span", null, formattedSafra))))),
         react_1.default.createElement("br", null),
         react_1.default.createElement("div", { style: { textAlign: "left" } },
             react_1.default.createElement("strong", null, "Qualidade:")),
@@ -151,22 +161,24 @@ var ContratoTemplateSoja = function (_a) {
                 " ",
                 formattedExtenso),
             " ",
-            "quilos."),
+            formattedMetrica),
         react_1.default.createElement("br", null),
         react_1.default.createElement("div", { style: { textAlign: "left" } },
             react_1.default.createElement("strong", null, "Pre\u00E7o:")),
         react_1.default.createElement("div", { style: { textAlign: "justify" } },
-            react_1.default.createElement("strong", null, (0, helpers_1.formatCurrency)(price, data.type_currency, modeSave)),
+            react_1.default.createElement("strong", null, data.type_currency === "Dólar"
+                ? "".concat("US").concat((0, helpers_1.formatCurrency)(price, data.type_currency, modeSave))
+                : (0, helpers_1.formatCurrency)(price, data.type_currency, modeSave)),
             " ",
-            "por saca de 60(sessenta) quilos,",
-            " ",
-            react_1.default.createElement("strong", null,
-                "(",
-                complement_destination
-                    ? "".concat(destination, " ").concat(complement_destination)
-                    : destination,
-                ")"),
-            "."),
+            formattedPreco,
+            destination && (react_1.default.createElement("span", null,
+                react_1.default.createElement("strong", null,
+                    "(",
+                    complement_destination
+                        ? "".concat(destination, " ").concat(complement_destination)
+                        : destination,
+                    ")"),
+                "."))),
         react_1.default.createElement("br", null),
         react_1.default.createElement("div", { style: { textAlign: "left" } },
             react_1.default.createElement("strong", null, "ICMS:")),
@@ -202,7 +214,7 @@ var ContratoTemplateSoja = function (_a) {
         react_1.default.createElement("div", { style: { textAlign: "justify" } },
             react_1.default.createElement("strong", null, "\"Favor comunicar qualquer discrep\u00E2ncia em 01 (um) dia \u00FAtil do recebimento da confirma\u00E7\u00E3o por escrito. Se n\u00E3o houver discrep\u00E2ncias relatadas, presume-se que todas as partes envolvidas aceitam e concordam com todos os termos conforme descrito na confirma\u00E7\u00E3o de neg\u00F3cio acima.\"")),
         react_1.default.createElement("br", null),
-        formattedCSeller ? (react_1.default.createElement("div", { style: { textAlign: "justify" } },
+        typeContract === "Vendedor" && formattedCSeller ? (react_1.default.createElement("div", { style: { textAlign: "justify" } },
             react_1.default.createElement("strong", null, "==="),
             react_1.default.createElement("br", null),
             react_1.default.createElement("strong", null,
@@ -212,7 +224,7 @@ var ContratoTemplateSoja = function (_a) {
                 "por conta do vendedor."),
             react_1.default.createElement("br", null),
             react_1.default.createElement("strong", null, "==="))) : (""),
-        formattedCBuyer ? (react_1.default.createElement("div", { style: { textAlign: "justify" } },
+        typeContract === "Comprador" && formattedCBuyer ? (react_1.default.createElement("div", { style: { textAlign: "justify" } },
             react_1.default.createElement("strong", null, "==="),
             react_1.default.createElement("br", null),
             react_1.default.createElement("strong", null,

@@ -35,6 +35,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -48,7 +57,7 @@ var EmailController = /** @class */ (function () {
     }
     EmailController.prototype.SendEmails = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, contractData, templateName, sender, number_contract, pdfSeller, pdfBuyer, transporter, error_1;
+            var _a, contractData, templateName, sender, number_contract, sigla, group1, group2, group3, blockEmailsLocal, bccEmails, pdfSeller, pdfBuyer, transporter, error_1;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -57,6 +66,33 @@ var EmailController = /** @class */ (function () {
                         if (!contractData || !templateName || !sender || !number_contract) {
                             res.status(400).send({ error: "Campos necessários não informados." });
                             return [2 /*return*/];
+                        }
+                        sigla = number_contract.split(".")[0].toUpperCase();
+                        group1 = ["S", "T", "SG", "CN"];
+                        group2 = ["O", "OC", "OA", "SB", "EP"];
+                        group3 = ["F"];
+                        blockEmailsLocal = process.env.BLOCK_SENDER_EMAIL_LOCAL === "true";
+                        bccEmails = [];
+                        if (!blockEmailsLocal) {
+                            if (group1.includes(sigla)) {
+                                //fromEmail = process.env.SMTP_SOY_TABLE!;
+                                bccEmails = [
+                                    "exec-mi@aryoleofar.com.br",
+                                    "evandro@aryoleofar.com.br",
+                                    "gilberto@aryoleofar.com.br",
+                                    "jhony@aryoleofar.com.br",
+                                    "talita@aryoleofar.com.br",
+                                    "elcio@aryoleofar.com.br",
+                                    "lelis@aryoleofar.com.br",
+                                ];
+                            }
+                            else if (group2.includes(sigla) || group3.includes(sigla)) {
+                                //fromEmail = process.env.SMTP_OIL_TABLE!;
+                                bccEmails = ["ary@aryoleofar.com.br", "lelis@aryoleofar.com.br"];
+                            }
+                        }
+                        else {
+                            console.log("🚫 Emails de grupo bloqueados no ambiente local");
                         }
                         return [4 /*yield*/, (0, pdfGenerator_1.default)({
                                 data: contractData,
@@ -85,12 +121,12 @@ var EmailController = /** @class */ (function () {
                         return [4 /*yield*/, transporter.sendMail({
                                 from: process.env.SMTP_USER,
                                 to: [contractData.list_email_seller],
-                                bcc: [
-                                    "'Contrato Enviado do Sistema - Vendedor' <suportearyoleofar@gmail.com>",
-                                ],
+                                bcc: __spreadArray([
+                                    "'Contrato Enviado do Sistema - Vendedor' <suportearyoleofar@gmail.com>"
+                                ], bccEmails, true),
                                 subject: "Contrato ".concat(number_contract, " - Vendedor"),
                                 text: "Segue o contrato ".concat(number_contract, " em anexo."),
-                                html: " \n          <div style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;\">\n            <p>Prezado ".concat(contractData.buyer.name, "</p>\n            <p>Segue anexo uma (01) c\u00F3pia de nossa confirma\u00E7\u00E3o, solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve poss\u00EDvel.</p>\n\n            <p>Agradecemos e nos colocamos a sua disposi\u00E7\u00E3o.</p>\n            <br/>\n            <small style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;\">Este contrato foi criado e enviado via sistema.</small>\n          </div>"),
+                                html: " \n          <div style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;\">\n            <p>Prezado ".concat(contractData.seller.name, "</p>\n            <p>Segue anexo uma (01) c\u00F3pia de nossa confirma\u00E7\u00E3o, solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve poss\u00EDvel.</p>\n\n            <p>Agradecemos e nos colocamos a sua disposi\u00E7\u00E3o.</p>\n            <br/>\n            <small style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;\">Este contrato foi criado e enviado via sistema.</small>\n          </div>"),
                                 attachments: [
                                     {
                                         filename: "contrato_".concat(number_contract, "_vendedor.pdf"),
@@ -105,12 +141,12 @@ var EmailController = /** @class */ (function () {
                         return [4 /*yield*/, transporter.sendMail({
                                 from: process.env.SMTP_USER,
                                 to: [contractData.list_email_buyer],
-                                bcc: [
-                                    "'Contrato Enviado do Sistema - Comprador' <suportearyoleofar@gmail.com>",
-                                ],
+                                bcc: __spreadArray([
+                                    "'Contrato Enviado do Sistema - Comprador' <suportearyoleofar@gmail.com>"
+                                ], bccEmails, true),
                                 subject: "Contrato ".concat(number_contract, " - Comprador"),
                                 text: "Segue o contrato ".concat(number_contract, " em anexo."),
-                                html: "\n          <div style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;\">\n            <p>Prezado ".concat(contractData.seller.name, "</p>\n            <p>Segue anexo uma (01) c\u00F3pia de nossa confirma\u00E7\u00E3o, solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve poss\u00EDvel.</p>\n\n            <p>Agradecemos e nos colocamos a sua disposi\u00E7\u00E3o.</p>\n            <br/>\n            <small style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;\">Este contrato foi criado e enviado via sistema.</small>\n          </div>"),
+                                html: "\n          <div style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;\">\n            <p>Prezado ".concat(contractData.buyer.name, "</p>\n            <p>Segue anexo uma (01) c\u00F3pia de nossa confirma\u00E7\u00E3o, solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve poss\u00EDvel.</p>\n\n            <p>Agradecemos e nos colocamos a sua disposi\u00E7\u00E3o.</p>\n            <br/>\n            <small style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;\">Este contrato foi criado e enviado via sistema.</small>\n          </div>"),
                                 attachments: [
                                     {
                                         filename: "contrato_".concat(number_contract, "_comprador.pdf"),

@@ -62,6 +62,10 @@ var GrainContract = /** @class */ (function () {
         __metadata("design:type", String)
     ], GrainContract.prototype, "quality", void 0);
     __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "type_quantity", void 0);
+    __decorate([
         (0, typeorm_1.Column)("decimal"),
         __metadata("design:type", Number)
     ], GrainContract.prototype, "quantity", void 0);

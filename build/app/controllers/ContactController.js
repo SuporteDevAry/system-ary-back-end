@@ -79,11 +79,11 @@ var ContactController = /** @class */ (function () {
     };
     ContactController.prototype.create = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, name, email, sector, telephone, cellphone, code_client, contactExists, newContato, contatos;
+            var _a, name, email, sector, telephone, cellphone, code_client, receive_email, contactExists, newContato, contatos;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        _a = req.body, name = _a.name, email = _a.email, sector = _a.sector, telephone = _a.telephone, cellphone = _a.cellphone, code_client = _a.code_client;
+                        _a = req.body, name = _a.name, email = _a.email, sector = _a.sector, telephone = _a.telephone, cellphone = _a.cellphone, code_client = _a.code_client, receive_email = _a.receive_email;
                         return [4 /*yield*/, ContactRepository_1.contactRepository.findOneBy({
                                 email: email,
                                 code_client: code_client,
@@ -100,6 +100,7 @@ var ContactController = /** @class */ (function () {
                             telephone: telephone,
                             cellphone: cellphone,
                             code_client: code_client,
+                            receive_email: receive_email,
                         });
                         return [4 /*yield*/, ContactRepository_1.contactRepository.save(newContato)];
                     case 2:
@@ -112,12 +113,12 @@ var ContactController = /** @class */ (function () {
     };
     ContactController.prototype.update = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var id, _a, name, email, sector, telephone, cellphone, contactToUpdate, updatedContato;
+            var id, _a, name, email, sector, telephone, cellphone, receive_email, contactToUpdate, updatedContato;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         id = req.params.id;
-                        _a = req.body, name = _a.name, email = _a.email, sector = _a.sector, telephone = _a.telephone, cellphone = _a.cellphone;
+                        _a = req.body, name = _a.name, email = _a.email, sector = _a.sector, telephone = _a.telephone, cellphone = _a.cellphone, receive_email = _a.receive_email;
                         if (!id) {
                             throw new api_errors_1.BadRequestError("Código do Cliente não informado.");
                         }
@@ -139,6 +140,8 @@ var ContactController = /** @class */ (function () {
                             contactToUpdate.telephone = telephone;
                         if (cellphone)
                             contactToUpdate.cellphone = cellphone;
+                        if (receive_email)
+                            contactToUpdate.receive_email = receive_email;
                         return [4 /*yield*/, ContactRepository_1.contactRepository.save(contactToUpdate)];
                     case 2:
                         _b.sent();
