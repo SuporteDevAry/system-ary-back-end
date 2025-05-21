@@ -127,7 +127,7 @@ var GrainContractController = /** @class */ (function () {
             });
         }); };
         this.updateGrainContract = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var id, otherFields, grainContract, validNumberContract, match, currentProduct, currentBroker, currentIncrement, currentYear, isProductDifferent, isBrokerDifferent, updatedProduct, updatedBroker, updatedGrainContract, result, error_4;
+            var id, otherFields, grainContract, validNumberContract, match, currentProduct, currentBroker, currentIncrement, currentYear, isProductDifferent, isBrokerDifferent, updatedProduct, updatedBroker, listProducts, siglaProduct, updatedGrainContract, result, error_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -142,7 +142,7 @@ var GrainContractController = /** @class */ (function () {
                         if (!grainContract) {
                             return [2 /*return*/, res.status(404).json({ message: "Contrato não encontrado" })];
                         }
-                        validNumberContract = /^([A-Z]+)\.(\d+)-(\d{3})\/(\d{2})$/;
+                        validNumberContract = /^([A-Z]+)\.([A-Z0-9]+)-(\d{3})\/(\d{2})$/;
                         match = grainContract.number_contract.match(validNumberContract);
                         if (match) {
                             currentProduct = match[1], currentBroker = match[2], currentIncrement = match[3], currentYear = match[4];
@@ -156,8 +156,12 @@ var GrainContractController = /** @class */ (function () {
                                 updatedBroker = isBrokerDifferent
                                     ? otherFields.number_broker
                                     : currentBroker;
+                                listProducts = ["O", "OC", "OA", "SB", "EP"];
+                                siglaProduct = listProducts.includes(updatedProduct)
+                                    ? "O"
+                                    : updatedProduct;
                                 // Mantém o radical e o ano, alterando apenas o prefixo e sufixo
-                                grainContract.number_contract = "".concat(updatedProduct, ".").concat(updatedBroker, "-").concat(currentIncrement, "/").concat(currentYear);
+                                grainContract.number_contract = "".concat(siglaProduct, ".").concat(updatedBroker, "-").concat(currentIncrement, "/").concat(currentYear);
                                 grainContract.number_broker = updatedBroker;
                                 grainContract.product = updatedProduct;
                             }

@@ -40,30 +40,60 @@ exports.generateNumberContract = exports.grainContractRepository = void 0;
 var GrainContracts_1 = require("../entities/GrainContracts");
 var data_source_1 = require("../../database/data-source");
 exports.grainContractRepository = data_source_1.AppDataSource.getRepository(GrainContracts_1.GrainContract);
+// Definição dos grupos
+var productGroups = {
+    group1: ["S", "T", "SG", "CN"],
+    group2: ["O", "OC", "OA", "SB", "EP"],
+    group3: ["F"],
+};
+// Função para determinar a qual grupo um produto pertence
+var getProductGroup = function (product) {
+    for (var _i = 0, _a = Object.entries(productGroups); _i < _a.length; _i++) {
+        var _b = _a[_i], group = _b[0], products = _b[1];
+        if (products.includes(product)) {
+            return group; // Retorna "group1" ou "group2"
+        }
+    }
+    return null; // Retorna null se não encontrar o grupo
+};
 var generateNumberContract = function (data) { return __awaiter(void 0, void 0, void 0, function () {
-    var product, number_broker, currentYear, query, result, nextIncrement, lastNumberContract, match, formattedIncrement, numberContract, error_1;
+    var product, number_broker, currentYear, productGroup, productsInGroup, listProducts, validProducts, siglaProduct, query, result, nextIncrement, lastNumberContract, match, formattedIncrement, numberContract, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 product = data.product, number_broker = data.number_broker;
                 currentYear = new Date().getFullYear().toString().slice(-2);
-                query = "\n      SELECT number_contract\n      FROM grain_contracts\n      WHERE number_contract LIKE '%-%/".concat(currentYear, "'\n      ORDER BY created_at DESC\n      LIMIT 1\n    ");
+                if (!product) {
+                    throw new Error("Produto não informado.");
+                }
+                productGroup = getProductGroup(product);
+                if (!productGroup) {
+                    throw new Error("Produto ".concat(product, " n\u00E3o pertence a nenhum grupo."));
+                }
+                productsInGroup = productGroups[productGroup];
+                listProducts = ["O", "OC", "OA", "SB", "EP"];
+                validProducts = listProducts.includes(product);
+                siglaProduct = validProducts ? "O" : product;
+                query = "\n      SELECT number_contract\n      FROM grain_contracts\n      WHERE product = ANY($1)  -- Passando o array de produtos\n      AND number_contract LIKE $2\n      ORDER BY created_at DESC\n      LIMIT 1\n  ";
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, exports.grainContractRepository.query(query)];
+                return [4 /*yield*/, exports.grainContractRepository.query(query, [
+                        productsInGroup,
+                        "%.%-%/".concat(currentYear),
+                    ])];
             case 2:
                 result = _a.sent();
                 nextIncrement = 1;
                 if (result.length > 0) {
                     lastNumberContract = result[0].number_contract;
-                    match = lastNumberContract.match(/-(\d{3})\//);
+                    match = lastNumberContract.match(/-(\d{3})\/\d{2}$/);
                     if (match && match[1]) {
                         nextIncrement = parseInt(match[1], 10) + 1; // Incrementa o número extraído
                     }
                 }
                 formattedIncrement = nextIncrement.toString().padStart(3, "0");
-                numberContract = "".concat(product, ".").concat(number_broker, "-").concat(formattedIncrement, "/").concat(currentYear);
+                numberContract = "".concat(siglaProduct, ".").concat(number_broker, "-").concat(formattedIncrement, "/").concat(currentYear);
                 return [2 /*return*/, numberContract];
             case 3:
                 error_1 = _a.sent();

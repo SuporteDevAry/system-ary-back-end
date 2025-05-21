@@ -120,13 +120,15 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
     ? ` `
     : ` - Safra: ${data.crop}`;
 
-  let formattedMetrica = validProductsForMetricTon
-    ? ` toneladas métricas`
-    : ` quilos`;
+  let formattedMetrica =
+    data.type_quantity === "toneladas métricas"
+      ? ` toneladas métricas`
+      : ` quilos`;
 
-  let formattedPreco = validProductsForMetricTon
-    ? ` por tonelada métrica.`
-    : ` por saca de 60(sessenta) quilos,`;
+  let formattedPreco =
+    data.type_quantity === "toneladas métricas"
+      ? ` por tonelada métrica.`
+      : ` por saca de 60(sessenta) quilos,`;
 
   return (
     <div id="contrato">

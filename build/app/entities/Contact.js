@@ -67,6 +67,10 @@ var Contact = /** @class */ (function () {
         (0, typeorm_1.Column)({ type: "int" }),
         __metadata("design:type", Number)
     ], Contact.prototype, "code_client", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "text", default: "false" }),
+        __metadata("design:type", String)
+    ], Contact.prototype, "receive_email", void 0);
     Contact = __decorate([
         (0, typeorm_1.Entity)("contact"),
         __metadata("design:paramtypes", [])
