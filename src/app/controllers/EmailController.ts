@@ -1,7 +1,19 @@
+import path from "path";
+import fs from "fs";
 import { Request, Response } from "express";
 import nodemailer from "nodemailer";
 import PdfGeneratorNew from "../../pdfGenerator";
 import { EmailLogRepository } from "../repositories/EmailLogRepository";
+import { folhaDeRostoBuffer } from "../../pdfGenerator/helpers/coverPage";
+
+const signatureEmailImage = path.resolve(
+  __dirname,
+  "../../pdfGenerator/helpers/assinatura_execucao_mi.png"
+);
+
+const signatureEmail = `data:image/jpeg;base64,${fs
+  .readFileSync(signatureEmailImage)
+  .toString("base64")}`;
 
 export class EmailController {
   async SendEmails(req: Request, res: Response): Promise<void> {
@@ -46,6 +58,13 @@ export class EmailController {
         console.log("🚫 Emails de grupo bloqueados no ambiente local");
       }
 
+      // Regra de Reenvio: Verificar se já foi enviado anteriormente
+      const hasPreviousSent = contractData?.status?.history?.some(
+        (entry: any) => entry.status === "ENVIADO"
+      );
+
+      const subjectPrefix = hasPreviousSent ? "- (CÓPIA CORRETA)" : "";
+
       // Gerar o PDF para o vendedor
       const pdfSeller = await PdfGeneratorNew({
         data: contractData,
@@ -79,7 +98,7 @@ export class EmailController {
           "'Contrato Enviado do Sistema - Vendedor' <suportearyoleofar@gmail.com>",
           ...bccEmails,
         ],
-        subject: `Contrato ${number_contract} - Vendedor`,
+        subject: `Contrato ${number_contract} - Vendedor ${subjectPrefix}`,
         text: `Segue o contrato ${number_contract} em anexo.`,
         html: ` 
           <div style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;">
@@ -88,12 +107,28 @@ export class EmailController {
 
             <p>Agradecemos e nos colocamos a sua disposição.</p>
             <br/>
-            <small style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;">Este contrato foi criado e enviado via sistema.</small>
+
+            <p>Saudações,</p>
+           
+
+            <img src="cid:assinaturaemail" alt="Assinatura" style="max-width: 300px; height: auto;" />
+            <br/>
+
+            <small style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;">Este contrato foi criado e enviado via sistema, pedimos a gentileza que confirme o recebimento.</small>
           </div>`,
         attachments: [
           {
             filename: `contrato_${number_contract}_vendedor.pdf`,
             content: pdfSeller,
+          },
+          {
+            filename: "assinatura_execucao_mi.png",
+            path: signatureEmailImage,
+            cid: "assinaturaemail",
+          },
+          {
+            filename: `folha_de_rosto_${number_contract}.txt`,
+            content: folhaDeRostoBuffer,
           },
         ],
       });
@@ -106,7 +141,7 @@ export class EmailController {
           "'Contrato Enviado do Sistema - Comprador' <suportearyoleofar@gmail.com>",
           ...bccEmails,
         ],
-        subject: `Contrato ${number_contract} - Comprador`,
+        subject: `Contrato ${number_contract} - Comprador ${subjectPrefix}`,
         text: `Segue o contrato ${number_contract} em anexo.`,
         html: `
           <div style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;">
@@ -115,15 +150,33 @@ export class EmailController {
 
             <p>Agradecemos e nos colocamos a sua disposição.</p>
             <br/>
-            <small style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;">Este contrato foi criado e enviado via sistema.</small>
+
+            <p>Saudações,</p>
+            
+
+            <img src="cid:assinaturaemail" alt="Assinatura" style="max-width: 300px; height: auto;" />
+            <br/>
+              
+            <small style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;">Este contrato foi criado e enviado via sistema, pedimos a gentileza que confirme o recebimento.</small>
           </div>`,
         attachments: [
           {
             filename: `contrato_${number_contract}_comprador.pdf`,
             content: pdfBuyer,
           },
+          {
+            filename: "assinatura_execucao_mi.png",
+            path: signatureEmailImage,
+            cid: "assinaturaemail",
+          },
+          {
+            filename: `folha_de_rosto_${number_contract}.txt`,
+            content: folhaDeRostoBuffer,
+          },
         ],
       });
+
+      // anexar folha de rosto no email
 
       await EmailLogRepository.save({
         email_sender: sender,
