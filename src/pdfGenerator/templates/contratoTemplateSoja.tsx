@@ -142,8 +142,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
           <span>{formatDateWithLongMonth(data.contract_emission_date)}</span>
         </div>
         <div style={{ paddingLeft: "250px" }}>
-          Confirmação de venda nr. <span> {numberContract} </span> fechada nesta
-          data:
+          Confirmação de negociação <span> {numberContract} </span>
         </div>
       </h3>
       <br />
