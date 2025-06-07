@@ -65,6 +65,14 @@ export class EmailController {
 
       const subjectPrefix = hasPreviousSent ? "- (CÓPIA CORRETA)" : "";
 
+      const nameSeller = contractData.seller?.nickname
+        ? contractData.seller.nickname
+        : contractData.seller.name;
+
+      const nameBuyer = contractData.buyer?.nickname
+        ? contractData.buyer.nickname
+        : contractData.buyer.name;
+
       // Gerar o PDF para o vendedor
       const pdfSeller = await PdfGeneratorNew({
         data: contractData,
@@ -98,7 +106,7 @@ export class EmailController {
           "'Contrato Enviado do Sistema - Vendedor' <suportearyoleofar@gmail.com>",
           ...bccEmails,
         ],
-        subject: `Contrato ${number_contract} - Vendedor ${subjectPrefix}`,
+        subject: `Contrato ${number_contract} - ${nameSeller} (X) ${nameBuyer} ${subjectPrefix}`,
         text: `Segue o contrato ${number_contract} em anexo.`,
         html: ` 
           <div style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;">
@@ -141,7 +149,7 @@ export class EmailController {
           "'Contrato Enviado do Sistema - Comprador' <suportearyoleofar@gmail.com>",
           ...bccEmails,
         ],
-        subject: `Contrato ${number_contract} - Comprador ${subjectPrefix}`,
+        subject: `Contrato ${number_contract} - ${nameBuyer} (X) ${nameSeller} ${subjectPrefix}`,
         text: `Segue o contrato ${number_contract} em anexo.`,
         html: `
           <div style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;">
