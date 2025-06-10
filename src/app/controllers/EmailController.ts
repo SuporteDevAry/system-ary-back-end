@@ -149,7 +149,7 @@ export class EmailController {
           "'Contrato Enviado do Sistema - Comprador' <suportearyoleofar@gmail.com>",
           ...bccEmails,
         ],
-        subject: `Contrato ${number_contract} - ${nameBuyer} (X) ${nameSeller} ${subjectPrefix}`,
+        subject: `Contrato ${number_contract} - ${nameSeller} (X) ${nameBuyer} ${subjectPrefix}`,
         text: `Segue o contrato ${number_contract} em anexo.`,
         html: `
           <div style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;">
