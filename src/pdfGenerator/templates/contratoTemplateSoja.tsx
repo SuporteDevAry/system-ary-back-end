@@ -130,6 +130,14 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
       ? ` por tonelada métrica.`
       : ` por saca de 60(sessenta) quilos,`;
 
+  let formattedComplementSeller = data.seller?.complement
+    ? `${" - "} ${data.seller.complement} `
+    : "";
+
+  let formattedComplementBuyer = data.buyer?.complement
+    ? `${" - "} ${data.buyer.complement} `
+    : "";
+
   return (
     <div id="contrato">
       <div style={{ margin: 0, textAlign: "center" }}>
@@ -151,7 +159,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
         <span style={{ paddingLeft: "45px" }}>{seller.name}</span>
         <br />
         <span style={{ paddingLeft: "140px" }}>
-          {seller.address}, {seller.number} - {seller.complement} -{" "}
+          {seller.address}, {seller.number} {formattedComplementSeller} -{" "}
           {seller.district}
         </span>
         <br />
@@ -175,7 +183,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
         <span style={{ paddingLeft: "30px" }}>{buyer.name}</span>
         <br />
         <span style={{ paddingLeft: "140px" }}>
-          {buyer.address}, {buyer.number} - {buyer.complement} -{" "}
+          {buyer.address}, {buyer.number} {formattedComplementBuyer} -{" "}
           {buyer.district}
         </span>
         <br />
