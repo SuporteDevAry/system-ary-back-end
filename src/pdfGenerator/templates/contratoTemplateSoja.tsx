@@ -151,7 +151,8 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
         <span style={{ paddingLeft: "45px" }}>{seller.name}</span>
         <br />
         <span style={{ paddingLeft: "140px" }}>
-          {seller.address}, {seller.number} - {seller.district}
+          {seller.address}, {seller.number} - {seller.complement} -{" "}
+          {seller.district}
         </span>
         <br />
         <span style={{ paddingLeft: "140px" }}>
@@ -174,7 +175,8 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
         <span style={{ paddingLeft: "30px" }}>{buyer.name}</span>
         <br />
         <span style={{ paddingLeft: "140px" }}>
-          {buyer.address}, {buyer.number} - {buyer.district}
+          {buyer.address}, {buyer.number} - {buyer.complement} -{" "}
+          {buyer.district}
         </span>
         <br />
         <span style={{ paddingLeft: "140px" }}>
