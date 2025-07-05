@@ -180,7 +180,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
       <br />
       <div style={{ textAlign: "left", margin: "0" }}>
         <strong>COMPRADOR:</strong>
-        <span style={{ paddingLeft: "30px" }}>{buyer.name}</span>
+        <span style={{ paddingLeft: "28px" }}>{buyer.name}</span>
         <br />
         <span style={{ paddingLeft: "140px" }}>
           {buyer.address}, {buyer.number} {formattedComplementBuyer} -{" "}
@@ -239,13 +239,27 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
             : formatCurrency(price, data.type_currency, modeSave)}
         </strong>{" "}
         {formattedPreco}
-        {destination && (
+        {/* {destination && (
           <span>
             <strong>
               (
               {complement_destination
                 ? `${destination} ${complement_destination}`
                 : destination}
+              )
+            </strong>
+            .
+          </span>
+        )} */}
+        {(destination !== "Nenhum" || complement_destination) && (
+          <span>
+            <strong>
+              (
+              {destination === "Nenhum"
+                ? complement_destination || ""
+                : `${destination}${
+                    complement_destination ? ` ${complement_destination}` : ""
+                  }`}
               )
             </strong>
             .

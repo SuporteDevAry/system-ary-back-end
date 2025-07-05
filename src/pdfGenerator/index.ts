@@ -36,11 +36,7 @@ const PdfGeneratorNew = async ({
               #contrato {
               width: 210mm; /* Largura fixa para A4 */
               height: 297mm; /* Altura fixa para A4 */
-              page-break-inside: avoid; /* Evitar quebras internas */
-              page-break-before: auto; /* Evitar quebras antes */
-              page-break-after: auto; /* Evitar quebras depois */
-              word-wrap: break-word; /* Quebra palavras longas */
-              word-break: break-word; /* Quebra de palavras */
+              
              
             }
              
