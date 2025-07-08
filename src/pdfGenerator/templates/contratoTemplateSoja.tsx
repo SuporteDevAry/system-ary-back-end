@@ -122,13 +122,18 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
 
   let formattedMetrica =
     data.type_quantity === "toneladas métricas"
-      ? ` toneladas métricas`
-      : ` quilos`;
+      ? ` toneladas métricas.`
+      : ` quilos.`;
+
+  let Dot =
+    data.destination === "Nenhum" && data.complement_destination?.length === 0
+      ? "."
+      : ", ";
 
   let formattedPreco =
     data.type_quantity === "toneladas métricas"
-      ? ` por tonelada métrica.`
-      : ` por saca de 60(sessenta) quilos,`;
+      ? ` por tonelada métrica${Dot}`
+      : ` por saca de 60(sessenta) quilos${Dot}`;
 
   let formattedComplementSeller = data.seller?.complement
     ? `${" - "} ${data.seller.complement} `
