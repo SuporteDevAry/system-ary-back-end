@@ -28,18 +28,19 @@ const PdfGeneratorNew = async ({
     const populatedTemplate = `
       <html>
         <head>
+          <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
           <style>
-            /* Adicione aqui os estilos globais para o PDF */
-            body {
-              font-family: Arial, sans-serif;
+            body, p, span {
+              font-family: 'Roboto', sans-serif;
             }
-              #contrato {
-              width: 210mm; /* Largura fixa para A4 */
-              height: 297mm; /* Altura fixa para A4 */
+
+            #contrato {
+              width: 210mm;
+              height: 297mm;
+            }
               
-             
-            }
-             
           </style>
         </head>
         <body>
