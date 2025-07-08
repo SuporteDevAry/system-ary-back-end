@@ -159,48 +159,69 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
         </div>
       </h3>
       <br />
-      <div style={{ textAlign: "left", margin: "0" }}>
-        <strong>VENDEDOR:</strong>
-        <span style={{ paddingLeft: "45px" }}>{seller.name}</span>
-        <br />
-        <span style={{ paddingLeft: "140px" }}>
-          {seller.address}, {seller.number} {formattedComplementSeller} -{" "}
-          {seller.district}
-        </span>
-        <br />
-        <span style={{ paddingLeft: "140px" }}>
-          <strong>
-            {seller.city} - {seller.state}
-          </strong>
-        </span>
-        <br />
-        <span style={{ paddingLeft: "140px" }}>
-          CNPJ: {formattedSellerCNPJ}
-        </span>
-        <span style={{ paddingLeft: "30px" }}>
-          Inscr.Est.: {seller.ins_est}
-        </span>
-        <br />
+
+      {/* VENDEDOR */}
+      <div style={{ display: "table", width: "100%", marginBottom: "20px" }}>
+        <div style={{ display: "table-row" }}>
+          <div
+            style={{
+              display: "table-cell",
+              fontWeight: "bold",
+              width: "110px",
+              verticalAlign: "top",
+            }}
+          >
+            VENDEDOR:
+          </div>
+          <div style={{ display: "table-cell" }}>
+            <div>{seller.name}</div>
+            <div>
+              {seller.address}, {seller.number} {formattedComplementSeller} -{" "}
+              {seller.district}
+            </div>
+            <div>
+              <strong>
+                {seller.city} - {seller.state}
+              </strong>
+            </div>
+            <div>
+              CNPJ: {formattedSellerCNPJ} &nbsp;&nbsp; Inscr.Est.:{" "}
+              {seller.ins_est}
+            </div>
+          </div>
+        </div>
       </div>
-      <br />
-      <div style={{ textAlign: "left", margin: "0" }}>
-        <strong>COMPRADOR:</strong>
-        <span style={{ paddingLeft: "28px" }}>{buyer.name}</span>
-        <br />
-        <span style={{ paddingLeft: "140px" }}>
-          {buyer.address}, {buyer.number} {formattedComplementBuyer} -{" "}
-          {buyer.district}
-        </span>
-        <br />
-        <span style={{ paddingLeft: "140px" }}>
-          <strong>
-            {buyer.city} - {buyer.state}
-          </strong>
-        </span>
-        <br />
-        <span style={{ paddingLeft: "140px" }}>CNPJ: {formattedBuyerCNPJ}</span>
-        <span style={{ paddingLeft: "30px" }}>Inscr.Est.: {buyer.ins_est}</span>
-        <br />
+
+      {/* COMPRADOR */}
+      <div style={{ display: "table", width: "100%", marginBottom: "20px" }}>
+        <div style={{ display: "table-row" }}>
+          <div
+            style={{
+              display: "table-cell",
+              fontWeight: "bold",
+              width: "110px",
+              verticalAlign: "top",
+            }}
+          >
+            COMPRADOR:
+          </div>
+          <div style={{ display: "table-cell" }}>
+            <div>{buyer.name}</div>
+            <div>
+              {buyer.address}, {buyer.number} {formattedComplementBuyer} -{" "}
+              {buyer.district}
+            </div>
+            <div>
+              <strong>
+                {buyer.city} - {buyer.state}
+              </strong>
+            </div>
+            <div>
+              CNPJ: {formattedBuyerCNPJ} &nbsp;&nbsp; Inscr.Est.:{" "}
+              {buyer.ins_est}
+            </div>
+          </div>
+        </div>
       </div>
 
       <br />
@@ -303,9 +324,11 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
       <div style={{ textAlign: "justify" }}>{inspection}</div>
       <br />
 
-      <div style={{ textAlign: "left" }}>
-        <strong>Observações:</strong>
-      </div>
+      {observation && (
+        <div style={{ textAlign: "left" }}>
+          <strong>Observações:</strong>
+        </div>
+      )}
       <div
         style={{ textAlign: "justify", whiteSpace: "pre" }}
         dangerouslySetInnerHTML={{
