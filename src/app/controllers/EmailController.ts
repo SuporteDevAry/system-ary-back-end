@@ -58,10 +58,13 @@ export class EmailController {
         console.log("🚫 Emails de grupo bloqueados no ambiente local");
       }
 
+      // Removerei em breve, pois agora essa regra foi abstraída pelo checkbox Cópia correta.
       // Regra de Reenvio: Verificar se já foi enviado anteriormente
-      const hasPreviousSent = contractData?.status?.history?.some(
-        (entry: any) => entry.status === "ENVIADO"
-      );
+      // const hasPreviousSent = contractData?.status?.history?.some(
+      //   (entry: any) => entry.status === "ENVIADO"
+      // );
+
+      const hasPreviousSent = contractData.copy_correct;
 
       const subjectPrefix = hasPreviousSent ? "- (CÓPIA CORRETA)" : "";
 
