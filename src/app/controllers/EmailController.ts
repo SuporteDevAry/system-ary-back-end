@@ -6,14 +6,15 @@ import PdfGeneratorNew from "../../pdfGenerator";
 import { EmailLogRepository } from "../repositories/EmailLogRepository";
 import { folhaDeRostoBuffer } from "../../pdfGenerator/helpers/coverPage";
 
-const signatureEmailImage = path.resolve(
+const signatureEmailImageSoy = path.resolve(
   __dirname,
   "../../pdfGenerator/helpers/assinatura_execucao_mi.png"
 );
 
-const signatureEmail = `data:image/jpeg;base64,${fs
-  .readFileSync(signatureEmailImage)
-  .toString("base64")}`;
+const signatureEmailImageOil = path.resolve(
+  __dirname,
+  "../../pdfGenerator/helpers/assinatura_oleo.png"
+);
 
 export class EmailController {
   async SendEmails(req: Request, res: Response): Promise<void> {
@@ -33,39 +34,62 @@ export class EmailController {
       const group2 = ["O", "OC", "OA", "SB", "EP"];
       const group3 = ["F"];
 
-      const blockEmailsLocal = process.env.BLOCK_SENDER_EMAIL_LOCAL === "true";
+      const isLocal = process.env.BLOCK_SENDER_EMAIL_LOCAL === "true";
 
-      //let fromEmail = process.env.SMTP_USER as string;
+      let signatureFileName = "";
+      let signatureEmailImage = "";
+      let smtpUser = process.env.SMTP_USER!;
+      let smtpPass = process.env.SMTP_PASS!;
       let bccEmails: string[] = [];
 
-      if (!blockEmailsLocal) {
-        if (group1.includes(sigla)) {
-          //fromEmail = process.env.SMTP_SOY_TABLE!;
-          bccEmails = [
-            "exec-mi@aryoleofar.com.br",
-            "evandro@aryoleofar.com.br",
-            "gilberto@aryoleofar.com.br",
-            "jhony@aryoleofar.com.br",
-            "talita@aryoleofar.com.br",
-            "elcio@aryoleofar.com.br",
-            "lelis@aryoleofar.com.br",
-          ];
-        } else if (group2.includes(sigla) || group3.includes(sigla)) {
-          //fromEmail = process.env.SMTP_OIL_TABLE!;
-          bccEmails = ["ary@aryoleofar.com.br", "lelis@aryoleofar.com.br"];
-        }
-      } else {
-        console.log("🚫 Emails de grupo bloqueados no ambiente local");
+      //Regra de Remetente por Mesa: Soja e Óleo!
+      if (group1.includes(sigla)) {
+        signatureFileName = "assinatura_execucao_mi.png";
+        signatureEmailImage = signatureEmailImageSoy;
+        smtpUser = process.env.SMTP_SOY_USER!;
+        smtpPass = process.env.SMTP_SOY_PASS!;
+        bccEmails = isLocal
+          ? ["andre.camargo500@gmail.com", "carlos@casinfo.com.br"]
+          : [
+              "exec-mi@aryoleofar.com.br",
+              "evandro@aryoleofar.com.br",
+              "gilberto@aryoleofar.com.br",
+              "jhony@aryoleofar.com.br",
+              "talita@aryoleofar.com.br",
+              "elcio@aryoleofar.com.br",
+            ];
+      } else if (group2.includes(sigla)) {
+        signatureFileName = "assinatura_oleo.png";
+        signatureEmailImage = signatureEmailImageOil;
+        smtpUser = process.env.SMTP_OIL_USER!;
+        smtpPass = process.env.SMTP_OIL_PASS!;
+        bccEmails = isLocal
+          ? ["andre.camargo500@gmail.com", "carlos@casinfo.com.br"]
+          : [
+              "ary@aryoleofar.com.br",
+              "beto@aryoleofar.com.br",
+              "nilo@aryoleofar.com.br",
+              "renan@aryoleofar.com.br",
+              "gustavo@aryoleofar.com.br",
+            ];
+      } else if (group3.includes(sigla)) {
+        signatureFileName = "assinatura_oleo.png";
+        signatureEmailImage = signatureEmailImageOil;
+        smtpUser = process.env.SMTP_OIL_USER!;
+        smtpPass = process.env.SMTP_OIL_PASS!;
+        bccEmails = isLocal
+          ? ["andre.camargo500@gmail.com", "carlos@casinfo.com.br"]
+          : ["ary@aryoleofar.com.br"];
       }
 
-      // Removerei em breve, pois agora essa regra foi abstraída pelo checkbox Cópia correta.
-      // Regra de Reenvio: Verificar se já foi enviado anteriormente
-      // const hasPreviousSent = contractData?.status?.history?.some(
-      //   (entry: any) => entry.status === "ENVIADO"
-      // );
+      if (isLocal) {
+        console.log(
+          "🚫 Ambiente local: remetente configurado para teste.",
+          smtpUser
+        );
+      }
 
       const hasPreviousSent = contractData.copy_correct;
-
       const subjectPrefix = hasPreviousSent ? "- (CÓPIA CORRETA)" : "";
 
       const nameSeller = contractData.seller?.nickname
@@ -96,14 +120,14 @@ export class EmailController {
         port: parseInt(process.env.SMTP_PORT, 10),
         secure: process.env.SMTP_SECURE === "true",
         auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
+          user: smtpUser,
+          pass: smtpPass,
         },
       });
 
       // Enviar e-mail para o vendedor
       await transporter.sendMail({
-        from: process.env.SMTP_USER,
+        from: smtpUser,
         to: [contractData.list_email_seller],
         bcc: [
           "'Contrato Enviado do Sistema - Vendedor' <suportearyoleofar@gmail.com>",
@@ -133,7 +157,7 @@ export class EmailController {
             content: pdfSeller,
           },
           {
-            filename: "assinatura_execucao_mi.png",
+            filename: signatureFileName,
             path: signatureEmailImage,
             cid: "assinaturaemail",
           },
@@ -146,7 +170,7 @@ export class EmailController {
 
       // Enviar e-mail para o comprador
       await transporter.sendMail({
-        from: process.env.SMTP_USER,
+        from: smtpUser,
         to: [contractData.list_email_buyer],
         bcc: [
           "'Contrato Enviado do Sistema - Comprador' <suportearyoleofar@gmail.com>",
@@ -176,7 +200,7 @@ export class EmailController {
             content: pdfBuyer,
           },
           {
-            filename: "assinatura_execucao_mi.png",
+            filename: signatureFileName,
             path: signatureEmailImage,
             cid: "assinaturaemail",
           },
