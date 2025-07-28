@@ -12,6 +12,7 @@ var logoBase64 = "data:image/jpeg;base64,".concat(fs_1.default
     .readFileSync(logoContrato)
     .toString("base64"));
 var ContratoTemplateSoja = function (_a) {
+    var _b, _c, _d;
     var data = _a.data, typeContract = _a.typeContract, modeSave = _a.modeSave;
     var today = new Date();
     var currentYear = today.getFullYear().toString().substr(-2);
@@ -68,11 +69,20 @@ var ContratoTemplateSoja = function (_a) {
         ? " "
         : " - Safra: ".concat(data.crop);
     var formattedMetrica = data.type_quantity === "toneladas métricas"
-        ? " toneladas m\u00E9tricas"
-        : " quilos";
+        ? " toneladas m\u00E9tricas."
+        : " quilos.";
+    var Dot = data.destination === "Nenhum" && ((_b = data.complement_destination) === null || _b === void 0 ? void 0 : _b.length) === 0
+        ? "."
+        : ", ";
     var formattedPreco = data.type_quantity === "toneladas métricas"
-        ? " por tonelada m\u00E9trica."
-        : " por saca de 60(sessenta) quilos,";
+        ? " por tonelada m\u00E9trica".concat(Dot)
+        : " por saca de 60(sessenta) quilos".concat(Dot);
+    var formattedComplementSeller = ((_c = data.seller) === null || _c === void 0 ? void 0 : _c.complement)
+        ? "".concat(" - ", " ").concat(data.seller.complement, " ")
+        : "";
+    var formattedComplementBuyer = ((_d = data.buyer) === null || _d === void 0 ? void 0 : _d.complement)
+        ? "".concat(" - ", " ").concat(data.buyer.complement, " ")
+        : "";
     return (react_1.default.createElement("div", { id: "contrato" },
         react_1.default.createElement("div", { style: { margin: 0, textAlign: "center" } },
             react_1.default.createElement("img", { src: logoBase64, alt: "logo Ary Completo", width: 300 })),
@@ -83,62 +93,72 @@ var ContratoTemplateSoja = function (_a) {
                 " ",
                 react_1.default.createElement("span", null, (0, helpers_1.formatDateWithLongMonth)(data.contract_emission_date))),
             react_1.default.createElement("div", { style: { paddingLeft: "250px" } },
-                "Confirma\u00E7\u00E3o de venda nr. ",
+                "Confirma\u00E7\u00E3o de negocia\u00E7\u00E3o ",
                 react_1.default.createElement("span", null,
                     " ",
                     numberContract,
-                    " "),
-                " fechada nesta data:")),
+                    " "))),
         react_1.default.createElement("br", null),
-        react_1.default.createElement("div", { style: { textAlign: "left", margin: "0" } },
-            react_1.default.createElement("strong", null, "VENDEDOR:"),
-            react_1.default.createElement("span", { style: { paddingLeft: "45px" } }, seller.name),
-            react_1.default.createElement("br", null),
-            react_1.default.createElement("span", { style: { paddingLeft: "140px" } },
-                seller.address,
-                ", ",
-                seller.number,
-                " - ",
-                seller.district),
-            react_1.default.createElement("br", null),
-            react_1.default.createElement("span", { style: { paddingLeft: "140px" } },
-                react_1.default.createElement("strong", null,
-                    seller.city,
-                    " - ",
-                    seller.state)),
-            react_1.default.createElement("br", null),
-            react_1.default.createElement("span", { style: { paddingLeft: "140px" } },
-                "CNPJ: ",
-                formattedSellerCNPJ),
-            react_1.default.createElement("span", { style: { paddingLeft: "30px" } },
-                "Inscr.Est.: ",
-                seller.ins_est),
-            react_1.default.createElement("br", null)),
-        react_1.default.createElement("br", null),
-        react_1.default.createElement("div", { style: { textAlign: "left", margin: "0" } },
-            react_1.default.createElement("strong", null, "COMPRADOR:"),
-            react_1.default.createElement("span", { style: { paddingLeft: "30px" } }, buyer.name),
-            react_1.default.createElement("br", null),
-            react_1.default.createElement("span", { style: { paddingLeft: "140px" } },
-                buyer.address,
-                ", ",
-                buyer.number,
-                " - ",
-                buyer.district),
-            react_1.default.createElement("br", null),
-            react_1.default.createElement("span", { style: { paddingLeft: "140px" } },
-                react_1.default.createElement("strong", null,
-                    buyer.city,
-                    " - ",
-                    buyer.state)),
-            react_1.default.createElement("br", null),
-            react_1.default.createElement("span", { style: { paddingLeft: "140px" } },
-                "CNPJ: ",
-                formattedBuyerCNPJ),
-            react_1.default.createElement("span", { style: { paddingLeft: "30px" } },
-                "Inscr.Est.: ",
-                buyer.ins_est),
-            react_1.default.createElement("br", null)),
+        react_1.default.createElement("div", { style: { display: "table", width: "100%", marginBottom: "20px" } },
+            react_1.default.createElement("div", { style: { display: "table-row" } },
+                react_1.default.createElement("div", { style: {
+                        display: "table-cell",
+                        fontWeight: "bold",
+                        width: "110px",
+                        verticalAlign: "top",
+                    } }, "VENDEDOR:"),
+                react_1.default.createElement("div", { style: { display: "table-cell" } },
+                    react_1.default.createElement("div", null, seller.name),
+                    react_1.default.createElement("div", null,
+                        seller.address,
+                        ", ",
+                        seller.number,
+                        " ",
+                        formattedComplementSeller,
+                        " -",
+                        " ",
+                        seller.district),
+                    react_1.default.createElement("div", null,
+                        react_1.default.createElement("strong", null,
+                            seller.city,
+                            " - ",
+                            seller.state)),
+                    react_1.default.createElement("div", null,
+                        "CNPJ: ",
+                        formattedSellerCNPJ,
+                        " \u00A0\u00A0 Inscr.Est.:",
+                        " ",
+                        seller.ins_est)))),
+        react_1.default.createElement("div", { style: { display: "table", width: "100%", marginBottom: "20px" } },
+            react_1.default.createElement("div", { style: { display: "table-row" } },
+                react_1.default.createElement("div", { style: {
+                        display: "table-cell",
+                        fontWeight: "bold",
+                        width: "110px",
+                        verticalAlign: "top",
+                    } }, "COMPRADOR:"),
+                react_1.default.createElement("div", { style: { display: "table-cell" } },
+                    react_1.default.createElement("div", null, buyer.name),
+                    react_1.default.createElement("div", null,
+                        buyer.address,
+                        ", ",
+                        buyer.number,
+                        " ",
+                        formattedComplementBuyer,
+                        " -",
+                        " ",
+                        buyer.district),
+                    react_1.default.createElement("div", null,
+                        react_1.default.createElement("strong", null,
+                            buyer.city,
+                            " - ",
+                            buyer.state)),
+                    react_1.default.createElement("div", null,
+                        "CNPJ: ",
+                        formattedBuyerCNPJ,
+                        " \u00A0\u00A0 Inscr.Est.:",
+                        " ",
+                        buyer.ins_est)))),
         react_1.default.createElement("br", null),
         react_1.default.createElement("div", { style: { textAlign: "left", margin: "0" } },
             react_1.default.createElement("strong", null, "Mercadoria:"),
@@ -170,12 +190,12 @@ var ContratoTemplateSoja = function (_a) {
                 : (0, helpers_1.formatCurrency)(price, data.type_currency, modeSave)),
             " ",
             formattedPreco,
-            destination && (react_1.default.createElement("span", null,
+            (destination !== "Nenhum" || complement_destination) && (react_1.default.createElement("span", null,
                 react_1.default.createElement("strong", null,
                     "(",
-                    complement_destination
-                        ? "".concat(destination, " ").concat(complement_destination)
-                        : destination,
+                    destination === "Nenhum"
+                        ? complement_destination || ""
+                        : "".concat(destination).concat(complement_destination ? " ".concat(complement_destination) : ""),
                     ")"),
                 "."))),
         react_1.default.createElement("br", null),
@@ -204,8 +224,8 @@ var ContratoTemplateSoja = function (_a) {
             react_1.default.createElement("strong", null, "Confer\u00EAncia:")),
         react_1.default.createElement("div", { style: { textAlign: "justify" } }, inspection),
         react_1.default.createElement("br", null),
-        react_1.default.createElement("div", { style: { textAlign: "left" } },
-            react_1.default.createElement("strong", null, "Observa\u00E7\u00F5es:")),
+        observation && (react_1.default.createElement("div", { style: { textAlign: "left" } },
+            react_1.default.createElement("strong", null, "Observa\u00E7\u00F5es:"))),
         react_1.default.createElement("div", { style: { textAlign: "justify", whiteSpace: "pre" }, dangerouslySetInnerHTML: {
                 __html: formatObservationText(observation),
             } }),

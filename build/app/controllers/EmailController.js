@@ -49,20 +49,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmailController = void 0;
+var path_1 = __importDefault(require("path"));
 var nodemailer_1 = __importDefault(require("nodemailer"));
 var pdfGenerator_1 = __importDefault(require("../../pdfGenerator"));
 var EmailLogRepository_1 = require("../repositories/EmailLogRepository");
+var coverPage_1 = require("../../pdfGenerator/helpers/coverPage");
+var signatureEmailImageSoy = path_1.default.resolve(__dirname, "../../pdfGenerator/helpers/assinatura_execucao_mi.png");
+var signatureEmailImageOil = path_1.default.resolve(__dirname, "../../pdfGenerator/helpers/assinatura_oleo.png");
 var EmailController = /** @class */ (function () {
     function EmailController() {
     }
     EmailController.prototype.SendEmails = function (req, res) {
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var _a, contractData, templateName, sender, number_contract, sigla, group1, group2, group3, blockEmailsLocal, bccEmails, pdfSeller, pdfBuyer, transporter, error_1;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var _c, contractData, templateName, sender, number_contract, sigla, group1, group2, group3, isLocal, signatureFileName, signatureEmailImage, smtpUser, smtpPass, bccEmails, hasPreviousSent, subjectPrefix, nameSeller, nameBuyer, pdfSeller, pdfBuyer, transporter, error_1;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
                     case 0:
-                        _b.trys.push([0, 6, , 7]);
-                        _a = req.body, contractData = _a.contractData, templateName = _a.templateName, sender = _a.sender, number_contract = _a.number_contract;
+                        _d.trys.push([0, 6, , 7]);
+                        _c = req.body, contractData = _c.contractData, templateName = _c.templateName, sender = _c.sender, number_contract = _c.number_contract;
                         if (!contractData || !templateName || !sender || !number_contract) {
                             res.status(400).send({ error: "Campos necessários não informados." });
                             return [2 /*return*/];
@@ -71,103 +76,158 @@ var EmailController = /** @class */ (function () {
                         group1 = ["S", "T", "SG", "CN"];
                         group2 = ["O", "OC", "OA", "SB", "EP"];
                         group3 = ["F"];
-                        blockEmailsLocal = process.env.BLOCK_SENDER_EMAIL_LOCAL === "true";
+                        isLocal = process.env.BLOCK_SENDER_EMAIL_LOCAL === "true";
+                        signatureFileName = "";
+                        signatureEmailImage = "";
+                        smtpUser = process.env.SMTP_USER;
+                        smtpPass = process.env.SMTP_PASS;
                         bccEmails = [];
-                        if (!blockEmailsLocal) {
-                            if (group1.includes(sigla)) {
-                                //fromEmail = process.env.SMTP_SOY_TABLE!;
-                                bccEmails = [
+                        //Regra de Remetente por Mesa: Soja e Óleo!
+                        if (group1.includes(sigla)) {
+                            signatureFileName = "assinatura_execucao_mi.png";
+                            signatureEmailImage = signatureEmailImageSoy;
+                            smtpUser = process.env.SMTP_SOY_USER;
+                            smtpPass = process.env.SMTP_SOY_PASS;
+                            bccEmails = isLocal
+                                ? ["andre.camargo500@gmail.com", "carlos@casinfo.com.br"]
+                                : [
                                     "exec-mi@aryoleofar.com.br",
                                     "evandro@aryoleofar.com.br",
                                     "gilberto@aryoleofar.com.br",
                                     "jhony@aryoleofar.com.br",
                                     "talita@aryoleofar.com.br",
                                     "elcio@aryoleofar.com.br",
-                                    "lelis@aryoleofar.com.br",
                                 ];
-                            }
-                            else if (group2.includes(sigla) || group3.includes(sigla)) {
-                                //fromEmail = process.env.SMTP_OIL_TABLE!;
-                                bccEmails = ["ary@aryoleofar.com.br", "lelis@aryoleofar.com.br"];
-                            }
                         }
-                        else {
-                            console.log("🚫 Emails de grupo bloqueados no ambiente local");
+                        else if (group2.includes(sigla)) {
+                            signatureFileName = "assinatura_oleo.png";
+                            signatureEmailImage = signatureEmailImageOil;
+                            smtpUser = process.env.SMTP_OIL_USER;
+                            smtpPass = process.env.SMTP_OIL_PASS;
+                            bccEmails = isLocal
+                                ? ["andre.camargo500@gmail.com", "carlos@casinfo.com.br"]
+                                : [
+                                    "ary@aryoleofar.com.br",
+                                    "beto@aryoleofar.com.br",
+                                    "nilo@aryoleofar.com.br",
+                                    "renan@aryoleofar.com.br",
+                                    "gustavo@aryoleofar.com.br",
+                                ];
                         }
+                        else if (group3.includes(sigla)) {
+                            signatureFileName = "assinatura_oleo.png";
+                            signatureEmailImage = signatureEmailImageOil;
+                            smtpUser = process.env.SMTP_OIL_USER;
+                            smtpPass = process.env.SMTP_OIL_PASS;
+                            bccEmails = isLocal
+                                ? ["andre.camargo500@gmail.com", "carlos@casinfo.com.br"]
+                                : ["ary@aryoleofar.com.br"];
+                        }
+                        if (isLocal) {
+                            console.log("🚫 Ambiente local: remetente configurado para teste.", smtpUser);
+                        }
+                        hasPreviousSent = contractData.copy_correct;
+                        subjectPrefix = hasPreviousSent ? "- (CÓPIA CORRETA)" : "";
+                        nameSeller = ((_a = contractData.seller) === null || _a === void 0 ? void 0 : _a.nickname)
+                            ? contractData.seller.nickname
+                            : contractData.seller.name;
+                        nameBuyer = ((_b = contractData.buyer) === null || _b === void 0 ? void 0 : _b.nickname)
+                            ? contractData.buyer.nickname
+                            : contractData.buyer.name;
                         return [4 /*yield*/, (0, pdfGenerator_1.default)({
                                 data: contractData,
                                 typeContract: "Vendedor",
                                 template: templateName,
                             })];
                     case 1:
-                        pdfSeller = _b.sent();
+                        pdfSeller = _d.sent();
                         return [4 /*yield*/, (0, pdfGenerator_1.default)({
                                 data: contractData,
                                 typeContract: "Comprador",
                                 template: templateName,
                             })];
                     case 2:
-                        pdfBuyer = _b.sent();
+                        pdfBuyer = _d.sent();
                         transporter = nodemailer_1.default.createTransport({
                             host: process.env.SMTP_HOST,
                             port: parseInt(process.env.SMTP_PORT, 10),
                             secure: process.env.SMTP_SECURE === "true",
                             auth: {
-                                user: process.env.SMTP_USER,
-                                pass: process.env.SMTP_PASS,
+                                user: smtpUser,
+                                pass: smtpPass,
                             },
                         });
                         // Enviar e-mail para o vendedor
                         return [4 /*yield*/, transporter.sendMail({
-                                from: process.env.SMTP_USER,
+                                from: smtpUser,
                                 to: [contractData.list_email_seller],
                                 bcc: __spreadArray([
                                     "'Contrato Enviado do Sistema - Vendedor' <suportearyoleofar@gmail.com>"
                                 ], bccEmails, true),
-                                subject: "Contrato ".concat(number_contract, " - Vendedor"),
+                                subject: "Contrato ".concat(number_contract, " - ").concat(nameSeller, " (X) ").concat(nameBuyer, " ").concat(subjectPrefix),
                                 text: "Segue o contrato ".concat(number_contract, " em anexo."),
-                                html: " \n          <div style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;\">\n            <p>Prezado ".concat(contractData.seller.name, "</p>\n            <p>Segue anexo uma (01) c\u00F3pia de nossa confirma\u00E7\u00E3o, solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve poss\u00EDvel.</p>\n\n            <p>Agradecemos e nos colocamos a sua disposi\u00E7\u00E3o.</p>\n            <br/>\n            <small style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;\">Este contrato foi criado e enviado via sistema.</small>\n          </div>"),
+                                html: " \n          <div style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;\">\n            <p>Prezado ".concat(contractData.seller.name, "</p>\n            <p>Segue anexo uma (01) c\u00F3pia de nossa confirma\u00E7\u00E3o, solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve poss\u00EDvel.</p>\n\n            <p>Agradecemos e nos colocamos a sua disposi\u00E7\u00E3o.</p>\n            <br/>\n\n            <p>Sauda\u00E7\u00F5es,</p>\n           \n\n            <img src=\"cid:assinaturaemail\" alt=\"Assinatura\" style=\"max-width: 300px; height: auto;\" />\n            <br/>\n\n            <small style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;\">Este contrato foi criado e enviado via sistema, pedimos a gentileza que confirme o recebimento.</small>\n          </div>"),
                                 attachments: [
                                     {
                                         filename: "contrato_".concat(number_contract, "_vendedor.pdf"),
                                         content: pdfSeller,
                                     },
+                                    {
+                                        filename: signatureFileName,
+                                        path: signatureEmailImage,
+                                        cid: "assinaturaemail",
+                                    },
+                                    {
+                                        filename: "folha_de_rosto_".concat(number_contract, ".txt"),
+                                        content: coverPage_1.folhaDeRostoBuffer,
+                                    },
                                 ],
                             })];
                     case 3:
                         // Enviar e-mail para o vendedor
-                        _b.sent();
+                        _d.sent();
                         // Enviar e-mail para o comprador
                         return [4 /*yield*/, transporter.sendMail({
-                                from: process.env.SMTP_USER,
+                                from: smtpUser,
                                 to: [contractData.list_email_buyer],
                                 bcc: __spreadArray([
                                     "'Contrato Enviado do Sistema - Comprador' <suportearyoleofar@gmail.com>"
                                 ], bccEmails, true),
-                                subject: "Contrato ".concat(number_contract, " - Comprador"),
+                                subject: "Contrato ".concat(number_contract, " - ").concat(nameSeller, " (X) ").concat(nameBuyer, " ").concat(subjectPrefix),
                                 text: "Segue o contrato ".concat(number_contract, " em anexo."),
-                                html: "\n          <div style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;\">\n            <p>Prezado ".concat(contractData.buyer.name, "</p>\n            <p>Segue anexo uma (01) c\u00F3pia de nossa confirma\u00E7\u00E3o, solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve poss\u00EDvel.</p>\n\n            <p>Agradecemos e nos colocamos a sua disposi\u00E7\u00E3o.</p>\n            <br/>\n            <small style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;\">Este contrato foi criado e enviado via sistema.</small>\n          </div>"),
+                                html: "\n          <div style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;\">\n            <p>Prezado ".concat(contractData.buyer.name, "</p>\n            <p>Segue anexo uma (01) c\u00F3pia de nossa confirma\u00E7\u00E3o, solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve poss\u00EDvel.</p>\n\n            <p>Agradecemos e nos colocamos a sua disposi\u00E7\u00E3o.</p>\n            <br/>\n\n            <p>Sauda\u00E7\u00F5es,</p>\n            \n\n            <img src=\"cid:assinaturaemail\" alt=\"Assinatura\" style=\"max-width: 300px; height: auto;\" />\n            <br/>\n              \n            <small style=\"font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;\">Este contrato foi criado e enviado via sistema, pedimos a gentileza que confirme o recebimento.</small>\n          </div>"),
                                 attachments: [
                                     {
                                         filename: "contrato_".concat(number_contract, "_comprador.pdf"),
                                         content: pdfBuyer,
                                     },
+                                    {
+                                        filename: signatureFileName,
+                                        path: signatureEmailImage,
+                                        cid: "assinaturaemail",
+                                    },
+                                    {
+                                        filename: "folha_de_rosto_".concat(number_contract, ".txt"),
+                                        content: coverPage_1.folhaDeRostoBuffer,
+                                    },
                                 ],
                             })];
                     case 4:
                         // Enviar e-mail para o comprador
-                        _b.sent();
+                        _d.sent();
+                        // anexar folha de rosto no email
                         return [4 /*yield*/, EmailLogRepository_1.EmailLogRepository.save({
                                 email_sender: sender,
                                 number_contract: number_contract,
                                 sent_at: new Date(),
                             })];
                     case 5:
-                        _b.sent();
+                        // anexar folha de rosto no email
+                        _d.sent();
                         res.status(200).send({ message: "E-mails enviados com sucesso!" });
                         return [3 /*break*/, 7];
                     case 6:
-                        error_1 = _b.sent();
+                        error_1 = _d.sent();
                         console.error(error_1);
                         res.status(500).send({ error: "Erro ao enviar os e-mails." });
                         return [3 /*break*/, 7];
