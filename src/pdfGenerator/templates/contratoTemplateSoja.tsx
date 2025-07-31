@@ -261,7 +261,10 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
       <div style={{ textAlign: "justify" }}>
         <strong>
           {data.type_currency === "Dólar"
-            ? `${"US"}${formatCurrency(price, data.type_currency, modeSave)}`
+            ? `${formatCurrency(price, data.type_currency, modeSave).replace(
+                "$",
+                "US$ "
+              )}`
             : formatCurrency(price, data.type_currency, modeSave)}
         </strong>{" "}
         {formattedPreco}
