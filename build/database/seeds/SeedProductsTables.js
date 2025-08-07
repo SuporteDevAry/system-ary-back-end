@@ -35,56 +35,53 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-require("express-async-errors");
-require("reflect-metadata");
-require("dotenv/config");
-var express_1 = __importDefault(require("express"));
-var cors_1 = __importDefault(require("cors"));
-var data_source_1 = require("./database/data-source");
-var routes_1 = __importDefault(require("./app/routes"));
-//Error middleware fazer aqui para eliminar try catch no app
-var error_1 = require("./app/middlewares/error");
-// Seeds
-var SeedProducts_1 = require("./database/seeds/SeedProducts");
-var SeedProductsTables_1 = require("./database/seeds/SeedProductsTables");
-var port = process.env.SERVER_PORT;
-var app = (0, express_1.default)();
-app.use((0, cors_1.default)());
-app.use(express_1.default.json({ limit: "100mb" }));
-app.use(routes_1.default);
-app.use(error_1.errorMiddleware);
-app.use(express_1.default.urlencoded({ limit: "100mb", extended: true }));
-// AppDataSource.initialize().then(async () => {
-//   app.listen(port, () => {
-//     console.log(`Server is running on port: ${port}`);
-//   });
-// });
-data_source_1.AppDataSource.initialize()
-    .then(function () { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                if (!(process.env.NODE_ENV === "dev")) return [3 /*break*/, 3];
-                return [4 /*yield*/, (0, SeedProducts_1.seedProducts)(data_source_1.AppDataSource)];
-            case 1:
-                _a.sent();
-                return [4 /*yield*/, (0, SeedProductsTables_1.seedProductTables)(data_source_1.AppDataSource)];
-            case 2:
-                _a.sent();
-                _a.label = 3;
-            case 3:
-                app.listen(port, function () {
-                    console.log("Server is running on port: ".concat(port));
-                });
-                return [2 /*return*/];
-        }
+exports.seedProductTables = void 0;
+var ProductsTable_1 = require("../../app/entities/ProductsTable");
+function seedProductTables(dataSource) {
+    return __awaiter(this, void 0, void 0, function () {
+        var productTableRepository, tables, _i, tables_1, table, exists, newTable;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    productTableRepository = dataSource.getRepository(ProductsTable_1.ProductTable);
+                    tables = [
+                        {
+                            name: "Soja",
+                            product_types: ["S", "T", "SG", "CN"],
+                        },
+                        {
+                            name: "Óleo",
+                            product_types: ["O", "OC", "OA", "SB", "EP"],
+                        },
+                        {
+                            name: "Farelo",
+                            product_types: ["F"],
+                        },
+                    ];
+                    _i = 0, tables_1 = tables;
+                    _a.label = 1;
+                case 1:
+                    if (!(_i < tables_1.length)) return [3 /*break*/, 5];
+                    table = tables_1[_i];
+                    return [4 /*yield*/, productTableRepository.findOneBy({ name: table.name })];
+                case 2:
+                    exists = _a.sent();
+                    if (!!exists) return [3 /*break*/, 4];
+                    newTable = productTableRepository.create(table);
+                    return [4 /*yield*/, productTableRepository.save(newTable)];
+                case 3:
+                    _a.sent();
+                    _a.label = 4;
+                case 4:
+                    _i++;
+                    return [3 /*break*/, 1];
+                case 5:
+                    console.log("✅ Seed de product_tables finalizada com sucesso!");
+                    return [2 /*return*/];
+            }
+        });
     });
-}); })
-    .catch(function (err) {
-    console.error("Erro ao inicializar AppDataSource:", err);
-});
-//# sourceMappingURL=server.js.map
+}
+exports.seedProductTables = seedProductTables;
+//# sourceMappingURL=SeedProductsTables.js.map

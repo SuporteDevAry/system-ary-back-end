@@ -186,18 +186,21 @@ var ContratoTemplateSoja = function (_a) {
             react_1.default.createElement("strong", null, "Pre\u00E7o:")),
         react_1.default.createElement("div", { style: { textAlign: "justify" } },
             react_1.default.createElement("strong", null, data.type_currency === "Dólar"
-                ? "".concat("US").concat((0, helpers_1.formatCurrency)(price, data.type_currency, modeSave))
+                ? "".concat((0, helpers_1.formatCurrency)(price, data.type_currency, modeSave).replace("$", "US$ "))
                 : (0, helpers_1.formatCurrency)(price, data.type_currency, modeSave)),
             " ",
             formattedPreco,
-            (destination !== "Nenhum" || complement_destination) && (react_1.default.createElement("span", null,
+            (destination && destination !== "Nenhum") || complement_destination ? (react_1.default.createElement("span", null,
                 react_1.default.createElement("strong", null,
                     "(",
-                    destination === "Nenhum"
-                        ? complement_destination || ""
-                        : "".concat(destination).concat(complement_destination ? " ".concat(complement_destination) : ""),
+                    [
+                        destination !== "Nenhum" ? destination : "",
+                        complement_destination,
+                    ]
+                        .filter(Boolean)
+                        .join(" "),
                     ")"),
-                "."))),
+                ".")) : null),
         react_1.default.createElement("br", null),
         react_1.default.createElement("div", { style: { textAlign: "left" } },
             react_1.default.createElement("strong", null, "ICMS:")),

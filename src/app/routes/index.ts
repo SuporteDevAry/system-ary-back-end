@@ -8,6 +8,8 @@ import { ContactController } from "../controllers/ContactController";
 import { NotificationController } from "../controllers/NotificationsController";
 import { GrainContractController } from "../controllers/GrainContractController";
 import { EmailController } from "../controllers/EmailController";
+import { ProductController } from "../controllers/ProductController";
+import { ProductTablesController } from "../controllers/ProductTablesController";
 
 const routes = Router();
 
@@ -21,7 +23,7 @@ const routes = Router();
 routes.post("/api/login", new SessionController().login);
 
 // Routes protected
-routes.use(authMiddleware);
+routes.use(authMiddleware); // comentar ao usar local
 routes.get("/api/profile", new UserController().getProfile);
 routes.post("/api/reset-password", new SessionController().resetPassword);
 
@@ -95,6 +97,21 @@ routes.delete(
   new GrainContractController().deleteGrainContract
 );
 
+// Send Emails
 routes.post("/api/send-emails", new EmailController().SendEmails);
+
+// Products
+routes.post("/api/products", ProductController.createProduct);
+routes.get("/api/products", ProductController.findAllProducts);
+routes.get("/api/products/:id", ProductController.findProductById);
+routes.patch("/api/products/:id", ProductController.updateProduct);
+routes.delete("/api/products/:id", ProductController.deleteProduct);
+
+//Products Table
+routes.post("/api/products-tables", ProductTablesController.createTable);
+routes.get("/api/products-tables", ProductTablesController.findTablesAll);
+routes.get("/api/products-tables/:id", ProductTablesController.findTableById);
+routes.patch("/api/products-tables/:id", ProductTablesController.updateTable);
+routes.delete("/api/products-tables/:id", ProductTablesController.deleteTable);
 
 export default routes;

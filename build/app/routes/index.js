@@ -10,6 +10,8 @@ var ContactController_1 = require("../controllers/ContactController");
 var NotificationsController_1 = require("../controllers/NotificationsController");
 var GrainContractController_1 = require("../controllers/GrainContractController");
 var EmailController_1 = require("../controllers/EmailController");
+var ProductController_1 = require("../controllers/ProductController");
+var ProductTablesController_1 = require("../controllers/ProductTablesController");
 var routes = (0, express_1.Router)();
 // Utilizar futuramente para criar métricas de chamadas
 // routes.use("/api", (req, res, next) => {
@@ -19,7 +21,7 @@ var routes = (0, express_1.Router)();
 // IN and OUT application
 routes.post("/api/login", new SessionController_1.SessionController().login);
 // Routes protected
-routes.use(authMiddleware_1.authMiddleware);
+routes.use(authMiddleware_1.authMiddleware); // comentar ao usar local
 routes.get("/api/profile", new UserController_1.UserController().getProfile);
 routes.post("/api/reset-password", new SessionController_1.SessionController().resetPassword);
 // CRUD USERS
@@ -54,6 +56,19 @@ routes.get("/api/grain-contracts/:id", new GrainContractController_1.GrainContra
 routes.post("/api/grain-contracts", new GrainContractController_1.GrainContractController().createGrainContract);
 routes.patch("/api/grain-contracts/:id", new GrainContractController_1.GrainContractController().updateGrainContract);
 routes.delete("/api/grain-contracts/:id", new GrainContractController_1.GrainContractController().deleteGrainContract);
+// Send Emails
 routes.post("/api/send-emails", new EmailController_1.EmailController().SendEmails);
+// Products
+routes.post("/api/products", ProductController_1.ProductController.createProduct);
+routes.get("/api/products", ProductController_1.ProductController.findAllProducts);
+routes.get("/api/products/:id", ProductController_1.ProductController.findProductById);
+routes.patch("/api/products/:id", ProductController_1.ProductController.updateProduct);
+routes.delete("/api/products/:id", ProductController_1.ProductController.deleteProduct);
+//Products Table
+routes.post("/api/products-tables", ProductTablesController_1.ProductTablesController.createTable);
+routes.get("/api/products-tables", ProductTablesController_1.ProductTablesController.findTablesAll);
+routes.get("/api/products-tables/:id", ProductTablesController_1.ProductTablesController.findTableById);
+routes.patch("/api/products-tables/:id", ProductTablesController_1.ProductTablesController.updateTable);
+routes.delete("/api/products-tables/:id", ProductTablesController_1.ProductTablesController.deleteTable);
 exports.default = routes;
 //# sourceMappingURL=index.js.map
