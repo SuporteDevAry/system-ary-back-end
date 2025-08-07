@@ -268,32 +268,21 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
             : formatCurrency(price, data.type_currency, modeSave)}
         </strong>{" "}
         {formattedPreco}
-        {/* {destination && (
+        {(destination && destination !== "Nenhum") || complement_destination ? (
           <span>
             <strong>
               (
-              {complement_destination
-                ? `${destination} ${complement_destination}`
-                : destination}
+              {[
+                destination !== "Nenhum" ? destination : "",
+                complement_destination,
+              ]
+                .filter(Boolean)
+                .join(" ")}
               )
             </strong>
             .
           </span>
-        )} */}
-        {(destination !== "Nenhum" || complement_destination) && (
-          <span>
-            <strong>
-              (
-              {destination === "Nenhum"
-                ? complement_destination || ""
-                : `${destination}${
-                    complement_destination ? ` ${complement_destination}` : ""
-                  }`}
-              )
-            </strong>
-            .
-          </span>
-        )}
+        ) : null}
       </div>
       <br />
 
