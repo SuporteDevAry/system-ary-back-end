@@ -126,7 +126,8 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
       : ` quilos.`;
 
   let Dot =
-    data.destination === "Nenhum" && data.complement_destination?.length === 0
+    data.destination === "Nenhum" ||
+    (data.destination === "" && data.complement_destination?.length === 0)
       ? "."
       : ", ";
 
