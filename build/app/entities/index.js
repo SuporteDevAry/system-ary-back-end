@@ -8,6 +8,8 @@ var Contact_1 = require("./Contact");
 var Notifications_1 = require("./Notifications");
 var GrainContracts_1 = require("./GrainContracts");
 var EmailLog_1 = require("./EmailLog");
+var Products_1 = require("./Products");
+var ProductsTable_1 = require("./ProductsTable");
 exports.entitiesDir = {
     User: User_1.User,
     Permission: Permission_1.Permission,
@@ -16,5 +18,7 @@ exports.entitiesDir = {
     Notifications: Notifications_1.Notifications,
     GrainContract: GrainContracts_1.GrainContract,
     EmailLog: EmailLog_1.EmailLog,
+    Product: Products_1.Product,
+    ProductTable: ProductsTable_1.ProductTable,
 };
 //# sourceMappingURL=index.js.map

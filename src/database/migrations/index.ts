@@ -8,6 +8,8 @@ import { AddComplementationDestination1732715196786 as AddComplementationDestina
 import { EmailLogs1733888615818 as EmailLog } from "./1733888615818-EmailLogs";
 import { AddReceiveEmailInContacts1742958762694 as AddReceiveEmailInContacts } from "./1742958762694-AddReceiveEmailInContacts";
 import { AddTypeQuantity1747783875290 as AddTypeQuantity } from "./1747783875290-addTypeQuantity";
+import { Products1754078917113 as Products } from "./1754078917113-products";
+import { ProductsTable1754444551923 as ProductsTable } from "./1754444551923-productsTable";
 
 export const migrationDir = {
   CreatePermissions,
@@ -20,4 +22,6 @@ export const migrationDir = {
   EmailLog,
   AddReceiveEmailInContacts,
   AddTypeQuantity,
+  Products,
+  ProductsTable,
 };
