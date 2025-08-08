@@ -71,7 +71,8 @@ var ContratoTemplateSoja = function (_a) {
     var formattedMetrica = data.type_quantity === "toneladas métricas"
         ? " toneladas m\u00E9tricas."
         : " quilos.";
-    var Dot = data.destination === "Nenhum" && ((_b = data.complement_destination) === null || _b === void 0 ? void 0 : _b.length) === 0
+    var Dot = data.destination === "Nenhum" ||
+        (data.destination === "" && ((_b = data.complement_destination) === null || _b === void 0 ? void 0 : _b.length) === 0)
         ? "."
         : ", ";
     var formattedPreco = data.type_quantity === "toneladas métricas"
