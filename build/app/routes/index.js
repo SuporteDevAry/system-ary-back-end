@@ -65,10 +65,10 @@ routes.get("/api/products/:id", ProductController_1.ProductController.findProduc
 routes.patch("/api/products/:id", ProductController_1.ProductController.updateProduct);
 routes.delete("/api/products/:id", ProductController_1.ProductController.deleteProduct);
 //Products Table
-routes.post("/api/products-tables", ProductTablesController_1.ProductTablesController.createTable);
-routes.get("/api/products-tables", ProductTablesController_1.ProductTablesController.findTablesAll);
-routes.get("/api/products-tables/:id", ProductTablesController_1.ProductTablesController.findTableById);
-routes.patch("/api/products-tables/:id", ProductTablesController_1.ProductTablesController.updateTable);
-routes.delete("/api/products-tables/:id", ProductTablesController_1.ProductTablesController.deleteTable);
+routes.post("/api/tables-products", ProductTablesController_1.ProductTablesController.createTable);
+routes.get("/api/tables-products", ProductTablesController_1.ProductTablesController.findTablesAll);
+routes.get("/api/tables-products/:id", ProductTablesController_1.ProductTablesController.findTableById);
+routes.patch("/api/tables-products/:id", ProductTablesController_1.ProductTablesController.updateTable);
+routes.delete("/api/tables-products/:id", ProductTablesController_1.ProductTablesController.deleteTable);
 exports.default = routes;
 //# sourceMappingURL=index.js.map

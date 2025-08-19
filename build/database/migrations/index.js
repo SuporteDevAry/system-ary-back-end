@@ -13,6 +13,7 @@ var _1742958762694_AddReceiveEmailInContacts_1 = require("./1742958762694-AddRec
 var _1747783875290_addTypeQuantity_1 = require("./1747783875290-addTypeQuantity");
 var _1754078917113_products_1 = require("./1754078917113-products");
 var _1754444551923_productsTable_1 = require("./1754444551923-productsTable");
+var _1755633180693_AddTableId_1 = require("./1755633180693-AddTableId");
 exports.migrationDir = {
     CreatePermissions: _1697084968105_permissions_1.Permissions1697084968105,
     CreateUsers: _1694720577496_createUsers_1.CreateUsers1694720577496,
@@ -26,5 +27,6 @@ exports.migrationDir = {
     AddTypeQuantity: _1747783875290_addTypeQuantity_1.AddTypeQuantity1747783875290,
     Products: _1754078917113_products_1.Products1754078917113,
     ProductsTable: _1754444551923_productsTable_1.ProductsTable1754444551923,
+    AddTableIdInGrainContracts: _1755633180693_AddTableId_1.AddTableId1755633180693,
 };
 //# sourceMappingURL=index.js.map

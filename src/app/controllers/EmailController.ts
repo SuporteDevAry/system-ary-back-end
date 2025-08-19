@@ -29,6 +29,7 @@ export class EmailController {
       // Extração da sigla
       const sigla = number_contract.split(".")[0].toUpperCase();
 
+      // Poderá ser mudado se criarem outras mesas além dessas.
       // Grupos de siglas
       const group1 = ["S", "T", "SG", "CN"];
       const group2 = ["O", "OC", "OA", "SB", "EP"];

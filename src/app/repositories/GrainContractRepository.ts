@@ -1,30 +1,11 @@
 import { GrainContract } from "../entities/GrainContracts";
 import { AppDataSource } from "../../database/data-source";
+import { ProductTable } from "../entities/ProductsTable";
 
 export const grainContractRepository =
   AppDataSource.getRepository(GrainContract);
 
-type ProductGroup = keyof typeof productGroups;
-
-// Definição dos grupos
-const productGroups = {
-  group1: ["S", "T", "SG", "CN"],
-  group2: ["O", "OC", "OA", "SB", "EP"],
-  group3: ["F"],
-} as const;
-
-// Função para determinar a qual grupo um produto pertence
-const getProductGroup = (product: string): ProductGroup | null => {
-  for (const [group, products] of Object.entries(productGroups) as unknown as [
-    ProductGroup,
-    string[]
-  ][]) {
-    if (products.includes(product)) {
-      return group; // Retorna "group1" ou "group2"
-    }
-  }
-  return null; // Retorna null se não encontrar o grupo
-};
+const productTableRepository = AppDataSource.getRepository(ProductTable);
 
 export const generateNumberContract = async (
   data: Partial<GrainContract>
@@ -36,13 +17,17 @@ export const generateNumberContract = async (
     throw new Error("Produto não informado.");
   }
 
-  const productGroup = getProductGroup(product);
-  if (!productGroup) {
-    throw new Error(`Produto ${product} não pertence a nenhum grupo.`);
+  // Buscar a mesa que contenha esse produto
+  const productTable = await productTableRepository
+    .createQueryBuilder("table")
+    .where(":product = ANY(table.product_types)", { product })
+    .getOne();
+
+  if (!productTable) {
+    throw new Error(`Produto ${product} não pertence a nenhuma mesa.`);
   }
 
-  // Obtém os produtos do grupo correspondente
-  const productsInGroup = productGroups[productGroup];
+  const productsInGroup = productTable.product_types;
 
   // Só iremos remover essa regra das siglas, caso o cliente aceite a sugestão da reunião do dia 09/04/2025
   const listProducts = ["O", "OC", "OA", "SB", "EP"];

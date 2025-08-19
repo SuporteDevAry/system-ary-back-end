@@ -146,6 +146,9 @@ export class GrainContract {
   @Column({ nullable: true })
   internal_communication: string;
 
+  @Column({ type: "uuid", nullable: true })
+  table_id?: string;
+
   @CreateDateColumn()
   created_at: Date;
 
