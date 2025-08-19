@@ -108,10 +108,10 @@ routes.patch("/api/products/:id", ProductController.updateProduct);
 routes.delete("/api/products/:id", ProductController.deleteProduct);
 
 //Products Table
-routes.post("/api/products-tables", ProductTablesController.createTable);
-routes.get("/api/products-tables", ProductTablesController.findTablesAll);
-routes.get("/api/products-tables/:id", ProductTablesController.findTableById);
-routes.patch("/api/products-tables/:id", ProductTablesController.updateTable);
-routes.delete("/api/products-tables/:id", ProductTablesController.deleteTable);
+routes.post("/api/tables-products", ProductTablesController.createTable);
+routes.get("/api/tables-products", ProductTablesController.findTablesAll);
+routes.get("/api/tables-products/:id", ProductTablesController.findTableById);
+routes.patch("/api/tables-products/:id", ProductTablesController.updateTable);
+routes.delete("/api/tables-products/:id", ProductTablesController.deleteTable);
 
 export default routes;
