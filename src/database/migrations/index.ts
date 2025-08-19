@@ -10,6 +10,7 @@ import { AddReceiveEmailInContacts1742958762694 as AddReceiveEmailInContacts } f
 import { AddTypeQuantity1747783875290 as AddTypeQuantity } from "./1747783875290-addTypeQuantity";
 import { Products1754078917113 as Products } from "./1754078917113-products";
 import { ProductsTable1754444551923 as ProductsTable } from "./1754444551923-productsTable";
+import { AddTableId1755633180693 as AddTableIdInGrainContracts } from "./1755633180693-AddTableId";
 
 export const migrationDir = {
   CreatePermissions,
@@ -24,4 +25,5 @@ export const migrationDir = {
   AddTypeQuantity,
   Products,
   ProductsTable,
+  AddTableIdInGrainContracts,
 };

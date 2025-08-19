@@ -30,7 +30,7 @@ var ProductTable = /** @class */ (function () {
         __metadata("design:type", String)
     ], ProductTable.prototype, "name", void 0);
     __decorate([
-        (0, typeorm_1.Column)("simple-array"),
+        (0, typeorm_1.Column)("text", { array: true }),
         __metadata("design:type", Array)
     ], ProductTable.prototype, "product_types", void 0);
     __decorate([

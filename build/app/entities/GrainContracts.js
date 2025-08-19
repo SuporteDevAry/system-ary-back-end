@@ -194,6 +194,10 @@ var GrainContract = /** @class */ (function () {
         __metadata("design:type", String)
     ], GrainContract.prototype, "internal_communication", void 0);
     __decorate([
+        (0, typeorm_1.Column)({ type: "uuid", nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "table_id", void 0);
+    __decorate([
         (0, typeorm_1.CreateDateColumn)(),
         __metadata("design:type", Date)
     ], GrainContract.prototype, "created_at", void 0);

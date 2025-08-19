@@ -16,7 +16,7 @@ export class ProductTable {
   @Column({ unique: true })
   name: string;
 
-  @Column("simple-array")
+  @Column("text", { array: true })
   product_types: string[];
 
   @CreateDateColumn()
