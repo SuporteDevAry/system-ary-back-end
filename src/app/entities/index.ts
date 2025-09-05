@@ -9,6 +9,7 @@ import { Product } from "./Products";
 import { ProductTable } from "./ProductsTable";
 import { Tax } from "./Taxes";
 import { Invoice } from "./Invoices";
+import { Billing } from "./Billings";
 
 export const entitiesDir = {
   User,
@@ -22,4 +23,5 @@ export const entitiesDir = {
   ProductTable,
   Tax,
   Invoice,
+  Billing,
 };
