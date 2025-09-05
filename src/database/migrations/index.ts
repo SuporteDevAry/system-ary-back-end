@@ -14,6 +14,7 @@ import { AddTableId1755633180693 as AddTableIdInGrainContracts } from "./1755633
 import { AddReceiptFields1756778991841 as AddReceiptFields } from "./1756778991841-AddReceiptFields";
 import { Taxes1756780745306 as Taxes } from "./1756780745306-Taxes";
 import { Invoices1757045893213 as Invoices } from "./1757045893213-Invoices";
+import { Billing1757048894259 as Billings } from "./1757048894259-Billing";
 
 export const migrationDir = {
   CreatePermissions,
@@ -32,4 +33,5 @@ export const migrationDir = {
   AddReceiptFields,
   Taxes,
   Invoices,
+  Billings,
 };
