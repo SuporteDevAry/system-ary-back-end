@@ -10,6 +10,7 @@ var GrainContracts_1 = require("./GrainContracts");
 var EmailLog_1 = require("./EmailLog");
 var Products_1 = require("./Products");
 var ProductsTable_1 = require("./ProductsTable");
+var Taxes_1 = require("./Taxes");
 exports.entitiesDir = {
     User: User_1.User,
     Permission: Permission_1.Permission,
@@ -20,5 +21,6 @@ exports.entitiesDir = {
     EmailLog: EmailLog_1.EmailLog,
     Product: Products_1.Product,
     ProductTable: ProductsTable_1.ProductTable,
+    Tax: Taxes_1.Tax,
 };
 //# sourceMappingURL=index.js.map

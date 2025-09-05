@@ -11,6 +11,8 @@ import { AddTypeQuantity1747783875290 as AddTypeQuantity } from "./1747783875290
 import { Products1754078917113 as Products } from "./1754078917113-products";
 import { ProductsTable1754444551923 as ProductsTable } from "./1754444551923-productsTable";
 import { AddTableId1755633180693 as AddTableIdInGrainContracts } from "./1755633180693-AddTableId";
+import { AddReceiptFields1756778991841 as AddReceiptFields } from "./1756778991841-AddReceiptFields";
+import { Taxes1756780745306 as Taxes } from "./1756780745306-Taxes";
 
 export const migrationDir = {
   CreatePermissions,
@@ -26,4 +28,6 @@ export const migrationDir = {
   Products,
   ProductsTable,
   AddTableIdInGrainContracts,
+  AddReceiptFields,
+  Taxes,
 };

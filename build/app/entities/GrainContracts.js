@@ -198,6 +198,30 @@ var GrainContract = /** @class */ (function () {
         __metadata("design:type", String)
     ], GrainContract.prototype, "table_id", void 0);
     __decorate([
+        (0, typeorm_1.Column)("decimal", { nullable: true }),
+        __metadata("design:type", Number)
+    ], GrainContract.prototype, "final_quantity", void 0);
+    __decorate([
+        (0, typeorm_1.Column)("decimal", { nullable: true }),
+        __metadata("design:type", Number)
+    ], GrainContract.prototype, "commission_contract", void 0);
+    __decorate([
+        (0, typeorm_1.Column)("decimal", { nullable: true }),
+        __metadata("design:type", Number)
+    ], GrainContract.prototype, "total_received", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "status_received", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "timestamp", nullable: true }),
+        __metadata("design:type", Date)
+    ], GrainContract.prototype, "charge_date", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "timestamp", nullable: true }),
+        __metadata("design:type", Date)
+    ], GrainContract.prototype, "expected_receipt_date", void 0);
+    __decorate([
         (0, typeorm_1.CreateDateColumn)(),
         __metadata("design:type", Date)
     ], GrainContract.prototype, "created_at", void 0);
