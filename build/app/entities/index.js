@@ -12,6 +12,7 @@ var Products_1 = require("./Products");
 var ProductsTable_1 = require("./ProductsTable");
 var Taxes_1 = require("./Taxes");
 var Invoices_1 = require("./Invoices");
+var Billings_1 = require("./Billings");
 exports.entitiesDir = {
     User: User_1.User,
     Permission: Permission_1.Permission,
@@ -24,5 +25,6 @@ exports.entitiesDir = {
     ProductTable: ProductsTable_1.ProductTable,
     Tax: Taxes_1.Tax,
     Invoice: Invoices_1.Invoice,
+    Billing: Billings_1.Billing,
 };
 //# sourceMappingURL=index.js.map
