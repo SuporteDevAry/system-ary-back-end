@@ -16,6 +16,7 @@ var _1754444551923_productsTable_1 = require("./1754444551923-productsTable");
 var _1755633180693_AddTableId_1 = require("./1755633180693-AddTableId");
 var _1756778991841_AddReceiptFields_1 = require("./1756778991841-AddReceiptFields");
 var _1756780745306_Taxes_1 = require("./1756780745306-Taxes");
+var _1757045893213_Invoices_1 = require("./1757045893213-Invoices");
 exports.migrationDir = {
     CreatePermissions: _1697084968105_permissions_1.Permissions1697084968105,
     CreateUsers: _1694720577496_createUsers_1.CreateUsers1694720577496,
@@ -32,5 +33,6 @@ exports.migrationDir = {
     AddTableIdInGrainContracts: _1755633180693_AddTableId_1.AddTableId1755633180693,
     AddReceiptFields: _1756778991841_AddReceiptFields_1.AddReceiptFields1756778991841,
     Taxes: _1756780745306_Taxes_1.Taxes1756780745306,
+    Invoices: _1757045893213_Invoices_1.Invoices1757045893213,
 };
 //# sourceMappingURL=index.js.map
