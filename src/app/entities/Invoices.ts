@@ -15,14 +15,14 @@ export class Invoice {
   @Column()
   rps_number: string;
 
-  @Column("timestamp")
-  rps_emission_date: Date;
+  @Column()
+  rps_emission_date: string;
 
   @Column()
   nfs_number: string;
 
-  @Column("timestamp")
-  nfs_emission_date: Date;
+  @Column()
+  nfs_emission_date: string;
 
   @Column()
   service_code: string;

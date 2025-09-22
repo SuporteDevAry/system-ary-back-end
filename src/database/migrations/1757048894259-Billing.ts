@@ -31,7 +31,7 @@ export class Billing1757048894259 implements MigrationInterface {
             },
             {
               name: "receipt_date",
-              type: "timestamp",
+              type: "varchar",
             },
 
             {
@@ -71,12 +71,12 @@ export class Billing1757048894259 implements MigrationInterface {
 
             {
               name: "expected_receipt_date",
-              type: "timestamp",
+              type: "varchar",
             },
 
             {
               name: "liquid_contract_date",
-              type: "timestamp",
+              type: "varchar",
             },
 
             {
