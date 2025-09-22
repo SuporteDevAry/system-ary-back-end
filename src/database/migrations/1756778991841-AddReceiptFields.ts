@@ -27,12 +27,12 @@ export class AddReceiptFields1756778991841 implements MigrationInterface {
         }),
         new TableColumn({
           name: "charge_date",
-          type: "timestamp",
+          type: "varchar",
           isNullable: true,
         }),
         new TableColumn({
           name: "expected_receipt_date",
-          type: "timestamp",
+          type: "varchar",
           isNullable: true,
         }),
       ];

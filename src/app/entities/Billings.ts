@@ -24,8 +24,8 @@ export class Billing {
   @Column()
   year: string;
 
-  @Column("timestamp")
-  receipt_date: Date;
+  @Column()
+  receipt_date: string;
 
   @Column()
   internal_receipt_number: string;
@@ -51,11 +51,11 @@ export class Billing {
   @Column()
   liquid_contract: string;
 
-  @Column("timestamp")
-  expected_receipt_date: Date;
+  @Column()
+  expected_receipt_date: string;
 
-  @Column("timestamp")
-  liquid_contract_date: Date;
+  @Column()
+  liquid_contract_date: string;
 
   @Column()
   owner_record: string;

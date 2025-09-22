@@ -73,12 +73,12 @@ var AddReceiptFields1756778991841 = /** @class */ (function () {
                             }),
                             new typeorm_1.TableColumn({
                                 name: "charge_date",
-                                type: "timestamp",
+                                type: "varchar",
                                 isNullable: true,
                             }),
                             new typeorm_1.TableColumn({
                                 name: "expected_receipt_date",
-                                type: "timestamp",
+                                type: "varchar",
                                 isNullable: true,
                             }),
                         ];

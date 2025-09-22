@@ -114,7 +114,7 @@ var GrainContractController = /** @class */ (function () {
                         return [4 /*yield*/, (0, GrainContractRepository_1.generateNumberContract)(req.body)];
                     case 1:
                         numberContract = _a.sent();
-                        grainContract = GrainContractRepository_1.grainContractRepository.create(__assign(__assign({}, req.body), { number_contract: numberContract }));
+                        grainContract = GrainContractRepository_1.grainContractRepository.create(__assign(__assign({}, req.body), { number_contract: numberContract, final_quantity: req.body.quantity }));
                         return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.save(grainContract)];
                     case 2:
                         result = _a.sent();
@@ -206,6 +206,46 @@ var GrainContractController = /** @class */ (function () {
                     case 4:
                         error_5 = _a.sent();
                         return [2 /*return*/, res.status(500).json({ message: error_5.message })];
+                    case 5: return [2 /*return*/];
+                }
+            });
+        }); };
+        this.updateContractAdjustments = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+            var id, _a, final_quantity, payment_date, charge_date, expected_receipt_date, internal_communication, status_received, grainContract, updatedFields, filteredUpdates, result, error_6;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        id = req.params.id;
+                        _a = req.body, final_quantity = _a.final_quantity, payment_date = _a.payment_date, charge_date = _a.charge_date, expected_receipt_date = _a.expected_receipt_date, internal_communication = _a.internal_communication, status_received = _a.status_received;
+                        _b.label = 1;
+                    case 1:
+                        _b.trys.push([1, 4, , 5]);
+                        return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.findOneBy({ id: id })];
+                    case 2:
+                        grainContract = _b.sent();
+                        if (!grainContract) {
+                            return [2 /*return*/, res.status(404).json({ message: "Contrato não encontrado." })];
+                        }
+                        updatedFields = {
+                            final_quantity: final_quantity,
+                            payment_date: payment_date,
+                            charge_date: charge_date,
+                            expected_receipt_date: expected_receipt_date,
+                            internal_communication: internal_communication,
+                            status_received: status_received,
+                        };
+                        filteredUpdates = Object.fromEntries(Object.entries(updatedFields).filter(function (_a) {
+                            var _ = _a[0], v = _a[1];
+                            return v !== undefined;
+                        }));
+                        GrainContractRepository_1.grainContractRepository.merge(grainContract, filteredUpdates);
+                        return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.save(grainContract)];
+                    case 3:
+                        result = _b.sent();
+                        return [2 /*return*/, res.json(result)];
+                    case 4:
+                        error_6 = _b.sent();
+                        return [2 /*return*/, res.status(500).json({ message: error_6.message })];
                     case 5: return [2 /*return*/];
                 }
             });

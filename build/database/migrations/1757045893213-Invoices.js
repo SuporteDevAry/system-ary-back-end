@@ -64,7 +64,7 @@ var Invoices1757045893213 = /** @class */ (function () {
                                     },
                                     {
                                         name: "rps_emission_date",
-                                        type: "timestamp",
+                                        type: "varchar",
                                     },
                                     {
                                         name: "nfs_number",
@@ -72,7 +72,7 @@ var Invoices1757045893213 = /** @class */ (function () {
                                     },
                                     {
                                         name: "nfs_emission_date",
-                                        type: "timestamp",
+                                        type: "varchar",
                                     },
                                     {
                                         name: "service_code",

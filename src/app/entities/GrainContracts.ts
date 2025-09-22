@@ -158,14 +158,14 @@ export class GrainContract {
   @Column("decimal", { nullable: true })
   total_received: number;
 
-  @Column({ type: "varchar", nullable: true })
+  @Column({ nullable: true })
   status_received: string;
 
-  @Column({ type: "timestamp", nullable: true })
-  charge_date: Date;
+  @Column({ nullable: true })
+  charge_date: string;
 
-  @Column({ type: "timestamp", nullable: true })
-  expected_receipt_date: Date;
+  @Column({ nullable: true })
+  expected_receipt_date: string;
 
   @CreateDateColumn()
   created_at: Date;

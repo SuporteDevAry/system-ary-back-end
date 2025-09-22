@@ -42,8 +42,8 @@ var Billing = /** @class */ (function () {
         __metadata("design:type", String)
     ], Billing.prototype, "year", void 0);
     __decorate([
-        (0, typeorm_1.Column)("timestamp"),
-        __metadata("design:type", Date)
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", String)
     ], Billing.prototype, "receipt_date", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
@@ -78,12 +78,12 @@ var Billing = /** @class */ (function () {
         __metadata("design:type", String)
     ], Billing.prototype, "liquid_contract", void 0);
     __decorate([
-        (0, typeorm_1.Column)("timestamp"),
-        __metadata("design:type", Date)
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", String)
     ], Billing.prototype, "expected_receipt_date", void 0);
     __decorate([
-        (0, typeorm_1.Column)("timestamp"),
-        __metadata("design:type", Date)
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", String)
     ], Billing.prototype, "liquid_contract_date", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
