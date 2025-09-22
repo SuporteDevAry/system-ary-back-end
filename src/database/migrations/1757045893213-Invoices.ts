@@ -19,7 +19,7 @@ export class Invoices1757045893213 implements MigrationInterface {
             },
             {
               name: "rps_emission_date",
-              type: "timestamp",
+              type: "varchar",
             },
             {
               name: "nfs_number",
@@ -27,7 +27,7 @@ export class Invoices1757045893213 implements MigrationInterface {
             },
             {
               name: "nfs_emission_date",
-              type: "timestamp",
+              type: "varchar",
             },
             {
               name: "service_code",

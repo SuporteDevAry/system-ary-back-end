@@ -45,6 +45,7 @@ export class GrainContractController {
       const grainContract = grainContractRepository.create({
         ...req.body,
         number_contract: numberContract,
+        final_quantity: req.body.quantity, // Salvando o mesmo valor que quantity
       });
 
       const result = await grainContractRepository.save(grainContract);
@@ -135,6 +136,50 @@ export class GrainContractController {
       }
       grainContract = grainContractRepository.merge(grainContract, req.body);
       const result = await grainContractRepository.save(grainContract);
+      return res.json(result);
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  };
+
+  updateContractAdjustments = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    const { id } = req.params;
+    const {
+      final_quantity, // quantidade final
+      payment_date, // data de pagamento
+      charge_date, // Data da Cobrança
+      expected_receipt_date, // Data Prevista de Recebimento
+      internal_communication, //comunicao interna
+      status_received, // Liquidado S ou N
+    } = req.body;
+
+    try {
+      let grainContract = await grainContractRepository.findOneBy({ id });
+      if (!grainContract) {
+        return res.status(404).json({ message: "Contrato não encontrado." });
+      }
+
+      const updatedFields = {
+        final_quantity,
+        payment_date,
+        charge_date,
+        expected_receipt_date,
+        internal_communication,
+        status_received,
+      };
+
+      //[x] Remove os campos undefined para evitar que o merge os sobrescreva
+      const filteredUpdates = Object.fromEntries(
+        Object.entries(updatedFields).filter(([_, v]) => v !== undefined)
+      );
+
+      grainContractRepository.merge(grainContract, filteredUpdates);
+
+      const result = await grainContractRepository.save(grainContract);
+
       return res.json(result);
     } catch (error) {
       return res.status(500).json({ message: error.message });

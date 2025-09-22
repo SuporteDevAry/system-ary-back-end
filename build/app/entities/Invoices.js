@@ -30,16 +30,16 @@ var Invoice = /** @class */ (function () {
         __metadata("design:type", String)
     ], Invoice.prototype, "rps_number", void 0);
     __decorate([
-        (0, typeorm_1.Column)("timestamp"),
-        __metadata("design:type", Date)
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", String)
     ], Invoice.prototype, "rps_emission_date", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
     ], Invoice.prototype, "nfs_number", void 0);
     __decorate([
-        (0, typeorm_1.Column)("timestamp"),
-        __metadata("design:type", Date)
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", String)
     ], Invoice.prototype, "nfs_emission_date", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
