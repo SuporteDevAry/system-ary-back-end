@@ -10,6 +10,7 @@ import { GrainContractController } from "../controllers/GrainContractController"
 import { EmailController } from "../controllers/EmailController";
 import { ProductController } from "../controllers/ProductController";
 import { ProductTablesController } from "../controllers/ProductTablesController";
+import { InvoiceController } from "../controllers/InvoicesController";
 
 const routes = Router();
 
@@ -42,6 +43,10 @@ routes.get("/api/clients", new ClientController().getClients);
 routes.get(
   "/api/client/client-by-id/:code_client",
   new ClientController().getClientById
+);
+routes.get(
+  "/api/client/client-by-cnpj-cpf/:cnpj_cpf_client",
+  new ClientController().getClientByCnpj_cpf
 );
 routes.patch("/api/client/:id", new ClientController().update);
 routes.delete("/api/client/:id", new ClientController().delete);
@@ -113,5 +118,14 @@ routes.get("/api/tables-products", ProductTablesController.findTablesAll);
 routes.get("/api/tables-products/:id", ProductTablesController.findTableById);
 routes.patch("/api/tables-products/:id", ProductTablesController.updateTable);
 routes.delete("/api/tables-products/:id", ProductTablesController.deleteTable);
+
+// Invoices
+routes.post("/api/invoices", InvoiceController.createInvoice);
+routes.get("/api/invoices", InvoiceController.findAllInvoices);
+routes.get("/api/invoices/:id", InvoiceController.findInvoiceById);
+routes.get("/api/invoices/rps/:rps_number", InvoiceController.findInvoiceByRps_number);
+routes.get("/api/invoices/nfs/:nfs_number", InvoiceController.findInvoiceByNfs_number);
+routes.patch("/api/invoices/:id", InvoiceController.updateInvoice);
+routes.delete("/api/invoices/:id", InvoiceController.deleteInvoice);
 
 export default routes;
