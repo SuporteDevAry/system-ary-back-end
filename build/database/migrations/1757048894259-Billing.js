@@ -76,7 +76,7 @@ var Billing1757048894259 = /** @class */ (function () {
                                     },
                                     {
                                         name: "receipt_date",
-                                        type: "timestamp",
+                                        type: "varchar",
                                     },
                                     {
                                         name: "internal_receipt_number",
@@ -112,11 +112,11 @@ var Billing1757048894259 = /** @class */ (function () {
                                     },
                                     {
                                         name: "expected_receipt_date",
-                                        type: "timestamp",
+                                        type: "varchar",
                                     },
                                     {
                                         name: "liquid_contract_date",
-                                        type: "timestamp",
+                                        type: "varchar",
                                     },
                                     {
                                         name: "owner_record",

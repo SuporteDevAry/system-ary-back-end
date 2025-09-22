@@ -56,6 +56,7 @@ routes.get("/api/grain-contracts/:id", new GrainContractController_1.GrainContra
 routes.post("/api/grain-contracts", new GrainContractController_1.GrainContractController().createGrainContract);
 routes.patch("/api/grain-contracts/:id", new GrainContractController_1.GrainContractController().updateGrainContract);
 routes.delete("/api/grain-contracts/:id", new GrainContractController_1.GrainContractController().deleteGrainContract);
+routes.patch("/api/grain-contracts/update-contract-adjustments/:id", new GrainContractController_1.GrainContractController().updateContractAdjustments);
 // Send Emails
 routes.post("/api/send-emails", new EmailController_1.EmailController().SendEmails);
 // Products

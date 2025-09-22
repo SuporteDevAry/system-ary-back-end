@@ -102,6 +102,11 @@ routes.delete(
   new GrainContractController().deleteGrainContract
 );
 
+routes.patch(
+  "/api/grain-contracts/update-contract-adjustments/:id",
+  new GrainContractController().updateContractAdjustments
+);
+
 // Send Emails
 routes.post("/api/send-emails", new EmailController().SendEmails);
 
