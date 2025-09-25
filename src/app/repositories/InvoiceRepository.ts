@@ -39,4 +39,13 @@ export const InvoiceRepository = {
 
         await repo.remove(invoice);
     },
+
+    async nextNumberRps() {
+        const result = await repo.query(
+            `SELECT MAX(rps_number) as last_rps FROM invoices`
+        );
+
+        const lastRps = result?.[0]?.last_rps ?? 0;
+        return Number(lastRps) + 1;
+    }
 };

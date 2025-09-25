@@ -11,6 +11,7 @@ import { EmailController } from "../controllers/EmailController";
 import { ProductController } from "../controllers/ProductController";
 import { ProductTablesController } from "../controllers/ProductTablesController";
 import { InvoiceController } from "../controllers/InvoicesController";
+import { BillingController } from "../controllers/BillingsController";
 
 const routes = Router();
 
@@ -126,11 +127,22 @@ routes.delete("/api/tables-products/:id", ProductTablesController.deleteTable);
 
 // Invoices
 routes.post("/api/invoices", InvoiceController.createInvoice);
+routes.get("/api/invoices/nextrps", InvoiceController.nextNumberRps);
 routes.get("/api/invoices", InvoiceController.findAllInvoices);
 routes.get("/api/invoices/:id", InvoiceController.findInvoiceById);
 routes.get("/api/invoices/rps/:rps_number", InvoiceController.findInvoiceByRps_number);
 routes.get("/api/invoices/nfs/:nfs_number", InvoiceController.findInvoiceByNfs_number);
 routes.patch("/api/invoices/:id", InvoiceController.updateInvoice);
 routes.delete("/api/invoices/:id", InvoiceController.deleteInvoice);
+
+// Billing
+routes.post("/api/billings", BillingController.createBilling);
+routes.get("/api/billings", BillingController.findAllBillings);
+routes.get("/api/billings/:id", BillingController.findBillingById);
+routes.get("/api/billings/rps/:rps_number", BillingController.findBillingByRps_number);
+routes.get("/api/billings/nfs/:nfs_number", BillingController.findBillingByNfs_number);
+routes.patch("/api/billings/:id", BillingController.updateBilling);
+routes.delete("/api/billings/:id", BillingController.deleteBilling);
+
 
 export default routes;

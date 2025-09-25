@@ -47,4 +47,15 @@ export const InvoiceController = {
         await InvoiceRepository.delete(id);
         return res.status(204).send();
     },
+
+    async nextNumberRps(req: Request, res: Response) {
+        try {
+            const nextNumber = await InvoiceRepository.nextNumberRps();
+            return res.status(200).json({ nextNumber });
+        } catch (error) {
+            console.error("Erro ao buscar próximo RPS:", error);
+            return res.status(500).json({ message: "Erro ao buscar próximo número de RPS" });
+        }
+    }
+
 };
