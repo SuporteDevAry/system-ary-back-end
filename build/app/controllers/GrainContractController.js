@@ -60,6 +60,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GrainContractController = void 0;
 var GrainContractRepository_1 = require("../repositories/GrainContractRepository");
+var calcCommission_1 = require("../../utills/calcCommission");
 var GrainContractController = /** @class */ (function () {
     function GrainContractController() {
         var _this = this;
@@ -106,7 +107,7 @@ var GrainContractController = /** @class */ (function () {
             });
         }); };
         this.createGrainContract = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var numberContract, grainContract, result, error_3;
+            var numberContract, commissionValue, grainContract, result, error_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -114,7 +115,8 @@ var GrainContractController = /** @class */ (function () {
                         return [4 /*yield*/, (0, GrainContractRepository_1.generateNumberContract)(req.body)];
                     case 1:
                         numberContract = _a.sent();
-                        grainContract = GrainContractRepository_1.grainContractRepository.create(__assign(__assign({}, req.body), { number_contract: numberContract, final_quantity: req.body.quantity }));
+                        commissionValue = (0, calcCommission_1.calcCommission)(req.body);
+                        grainContract = GrainContractRepository_1.grainContractRepository.create(__assign(__assign({}, req.body), { number_contract: numberContract, final_quantity: req.body.quantity, status_received: "Não", commission_contract: commissionValue }));
                         return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.save(grainContract)];
                     case 2:
                         result = _a.sent();
@@ -172,6 +174,8 @@ var GrainContractController = /** @class */ (function () {
                                     .json({ message: "Formato do número do contrato inválido" })];
                         }
                         updatedGrainContract = __assign(__assign({}, otherFields), { number_contract: grainContract.number_contract, number_broker: grainContract.number_broker, product: grainContract.product });
+                        // Recalcula a comissão
+                        updatedGrainContract.commission_contract = (0, calcCommission_1.calcCommission)(__assign(__assign({}, grainContract), updatedGrainContract));
                         return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.save(updatedGrainContract)];
                     case 3:
                         result = _a.sent();
@@ -211,7 +215,7 @@ var GrainContractController = /** @class */ (function () {
             });
         }); };
         this.updateContractAdjustments = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var id, _a, final_quantity, payment_date, charge_date, expected_receipt_date, internal_communication, status_received, grainContract, updatedFields, filteredUpdates, result, error_6;
+            var id, _a, final_quantity, payment_date, charge_date, expected_receipt_date, internal_communication, status_received, grainContract, updatedFields, validProducts, quantityTon, filteredUpdates, result, error_6;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -234,10 +238,21 @@ var GrainContractController = /** @class */ (function () {
                             internal_communication: internal_communication,
                             status_received: status_received,
                         };
+                        if (final_quantity !== undefined &&
+                            Number(final_quantity) !== Number(grainContract.quantity)) {
+                            validProducts = ["O", "F", "OC", "OA", "SB", "EP"];
+                            quantityTon = validProducts.includes(grainContract.product)
+                                ? Number(final_quantity) / 1
+                                : Number(final_quantity) / 1000;
+                            updatedFields.total_contract_value =
+                                quantityTon * Number(grainContract.price);
+                        }
                         filteredUpdates = Object.fromEntries(Object.entries(updatedFields).filter(function (_a) {
                             var _ = _a[0], v = _a[1];
                             return v !== undefined;
                         }));
+                        // Recalcula a comissão também
+                        filteredUpdates.commission_contract = (0, calcCommission_1.calcCommission)(__assign(__assign({}, grainContract), filteredUpdates));
                         GrainContractRepository_1.grainContractRepository.merge(grainContract, filteredUpdates);
                         return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.save(grainContract)];
                     case 3:

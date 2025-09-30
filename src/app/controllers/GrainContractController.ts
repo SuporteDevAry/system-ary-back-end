@@ -3,6 +3,8 @@ import {
   generateNumberContract,
   grainContractRepository,
 } from "../repositories/GrainContractRepository";
+import { calcCommission } from "../../utills/calcCommission";
+import { GrainContract } from "../entities/GrainContracts";
 
 export class GrainContractController {
   getGrainContracts = async (
@@ -42,10 +44,14 @@ export class GrainContractController {
     try {
       const numberContract = await generateNumberContract(req.body);
 
+      const commissionValue = calcCommission(req.body);
+
       const grainContract = grainContractRepository.create({
         ...req.body,
         number_contract: numberContract,
         final_quantity: req.body.quantity, // Salvando o mesmo valor que quantity
+        status_received: "Não",
+        commission_contract: commissionValue,
       });
 
       const result = await grainContractRepository.save(grainContract);
@@ -117,6 +123,12 @@ export class GrainContractController {
         product: grainContract.product,
       };
 
+      // Recalcula a comissão
+      updatedGrainContract.commission_contract = calcCommission({
+        ...grainContract,
+        ...updatedGrainContract,
+      });
+
       const result = await grainContractRepository.save(updatedGrainContract);
       return res.json(result);
     } catch (error) {
@@ -162,7 +174,7 @@ export class GrainContractController {
         return res.status(404).json({ message: "Contrato não encontrado." });
       }
 
-      const updatedFields = {
+      const updatedFields: Partial<GrainContract> = {
         final_quantity,
         payment_date,
         charge_date,
@@ -171,10 +183,31 @@ export class GrainContractController {
         status_received,
       };
 
+      if (
+        final_quantity !== undefined &&
+        Number(final_quantity) !== Number(grainContract.quantity)
+      ) {
+        //TODO: Validar se o produto é Kg ou Toneladas métricas(óleo), tornar dinâmico pegando direto da base.
+        const validProducts = ["O", "F", "OC", "OA", "SB", "EP"];
+
+        const quantityTon = validProducts.includes(grainContract.product)
+          ? Number(final_quantity) / 1
+          : Number(final_quantity) / 1000;
+
+        updatedFields.total_contract_value =
+          quantityTon * Number(grainContract.price);
+      }
+
       //[x] Remove os campos undefined para evitar que o merge os sobrescreva
       const filteredUpdates = Object.fromEntries(
         Object.entries(updatedFields).filter(([_, v]) => v !== undefined)
       );
+
+      // Recalcula a comissão também
+      filteredUpdates.commission_contract = calcCommission({
+        ...grainContract,
+        ...filteredUpdates,
+      });
 
       grainContractRepository.merge(grainContract, filteredUpdates);
 
