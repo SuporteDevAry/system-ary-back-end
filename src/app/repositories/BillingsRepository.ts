@@ -18,15 +18,15 @@ export const BillingRepository = {
     },
 
     async findByNumberContract(number_contract: string) {
-        return await repo.findOneBy({ number_contract });
+        return await repo.findBy({ number_contract });
     },
 
     async findByRps_number(rps_number: string) {
-        return await repo.findOneBy({ rps_number });
+        return await repo.findBy({ rps_number });
     },
 
     async findByNfs_number(nfs_number: string) {
-        return await repo.findOneBy({ nfs_number });
+        return await repo.findBy({ nfs_number });
     },
 
     async update(id: string, data: Partial<Billing>) {

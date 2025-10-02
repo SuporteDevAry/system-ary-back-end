@@ -139,6 +139,7 @@ routes.delete("/api/invoices/:id", InvoiceController.deleteInvoice);
 routes.post("/api/billings", BillingController.createBilling);
 routes.get("/api/billings", BillingController.findAllBillings);
 routes.get("/api/billings/:id", BillingController.findBillingById);
+routes.get("/api/billings/contract/:number_contract", BillingController.findBillingByNumberContract);
 routes.get("/api/billings/rps/:rps_number", BillingController.findBillingByRps_number);
 routes.get("/api/billings/nfs/:nfs_number", BillingController.findBillingByNfs_number);
 routes.patch("/api/billings/:id", BillingController.updateBilling);
