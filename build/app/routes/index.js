@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = require("express");
 var UserController_1 = require("../controllers/UserController");
 var SessionController_1 = require("../controllers/SessionController");
+var authMiddleware_1 = require("../middlewares/authMiddleware");
 var PermissionController_1 = require("../controllers/PermissionController");
 var ClientController_1 = require("../controllers/ClientController");
 var ContactController_1 = require("../controllers/ContactController");
@@ -12,6 +13,7 @@ var EmailController_1 = require("../controllers/EmailController");
 var ProductController_1 = require("../controllers/ProductController");
 var ProductTablesController_1 = require("../controllers/ProductTablesController");
 var InvoicesController_1 = require("../controllers/InvoicesController");
+var BillingsController_1 = require("../controllers/BillingsController");
 var routes = (0, express_1.Router)();
 // Utilizar futuramente para criar métricas de chamadas
 // routes.use("/api", (req, res, next) => {
@@ -21,7 +23,7 @@ var routes = (0, express_1.Router)();
 // IN and OUT application
 routes.post("/api/login", new SessionController_1.SessionController().login);
 // Routes protected
-//routes.use(authMiddleware); // comentar ao usar local
+routes.use(authMiddleware_1.authMiddleware); // comentar ao usar local
 routes.get("/api/profile", new UserController_1.UserController().getProfile);
 routes.post("/api/reset-password", new SessionController_1.SessionController().resetPassword);
 // CRUD USERS
@@ -74,12 +76,21 @@ routes.patch("/api/tables-products/:id", ProductTablesController_1.ProductTables
 routes.delete("/api/tables-products/:id", ProductTablesController_1.ProductTablesController.deleteTable);
 // Invoices
 routes.post("/api/invoices", InvoicesController_1.InvoiceController.createInvoice);
+routes.get("/api/invoices/nextrps", InvoicesController_1.InvoiceController.nextNumberRps);
 routes.get("/api/invoices", InvoicesController_1.InvoiceController.findAllInvoices);
 routes.get("/api/invoices/:id", InvoicesController_1.InvoiceController.findInvoiceById);
 routes.get("/api/invoices/rps/:rps_number", InvoicesController_1.InvoiceController.findInvoiceByRps_number);
 routes.get("/api/invoices/nfs/:nfs_number", InvoicesController_1.InvoiceController.findInvoiceByNfs_number);
 routes.patch("/api/invoices/:id", InvoicesController_1.InvoiceController.updateInvoice);
 routes.delete("/api/invoices/:id", InvoicesController_1.InvoiceController.deleteInvoice);
-routes.get("/api/invoices/nextrps", InvoicesController_1.InvoiceController.nextNumberRps);
+// Billing
+routes.post("/api/billings", BillingsController_1.BillingController.createBilling);
+routes.get("/api/billings", BillingsController_1.BillingController.findAllBillings);
+routes.get("/api/billings/:id", BillingsController_1.BillingController.findBillingById);
+routes.get("/api/billings/contract/:number_contract", BillingsController_1.BillingController.findBillingByNumberContract);
+routes.get("/api/billings/rps/:rps_number", BillingsController_1.BillingController.findBillingByRps_number);
+routes.get("/api/billings/nfs/:nfs_number", BillingsController_1.BillingController.findBillingByNfs_number);
+routes.patch("/api/billings/:id", BillingsController_1.BillingController.updateBilling);
+routes.delete("/api/billings/:id", BillingsController_1.BillingController.deleteBilling);
 exports.default = routes;
 //# sourceMappingURL=index.js.map

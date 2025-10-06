@@ -36,135 +36,108 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InvoiceController = void 0;
-var InvoiceRepository_1 = require("../repositories/InvoiceRepository");
-exports.InvoiceController = {
-    createInvoice: function (req, res) {
+exports.BillingRepository = void 0;
+var data_source_1 = require("../../database/data-source");
+var Billings_1 = require("../entities/Billings");
+var repo = data_source_1.AppDataSource.getRepository(Billings_1.Billing);
+exports.BillingRepository = {
+    create: function (data) {
         return __awaiter(this, void 0, void 0, function () {
-            var invoice;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.create(req.body)];
-                    case 1:
-                        invoice = _a.sent();
-                        return [2 /*return*/, res.status(201).json(invoice)];
-                }
-            });
-        });
-    },
-    findAllInvoices: function (_, res) {
-        return __awaiter(this, void 0, void 0, function () {
-            var invoices;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.findAll()];
-                    case 1:
-                        invoices = _a.sent();
-                        return [2 /*return*/, res.json(invoices)];
-                }
-            });
-        });
-    },
-    findInvoiceById: function (req, res) {
-        return __awaiter(this, void 0, void 0, function () {
-            var id, invoice;
+            var billing;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        id = req.params.id;
-                        return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.findById(id)];
-                    case 1:
-                        invoice = _a.sent();
-                        if (!invoice)
-                            return [2 /*return*/, res.status(404).json({ message: "RPS não encontrada" })];
-                        return [2 /*return*/, res.json(invoice)];
+                        billing = repo.create(data);
+                        return [4 /*yield*/, repo.save(billing)];
+                    case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
     },
-    findInvoiceByRps_number: function (req, res) {
+    findAll: function () {
         return __awaiter(this, void 0, void 0, function () {
-            var rps_number, invoice;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        rps_number = req.params.rps_number;
-                        return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.findByRps_number(rps_number)];
-                    case 1:
-                        invoice = _a.sent();
-                        if (!invoice)
-                            return [2 /*return*/, res.status(404).json({ message: "Número de RPS não encontrada" })];
-                        return [2 /*return*/, res.json(invoice)];
+                    case 0: return [4 /*yield*/, repo.find()];
+                    case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
     },
-    findInvoiceByNfs_number: function (req, res) {
+    findById: function (id) {
         return __awaiter(this, void 0, void 0, function () {
-            var nfs_number, invoice;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        nfs_number = req.params.nfs_number;
-                        return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.findByNfs_number(nfs_number)];
-                    case 1:
-                        invoice = _a.sent();
-                        if (!invoice)
-                            return [2 /*return*/, res.status(404).json({ message: "Número de NF não encontrada" })];
-                        return [2 /*return*/, res.json(invoice)];
+                    case 0: return [4 /*yield*/, repo.findOneBy({ id: id })];
+                    case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
     },
-    updateInvoice: function (req, res) {
+    findByNumberContract: function (number_contract) {
         return __awaiter(this, void 0, void 0, function () {
-            var id, updated;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        id = req.params.id;
-                        return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.update(id, req.body)];
-                    case 1:
-                        updated = _a.sent();
-                        return [2 /*return*/, res.json(updated)];
+                    case 0: return [4 /*yield*/, repo.findBy({ number_contract: number_contract })];
+                    case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
     },
-    deleteInvoice: function (req, res) {
+    findByRps_number: function (rps_number) {
         return __awaiter(this, void 0, void 0, function () {
-            var id;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        id = req.params.id;
-                        return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.delete(id)];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/, res.status(204).send()];
+                    case 0: return [4 /*yield*/, repo.findBy({ rps_number: rps_number })];
+                    case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
     },
-    nextNumberRps: function (req, res) {
+    findByNfs_number: function (nfs_number) {
         return __awaiter(this, void 0, void 0, function () {
-            var nextNumber, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.nextNumberRps()];
+                    case 0: return [4 /*yield*/, repo.findBy({ nfs_number: nfs_number })];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    },
+    update: function (id, data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var billing;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, repo.findOneBy({ id: id })];
                     case 1:
-                        nextNumber = _a.sent();
-                        return [2 /*return*/, res.status(200).json({ nextNumber: nextNumber })];
+                        billing = _a.sent();
+                        if (!billing)
+                            throw new Error("Recebimento não encontrado");
+                        Object.assign(billing, data);
+                        return [4 /*yield*/, repo.save(billing)];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    },
+    delete: function (id) {
+        return __awaiter(this, void 0, void 0, function () {
+            var billing;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, repo.findOneBy({ id: id })];
+                    case 1:
+                        billing = _a.sent();
+                        if (!billing)
+                            throw new Error("Recebimento não encontrado");
+                        return [4 /*yield*/, repo.remove(billing)];
                     case 2:
-                        error_1 = _a.sent();
-                        console.error("Erro ao buscar próximo RPS:", error_1);
-                        return [2 /*return*/, res.status(500).json({ message: "Erro ao buscar próximo número de RPS" })];
-                    case 3: return [2 /*return*/];
+                        _a.sent();
+                        return [2 /*return*/];
                 }
             });
         });
-    }
+    },
 };
-//# sourceMappingURL=InvoicesController.js.map
+//# sourceMappingURL=BillingsRepository.js.map
