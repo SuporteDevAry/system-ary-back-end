@@ -2,7 +2,30 @@ import { Request, Response } from "express";
 
 import { BadRequestError } from "../helpers/api-errors";
 import { clientRepository, getClients } from "../repositories/ClientRepository";
+import { Not } from "typeorm";
 
+
+function formatCpfCnpj(value: string): string {
+  const digits = value.replace(/\D/g, "");
+
+  if (digits.length === 11) {
+    // CPF
+    return digits.replace(
+      /^(\d{3})(\d{3})(\d{3})(\d{2})$/,
+      "$1.$2.$3-$4"
+    );
+  }
+
+  if (digits.length === 14) {
+    // CNPJ
+    return digits.replace(
+      /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
+      "$1.$2.$3/$4-$5"
+    );
+  }
+
+  return value; // se não for válido
+}
 export class ClientController {
   async getProfile(req: Request, res: Response) {
     return res.json(req.user);
@@ -32,6 +55,32 @@ export class ClientController {
     }
 
     return res.status(200).json(clienteSearched);
+  }
+
+  async getClientByCnpj_cpf(req: Request, res: Response) {
+    const { cnpj_cpf_client } = req.params;
+
+    if (!cnpj_cpf_client) {
+      throw new BadRequestError("CNPJ/CPF não informado." + cnpj_cpf_client);
+    }
+
+    const cnpj_cpf_clientNumber = cnpj_cpf_client;
+
+    const formattedCnpj_cpf = formatCpfCnpj(cnpj_cpf_clientNumber);
+
+    const cnpj_cpf_clientSearched = await clientRepository.findOne({
+      where: {
+        cnpj_cpf: formattedCnpj_cpf,
+        kind: Not("E"), // <- ignorar estrangeiro
+      },
+    });
+
+
+    if (!cnpj_cpf_clientSearched) {
+      throw new BadRequestError("Não encontrado Cliente com CNPJ/CPF informado.");
+    }
+
+    return res.status(200).json(cnpj_cpf_clientSearched);
   }
 
   async create(req: Request, res: Response) {

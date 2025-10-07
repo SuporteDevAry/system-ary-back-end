@@ -50,6 +50,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClientController = void 0;
 var api_errors_1 = require("../helpers/api-errors");
 var ClientRepository_1 = require("../repositories/ClientRepository");
+var typeorm_1 = require("typeorm");
+function formatCpfCnpj(value) {
+    var digits = value.replace(/\D/g, "");
+    if (digits.length === 11) {
+        // CPF
+        return digits.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4");
+    }
+    if (digits.length === 14) {
+        // CNPJ
+        return digits.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+    }
+    return value; // se não for válido
+}
 var ClientController = /** @class */ (function () {
     function ClientController() {
     }
@@ -93,6 +106,34 @@ var ClientController = /** @class */ (function () {
                             throw new api_errors_1.BadRequestError("Cliente pesquisado não existe!");
                         }
                         return [2 /*return*/, res.status(200).json(clienteSearched)];
+                }
+            });
+        });
+    };
+    ClientController.prototype.getClientByCnpj_cpf = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var cnpj_cpf_client, cnpj_cpf_clientNumber, formattedCnpj_cpf, cnpj_cpf_clientSearched;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        cnpj_cpf_client = req.params.cnpj_cpf_client;
+                        if (!cnpj_cpf_client) {
+                            throw new api_errors_1.BadRequestError("CNPJ/CPF não informado." + cnpj_cpf_client);
+                        }
+                        cnpj_cpf_clientNumber = cnpj_cpf_client;
+                        formattedCnpj_cpf = formatCpfCnpj(cnpj_cpf_clientNumber);
+                        return [4 /*yield*/, ClientRepository_1.clientRepository.findOne({
+                                where: {
+                                    cnpj_cpf: formattedCnpj_cpf,
+                                    kind: (0, typeorm_1.Not)("E"), // <- ignorar estrangeiro
+                                },
+                            })];
+                    case 1:
+                        cnpj_cpf_clientSearched = _a.sent();
+                        if (!cnpj_cpf_clientSearched) {
+                            throw new api_errors_1.BadRequestError("Não encontrado Cliente com CNPJ/CPF informado.");
+                        }
+                        return [2 /*return*/, res.status(200).json(cnpj_cpf_clientSearched)];
                 }
             });
         });
