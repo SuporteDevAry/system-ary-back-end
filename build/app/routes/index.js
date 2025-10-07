@@ -12,6 +12,8 @@ var GrainContractController_1 = require("../controllers/GrainContractController"
 var EmailController_1 = require("../controllers/EmailController");
 var ProductController_1 = require("../controllers/ProductController");
 var ProductTablesController_1 = require("../controllers/ProductTablesController");
+var InvoicesController_1 = require("../controllers/InvoicesController");
+var BillingsController_1 = require("../controllers/BillingsController");
 var routes = (0, express_1.Router)();
 // Utilizar futuramente para criar métricas de chamadas
 // routes.use("/api", (req, res, next) => {
@@ -36,6 +38,7 @@ routes.get("/api/user/permissions", new UserController_1.UserController().getPer
 routes.post("/api/client", new ClientController_1.ClientController().create);
 routes.get("/api/clients", new ClientController_1.ClientController().getClients);
 routes.get("/api/client/client-by-id/:code_client", new ClientController_1.ClientController().getClientById);
+routes.get("/api/client/client-by-cnpj-cpf/:cnpj_cpf_client", new ClientController_1.ClientController().getClientByCnpj_cpf);
 routes.patch("/api/client/:id", new ClientController_1.ClientController().update);
 routes.delete("/api/client/:id", new ClientController_1.ClientController().delete);
 // v2 Contatos
@@ -71,5 +74,23 @@ routes.get("/api/tables-products", ProductTablesController_1.ProductTablesContro
 routes.get("/api/tables-products/:id", ProductTablesController_1.ProductTablesController.findTableById);
 routes.patch("/api/tables-products/:id", ProductTablesController_1.ProductTablesController.updateTable);
 routes.delete("/api/tables-products/:id", ProductTablesController_1.ProductTablesController.deleteTable);
+// Invoices
+routes.post("/api/invoices", InvoicesController_1.InvoiceController.createInvoice);
+routes.get("/api/invoices/nextrps", InvoicesController_1.InvoiceController.nextNumberRps);
+routes.get("/api/invoices", InvoicesController_1.InvoiceController.findAllInvoices);
+routes.get("/api/invoices/:id", InvoicesController_1.InvoiceController.findInvoiceById);
+routes.get("/api/invoices/rps/:rps_number", InvoicesController_1.InvoiceController.findInvoiceByRps_number);
+routes.get("/api/invoices/nfs/:nfs_number", InvoicesController_1.InvoiceController.findInvoiceByNfs_number);
+routes.patch("/api/invoices/:id", InvoicesController_1.InvoiceController.updateInvoice);
+routes.delete("/api/invoices/:id", InvoicesController_1.InvoiceController.deleteInvoice);
+// Billing
+routes.post("/api/billings", BillingsController_1.BillingController.createBilling);
+routes.get("/api/billings", BillingsController_1.BillingController.findAllBillings);
+routes.get("/api/billings/:id", BillingsController_1.BillingController.findBillingById);
+routes.get("/api/billings/contract/:number_contract", BillingsController_1.BillingController.findBillingByNumberContract);
+routes.get("/api/billings/rps/:rps_number", BillingsController_1.BillingController.findBillingByRps_number);
+routes.get("/api/billings/nfs/:nfs_number", BillingsController_1.BillingController.findBillingByNfs_number);
+routes.patch("/api/billings/:id", BillingsController_1.BillingController.updateBilling);
+routes.delete("/api/billings/:id", BillingsController_1.BillingController.deleteBilling);
 exports.default = routes;
 //# sourceMappingURL=index.js.map
