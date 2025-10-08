@@ -173,7 +173,8 @@ var GrainContractController = /** @class */ (function () {
                                     .status(400)
                                     .json({ message: "Formato do número do contrato inválido" })];
                         }
-                        updatedGrainContract = __assign(__assign({}, otherFields), { number_contract: grainContract.number_contract, number_broker: grainContract.number_broker, product: grainContract.product });
+                        updatedGrainContract = __assign(__assign({}, otherFields), { number_contract: grainContract.number_contract, number_broker: grainContract.number_broker, product: grainContract.product, final_quantity: Number(grainContract.quantity), total_contract_value: Number(grainContract.total_contract_value), quantity_kg: Number(grainContract.quantity_kg), quantity_bag: Number(grainContract.quantity_bag), commission_contract: Number(grainContract.commission_contract) });
+                        console.log("#### OPAAA", updatedGrainContract);
                         // Recalcula a comissão
                         updatedGrainContract.commission_contract = (0, calcCommission_1.calcCommission)(__assign(__assign({}, grainContract), updatedGrainContract));
                         return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.save(updatedGrainContract)];

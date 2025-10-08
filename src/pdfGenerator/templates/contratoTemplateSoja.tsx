@@ -98,18 +98,46 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
     ? number_contract
     : `${product}.${number_broker}-NNN/${currentYear}`;
 
-  function formatObservationText(observation: string) {
-    const lines = observation.split("\n");
-    return lines
-      .map((line) => {
-        if (/^\d+-/.test(line)) {
-          return `<span style="display:block; margin-left:0;">${line}</span>`;
-        } else {
-          return `<span style="display:block; margin-left:15px;">${line}</span>`;
-        }
-      })
-      .join("");
+  // function formatObservationText(observation: string) {
+  //   const lines = observation.split("\n");
+  //   return lines
+  //     .map((line) => {
+  //       if (/^\d+-/.test(line)) {
+  //         return `<span style="display:block; margin-left:0;">${line}</span>`;
+  //       } else {
+  //         return `<span style="display:block; margin-left:15px;">${line}</span>`;
+  //       }
+  //     })
+  //     .join("");
+  // }
+
+ function formatObservationText(observation: string) {
+  if (!observation) {
+    return "";
   }
+
+  // Divide e remove linhas vazias
+  const lines = observation
+    .split("\n")
+    .map(line => line.trim())
+    .filter(line => line !== "");
+
+  const hasMultipleLines = lines.length > 1;
+
+  const formattedLines = lines.map((line) => {
+    // Se a linha começar com número seguido de hífen (ex: 1-, 2-)
+    if (/^\d+-/.test(line)) {
+      return `<div style="margin-left: 0; line-height: 1.2;">${line}</div>`;
+    } else if (hasMultipleLines) {
+      // Adiciona leve indentação para linhas subsequentes
+      return `<div style="margin-left: 20px; line-height: 1.2;">${line}</div>`;
+    } else {
+      return `<div style="line-height: 1.2;">${line}</div>`;
+    }
+  });
+
+  return formattedLines.join("");
+}
 
   const listProductsForMetricTon = ["O", "F", "OC", "OA", "SB", "EP"];
   const validProductsForMetricTon = listProductsForMetricTon.includes(
@@ -149,7 +177,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
       <div style={{ margin: 0, textAlign: "center" }}>
         <img src={logoBase64} alt="logo Ary Completo" width={300} />
       </div>
-      <br />
+     
       <h3>
         <div style={{ paddingLeft: "250px" }}>
           São Paulo,{" "}
@@ -159,7 +187,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
           Confirmação de negociação <span> {numberContract} </span>
         </div>
       </h3>
-      <br />
+     
 
       {/* VENDEDOR */}
       <div style={{ display: "table", width: "100%", marginBottom: "20px" }}>
@@ -225,7 +253,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
         </div>
       </div>
 
-      <br />
+      
       <div style={{ textAlign: "left", margin: "0" }}>
         <strong>Mercadoria:</strong>
         <div style={{ textAlign: "left" }}>
@@ -323,7 +351,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
         </div>
       )}
       <div
-        style={{ textAlign: "justify", whiteSpace: "pre" }}
+        style={{ textAlign: "justify", whiteSpace: "pre-line" }}
         dangerouslySetInnerHTML={{
           __html: formatObservationText(observation),
         }}
