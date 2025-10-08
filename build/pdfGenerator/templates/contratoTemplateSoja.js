@@ -50,18 +50,42 @@ var ContratoTemplateSoja = function (_a) {
     var numberContract = number_contract
         ? number_contract
         : "".concat(product, ".").concat(number_broker, "-NNN/").concat(currentYear);
+    // function formatObservationText(observation: string) {
+    //   const lines = observation.split("\n");
+    //   return lines
+    //     .map((line) => {
+    //       if (/^\d+-/.test(line)) {
+    //         return `<span style="display:block; margin-left:0;">${line}</span>`;
+    //       } else {
+    //         return `<span style="display:block; margin-left:15px;">${line}</span>`;
+    //       }
+    //     })
+    //     .join("");
+    // }
     function formatObservationText(observation) {
-        var lines = observation.split("\n");
-        return lines
-            .map(function (line) {
+        if (!observation) {
+            return "";
+        }
+        // Divide e remove linhas vazias
+        var lines = observation
+            .split("\n")
+            .map(function (line) { return line.trim(); })
+            .filter(function (line) { return line !== ""; });
+        var hasMultipleLines = lines.length > 1;
+        var formattedLines = lines.map(function (line) {
+            // Se a linha começar com número seguido de hífen (ex: 1-, 2-)
             if (/^\d+-/.test(line)) {
-                return "<span style=\"display:block; margin-left:0;\">".concat(line, "</span>");
+                return "<div style=\"margin-left: 0; line-height: 1.2;\">".concat(line, "</div>");
+            }
+            else if (hasMultipleLines) {
+                // Adiciona leve indentação para linhas subsequentes
+                return "<div style=\"margin-left: 20px; line-height: 1.2;\">".concat(line, "</div>");
             }
             else {
-                return "<span style=\"display:block; margin-left:15px;\">".concat(line, "</span>");
+                return "<div style=\"line-height: 1.2;\">".concat(line, "</div>");
             }
-        })
-            .join("");
+        });
+        return formattedLines.join("");
     }
     var listProductsForMetricTon = ["O", "F", "OC", "OA", "SB", "EP"];
     var validProductsForMetricTon = listProductsForMetricTon.includes(data.product);
@@ -87,7 +111,6 @@ var ContratoTemplateSoja = function (_a) {
     return (react_1.default.createElement("div", { id: "contrato" },
         react_1.default.createElement("div", { style: { margin: 0, textAlign: "center" } },
             react_1.default.createElement("img", { src: logoBase64, alt: "logo Ary Completo", width: 300 })),
-        react_1.default.createElement("br", null),
         react_1.default.createElement("h3", null,
             react_1.default.createElement("div", { style: { paddingLeft: "250px" } },
                 "S\u00E3o Paulo,",
@@ -99,7 +122,6 @@ var ContratoTemplateSoja = function (_a) {
                     " ",
                     numberContract,
                     " "))),
-        react_1.default.createElement("br", null),
         react_1.default.createElement("div", { style: { display: "table", width: "100%", marginBottom: "20px" } },
             react_1.default.createElement("div", { style: { display: "table-row" } },
                 react_1.default.createElement("div", { style: {
@@ -160,7 +182,6 @@ var ContratoTemplateSoja = function (_a) {
                         " \u00A0\u00A0 Inscr.Est.:",
                         " ",
                         buyer.ins_est)))),
-        react_1.default.createElement("br", null),
         react_1.default.createElement("div", { style: { textAlign: "left", margin: "0" } },
             react_1.default.createElement("strong", null, "Mercadoria:"),
             react_1.default.createElement("div", { style: { textAlign: "left" } },
@@ -230,7 +251,7 @@ var ContratoTemplateSoja = function (_a) {
         react_1.default.createElement("br", null),
         observation && (react_1.default.createElement("div", { style: { textAlign: "left" } },
             react_1.default.createElement("strong", null, "Observa\u00E7\u00F5es:"))),
-        react_1.default.createElement("div", { style: { textAlign: "justify", whiteSpace: "pre" }, dangerouslySetInnerHTML: {
+        react_1.default.createElement("div", { style: { textAlign: "justify", whiteSpace: "pre-line" }, dangerouslySetInnerHTML: {
                 __html: formatObservationText(observation),
             } }),
         react_1.default.createElement("br", null),
