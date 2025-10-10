@@ -173,8 +173,7 @@ var GrainContractController = /** @class */ (function () {
                                     .status(400)
                                     .json({ message: "Formato do número do contrato inválido" })];
                         }
-                        updatedGrainContract = __assign(__assign({}, otherFields), { number_contract: grainContract.number_contract, number_broker: grainContract.number_broker, product: grainContract.product, final_quantity: Number(grainContract.quantity), total_contract_value: Number(grainContract.total_contract_value), quantity_kg: Number(grainContract.quantity_kg), quantity_bag: Number(grainContract.quantity_bag), commission_contract: Number(grainContract.commission_contract) });
-                        console.log("#### OPAAA", updatedGrainContract);
+                        updatedGrainContract = __assign(__assign({}, otherFields), { number_contract: grainContract.number_contract, number_broker: grainContract.number_broker, product: grainContract.product, final_quantity: Number(grainContract.quantity), total_contract_value: Number(grainContract.total_contract_value), quantity_kg: Number(grainContract.quantity_kg), quantity_bag: Number(grainContract.quantity_bag), commission_contract: Number(grainContract.commission_contract), total_received: Number(grainContract.total_received) });
                         // Recalcula a comissão
                         updatedGrainContract.commission_contract = (0, calcCommission_1.calcCommission)(__assign(__assign({}, grainContract), updatedGrainContract));
                         return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.save(updatedGrainContract)];
@@ -183,6 +182,7 @@ var GrainContractController = /** @class */ (function () {
                         return [2 /*return*/, res.json(result)];
                     case 4:
                         error_4 = _a.sent();
+                        console.log("erro 500", error_4);
                         return [2 /*return*/, res.status(500).json({ message: error_4.message })];
                     case 5: return [2 /*return*/];
                 }
@@ -216,12 +216,12 @@ var GrainContractController = /** @class */ (function () {
             });
         }); };
         this.updateContractAdjustments = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var id, _a, final_quantity, payment_date, charge_date, expected_receipt_date, internal_communication, status_received, grainContract, updatedFields, validProducts, quantityTon, filteredUpdates, result, error_6;
+            var id, _a, final_quantity, payment_date, charge_date, expected_receipt_date, internal_communication, status_received, total_received, grainContract, updatedFields, validProducts, quantityTon, filteredUpdates, result, error_6;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         id = req.params.id;
-                        _a = req.body, final_quantity = _a.final_quantity, payment_date = _a.payment_date, charge_date = _a.charge_date, expected_receipt_date = _a.expected_receipt_date, internal_communication = _a.internal_communication, status_received = _a.status_received;
+                        _a = req.body, final_quantity = _a.final_quantity, payment_date = _a.payment_date, charge_date = _a.charge_date, expected_receipt_date = _a.expected_receipt_date, internal_communication = _a.internal_communication, status_received = _a.status_received, total_received = _a.total_received;
                         _b.label = 1;
                     case 1:
                         _b.trys.push([1, 4, , 5]);
@@ -238,6 +238,7 @@ var GrainContractController = /** @class */ (function () {
                             expected_receipt_date: expected_receipt_date,
                             internal_communication: internal_communication,
                             status_received: status_received,
+                            total_received: total_received,
                         };
                         if (final_quantity !== undefined &&
                             Number(final_quantity) !== Number(grainContract.quantity)) {
