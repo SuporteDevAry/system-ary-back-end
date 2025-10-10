@@ -129,9 +129,6 @@ export class GrainContractController {
         total_received: Number(grainContract.total_received),
       };
 
-      console.log("#### OPAAA", updatedGrainContract, id)
-
-
       // Recalcula a comissão
       updatedGrainContract.commission_contract = calcCommission({
         ...grainContract,
