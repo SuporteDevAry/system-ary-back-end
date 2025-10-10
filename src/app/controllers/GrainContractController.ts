@@ -123,12 +123,11 @@ export class GrainContractController {
         product: grainContract.product,
         final_quantity: Number(grainContract.quantity),
         total_contract_value: Number(grainContract.total_contract_value),
-        quantity_kg:  Number(grainContract.quantity_kg),
-        quantity_bag:  Number(grainContract.quantity_bag),
-        commission_contract:Number(grainContract.commission_contract)
+        quantity_kg: Number(grainContract.quantity_kg),
+        quantity_bag: Number(grainContract.quantity_bag),
+        commission_contract: Number(grainContract.commission_contract),
+        total_received: Number(grainContract.total_received),
       };
-
-      console.log("#### OPAAA", updatedGrainContract)
 
       // Recalcula a comissão
       updatedGrainContract.commission_contract = calcCommission({
@@ -139,6 +138,7 @@ export class GrainContractController {
       const result = await grainContractRepository.save(updatedGrainContract);
       return res.json(result);
     } catch (error) {
+      console.log("erro 500", error);
       return res.status(500).json({ message: error.message });
     }
   };
@@ -173,6 +173,7 @@ export class GrainContractController {
       expected_receipt_date, // Data Prevista de Recebimento
       internal_communication, //comunicao interna
       status_received, // Liquidado S ou N
+      total_received, // Total Recebido
     } = req.body;
 
     try {
@@ -188,6 +189,7 @@ export class GrainContractController {
         expected_receipt_date,
         internal_communication,
         status_received,
+        total_received,
       };
 
       if (
