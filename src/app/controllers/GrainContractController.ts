@@ -4,6 +4,8 @@ import {
   grainContractRepository,
 } from "../repositories/GrainContractRepository";
 import { calcCommission } from "../../utills/calcCommission";
+import { convertPrice } from "../../utills/convertPrice";
+import { calculateTotalContractValue } from "../../utills/calculateTotalContractValue";
 import { GrainContract } from "../entities/GrainContracts";
 
 export class GrainContractController {
@@ -44,10 +46,28 @@ export class GrainContractController {
     try {
       const numberContract = await generateNumberContract(req.body);
 
-      const commissionValue = calcCommission(req.body);
+      const price = convertPrice(
+        req.body.price,
+        req.body.type_currency,
+        req.body.day_exchange_rate
+      );
+
+      const total_contract_value = calculateTotalContractValue(
+        req.body.product,
+        req.body.quantity,
+        price
+      );
+
+      const dataWithConvertedPrice = {
+        ...req.body,
+        price,
+        total_contract_value,
+      };
+
+      const commissionValue = calcCommission(dataWithConvertedPrice);
 
       const grainContract = grainContractRepository.create({
-        ...req.body,
+        ...dataWithConvertedPrice,
         number_contract: numberContract,
         final_quantity: req.body.quantity, // Salvando o mesmo valor que quantity
         status_received: "Não",
@@ -116,13 +136,40 @@ export class GrainContractController {
           .json({ message: "Formato do número do contrato inválido" });
       }
 
-      const updatedGrainContract = {
+      const productToCheck = otherFields.product || grainContract.product;
+      const quantityToUse =
+        otherFields.quantity !== undefined
+          ? otherFields.quantity
+          : grainContract.quantity;
+      const priceFromRequest =
+        otherFields.price !== undefined
+          ? otherFields.price
+          : grainContract.price;
+      const currencyToCheck =
+        otherFields.type_currency || grainContract.type_currency;
+      const exchangeRateToCheck =
+        otherFields.day_exchange_rate || grainContract.day_exchange_rate;
+
+      const price = convertPrice(
+        priceFromRequest,
+        currencyToCheck,
+        exchangeRateToCheck
+      );
+
+      const total_contract_value = calculateTotalContractValue(
+        productToCheck,
+        quantityToUse,
+        price
+      );
+
+      let updatedGrainContract = {
         ...otherFields,
         number_contract: grainContract.number_contract,
         number_broker: grainContract.number_broker,
         product: grainContract.product,
+        price,
         final_quantity: Number(grainContract.quantity),
-        total_contract_value: Number(grainContract.total_contract_value),
+        total_contract_value,
         quantity_kg: Number(grainContract.quantity_kg),
         quantity_bag: Number(grainContract.quantity_bag),
         commission_contract: Number(grainContract.commission_contract),
@@ -196,15 +243,19 @@ export class GrainContractController {
         final_quantity !== undefined &&
         Number(final_quantity) !== Number(grainContract.quantity)
       ) {
-        //TODO: Validar se o produto é Kg ou Toneladas métricas(óleo), tornar dinâmico pegando direto da base.
-        const validProducts = ["O", "F", "OC", "OA", "SB", "EP"];
+        const price = convertPrice(
+          grainContract.price,
+          grainContract.type_currency,
+          grainContract.day_exchange_rate
+        );
 
-        const quantityTon = validProducts.includes(grainContract.product)
-          ? Number(final_quantity) / 1
-          : Number(final_quantity) / 1000;
+        const total_contract_value = calculateTotalContractValue(
+          grainContract.product,
+          final_quantity,
+          price
+        );
 
-        updatedFields.total_contract_value =
-          quantityTon * Number(grainContract.price);
+        updatedFields.total_contract_value = total_contract_value;
       }
 
       //[x] Remove os campos undefined para evitar que o merge os sobrescreva
