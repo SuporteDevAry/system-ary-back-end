@@ -46,21 +46,20 @@ export class GrainContractController {
     try {
       const numberContract = await generateNumberContract(req.body);
 
-      const price = convertPrice(
-        req.body.price,
-        req.body.type_currency,
-        req.body.day_exchange_rate
-      );
+      // const price = convertPrice(
+      //   req.body.price,
+      //   req.body.type_currency,
+      //   req.body.day_exchange_rate
+      // );
 
       const total_contract_value = calculateTotalContractValue(
         req.body.product,
         req.body.quantity,
-        price
+        req.body.price
       );
 
       const dataWithConvertedPrice = {
         ...req.body,
-        price,
         total_contract_value,
       };
 
@@ -145,21 +144,22 @@ export class GrainContractController {
         otherFields.price !== undefined
           ? otherFields.price
           : grainContract.price;
-      const currencyToCheck =
-        otherFields.type_currency || grainContract.type_currency;
-      const exchangeRateToCheck =
-        otherFields.day_exchange_rate || grainContract.day_exchange_rate;
+      // const currencyToCheck =
+      //   otherFields.type_currency || grainContract.type_currency;
+      // const exchangeRateToCheck =
+      //   otherFields.day_exchange_rate || grainContract.day_exchange_rate;
 
-      const price = convertPrice(
-        priceFromRequest,
-        currencyToCheck,
-        exchangeRateToCheck
-      );
+      //TODO: Ao mudar o status ele atualiza o valor do preço também, preciso validar isso melhor
+      // const price = convertPrice(
+      //   priceFromRequest,
+      //   currencyToCheck,
+      //   exchangeRateToCheck
+      // );
 
       const total_contract_value = calculateTotalContractValue(
         productToCheck,
         quantityToUse,
-        price
+        priceFromRequest
       );
 
       let updatedGrainContract = {
@@ -167,7 +167,7 @@ export class GrainContractController {
         number_contract: grainContract.number_contract,
         number_broker: grainContract.number_broker,
         product: grainContract.product,
-        price,
+        price: priceFromRequest,
         final_quantity: Number(grainContract.quantity),
         total_contract_value,
         quantity_kg: Number(grainContract.quantity_kg),
@@ -243,16 +243,17 @@ export class GrainContractController {
         final_quantity !== undefined &&
         Number(final_quantity) !== Number(grainContract.quantity)
       ) {
-        const price = convertPrice(
-          grainContract.price,
-          grainContract.type_currency,
-          grainContract.day_exchange_rate
-        );
+        //TODO: Ao mudar o status ele atualiza o valor do preço também, preciso validar isso melhor
+        // const price = convertPrice(
+        //   grainContract.price,
+        //   grainContract.type_currency,
+        //   grainContract.day_exchange_rate
+        // );
 
         const total_contract_value = calculateTotalContractValue(
           grainContract.product,
           final_quantity,
-          price
+          grainContract.price
         );
 
         updatedFields.total_contract_value = total_contract_value;

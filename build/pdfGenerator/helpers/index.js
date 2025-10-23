@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.formatQuantity = exports.formatDateWithLongMonth = exports.insertMaskInCnpj = exports.Extenso = exports.formatCurrency = void 0;
+exports.numberToQuantityString = exports.formatQuantityWithDecimal = exports.parseQuantityToNumber = exports.formatQuantity = exports.formatDateWithLongMonth = exports.insertMaskInCnpj = exports.formatCurrency = void 0;
 var formatCurrency = function (value, currency, modeSave) {
     var numberValue = parseFloat(value);
     if (modeSave) {
@@ -19,107 +19,6 @@ var formatCurrency = function (value, currency, modeSave) {
     }).format(numberValue);
 };
 exports.formatCurrency = formatCurrency;
-function Extenso(vlr) {
-    if (vlr === 0)
-        return "zero";
-    var unidades = [
-        "",
-        "um",
-        "dois",
-        "três",
-        "quatro",
-        "cinco",
-        "seis",
-        "sete",
-        "oito",
-        "nove",
-    ];
-    var especiais = [
-        "dez",
-        "onze",
-        "doze",
-        "treze",
-        "quatorze",
-        "quinze",
-        "dezesseis",
-        "dezessete",
-        "dezoito",
-        "dezenove",
-    ];
-    var dezenas = [
-        "",
-        "",
-        "vinte",
-        "trinta",
-        "quarenta",
-        "cinquenta",
-        "sessenta",
-        "setenta",
-        "oitenta",
-        "noventa",
-    ];
-    var centenas = [
-        "",
-        "cento",
-        "duzentos",
-        "trezentos",
-        "quatrocentos",
-        "quinhentos",
-        "seiscentos",
-        "setecentos",
-        "oitocentos",
-        "novecentos",
-    ];
-    var extenso = "";
-    var milhoes = Math.floor(vlr / 1000000);
-    var milhar = Math.floor((vlr % 1000000) / 1000);
-    var centena = Math.floor((vlr % 1000) / 100);
-    var dezena = Math.floor((vlr % 100) / 10);
-    var unidade = vlr % 10;
-    if (milhoes > 0) {
-        if (milhoes === 1) {
-            extenso += "um milhão";
-        }
-        else {
-            extenso += Extenso(milhoes) + " milhões";
-        }
-        if (milhar > 0 || centena > 0 || dezena > 0 || unidade > 0)
-            extenso += ", ";
-    }
-    if (milhar > 0) {
-        if (milhar === 1) {
-            extenso += "mil";
-        }
-        else {
-            extenso += Extenso(milhar) + " mil";
-        }
-        if (centena > 0 || dezena > 0 || unidade > 0)
-            extenso += " e ";
-    }
-    if (centena > 0) {
-        if (centena === 1 && dezena === 0 && unidade === 0) {
-            extenso += "cem";
-        }
-        else {
-            extenso += centenas[centena];
-        }
-        if (dezena > 0 || unidade > 0)
-            extenso += " e ";
-    }
-    if (dezena > 1) {
-        extenso += dezenas[dezena];
-        if (unidade > 0)
-            extenso += " e " + unidades[unidade];
-    }
-    else if (dezena === 1) {
-        extenso += especiais[unidade];
-    }
-    else if (unidade > 0) {
-        extenso += unidades[unidade];
-    }
-    return extenso.trim();
-}
-exports.Extenso = Extenso;
 var insertMaskInCnpj = function (cnpj) {
     return cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/g, "$1.$2.$3/$4-$5");
 };
@@ -152,4 +51,54 @@ var formatQuantity = function (value) {
     return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, "."); // Adiciona o separador de milhares
 };
 exports.formatQuantity = formatQuantity;
+var parseQuantityToNumber = function (value) {
+    if (!value)
+        return 0;
+    var cleanValue = value.replace(/\./g, "").replace(",", ".");
+    return parseFloat(cleanValue) || 0;
+};
+exports.parseQuantityToNumber = parseQuantityToNumber;
+var formatQuantityWithDecimal = function (value) {
+    if (!value)
+        return "";
+    var cleanValue = value.replace(/[^\d,]/g, "");
+    var parts = cleanValue.split(",");
+    if (parts.length > 2) {
+        cleanValue = parts[0] + "," + parts.slice(1).join("");
+    }
+    if (parts.length === 2) {
+        var integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        var decimalPart = parts[1].slice(0, 3);
+        return "".concat(integerPart, ",").concat(decimalPart);
+    }
+    return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+exports.formatQuantityWithDecimal = formatQuantityWithDecimal;
+var numberToQuantityString = function (value) {
+    if (!value && value !== 0)
+        return "";
+    var numValue;
+    if (typeof value === "string") {
+        if (value.includes(",")) {
+            numValue = (0, exports.parseQuantityToNumber)(value);
+        }
+        else {
+            numValue = parseFloat(value);
+        }
+    }
+    else {
+        numValue = value;
+    }
+    if (isNaN(numValue))
+        return "";
+    var integerPart = Math.floor(numValue);
+    var decimalPart = numValue - integerPart;
+    if (decimalPart === 0) {
+        return integerPart.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+    var formattedDecimal = decimalPart.toFixed(3).substring(2);
+    var stringValue = "".concat(integerPart, ",").concat(formattedDecimal);
+    return (0, exports.formatQuantityWithDecimal)(stringValue);
+};
+exports.numberToQuantityString = numberToQuantityString;
 //# sourceMappingURL=index.js.map
