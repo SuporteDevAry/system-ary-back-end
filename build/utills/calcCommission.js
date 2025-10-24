@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.calcCommission = void 0;
-// src/utils/calcCommission.ts
 function calcCommission(contract) {
     // Converte o valor total em número
     var totalValue = typeof contract.total_contract_value === "string"

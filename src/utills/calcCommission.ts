@@ -1,4 +1,4 @@
-// src/utils/calcCommission.ts
+
 export function calcCommission(contract: any): number {
   // Converte o valor total em número
   const totalValue =

@@ -24,105 +24,6 @@ export const formatCurrency = (
   }).format(numberValue);
 };
 
-export function Extenso(vlr: number): string {
-  if (vlr === 0) return "zero";
-
-  const unidades = [
-    "",
-    "um",
-    "dois",
-    "três",
-    "quatro",
-    "cinco",
-    "seis",
-    "sete",
-    "oito",
-    "nove",
-  ];
-  const especiais = [
-    "dez",
-    "onze",
-    "doze",
-    "treze",
-    "quatorze",
-    "quinze",
-    "dezesseis",
-    "dezessete",
-    "dezoito",
-    "dezenove",
-  ];
-  const dezenas = [
-    "",
-    "",
-    "vinte",
-    "trinta",
-    "quarenta",
-    "cinquenta",
-    "sessenta",
-    "setenta",
-    "oitenta",
-    "noventa",
-  ];
-  const centenas = [
-    "",
-    "cento",
-    "duzentos",
-    "trezentos",
-    "quatrocentos",
-    "quinhentos",
-    "seiscentos",
-    "setecentos",
-    "oitocentos",
-    "novecentos",
-  ];
-
-  let extenso = "";
-
-  const milhoes = Math.floor(vlr / 1000000);
-  const milhar = Math.floor((vlr % 1000000) / 1000);
-  const centena = Math.floor((vlr % 1000) / 100);
-  const dezena = Math.floor((vlr % 100) / 10);
-  const unidade = vlr % 10;
-
-  if (milhoes > 0) {
-    if (milhoes === 1) {
-      extenso += "um milhão";
-    } else {
-      extenso += Extenso(milhoes) + " milhões";
-    }
-    if (milhar > 0 || centena > 0 || dezena > 0 || unidade > 0) extenso += ", ";
-  }
-
-  if (milhar > 0) {
-    if (milhar === 1) {
-      extenso += "mil";
-    } else {
-      extenso += Extenso(milhar) + " mil";
-    }
-    if (centena > 0 || dezena > 0 || unidade > 0) extenso += " e ";
-  }
-
-  if (centena > 0) {
-    if (centena === 1 && dezena === 0 && unidade === 0) {
-      extenso += "cem";
-    } else {
-      extenso += centenas[centena];
-    }
-    if (dezena > 0 || unidade > 0) extenso += " e ";
-  }
-
-  if (dezena > 1) {
-    extenso += dezenas[dezena];
-    if (unidade > 0) extenso += " e " + unidades[unidade];
-  } else if (dezena === 1) {
-    extenso += especiais[unidade];
-  } else if (unidade > 0) {
-    extenso += unidades[unidade];
-  }
-
-  return extenso.trim();
-}
-
 export const insertMaskInCnpj = (cnpj: string) => {
   return cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/g, "$1.$2.$3/$4-$5");
 };
@@ -156,4 +57,61 @@ export const formatDateWithLongMonth = (dateString: string): string => {
 export const formatQuantity = (value: string): string => {
   const numericValue = value.replace(/\D/g, ""); // Remove qualquer caractere não numérico
   return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, "."); // Adiciona o separador de milhares
+};
+
+export const parseQuantityToNumber = (value: string): number => {
+  if (!value) return 0;
+
+  const cleanValue = value.replace(/\./g, "").replace(",", ".");
+
+  return parseFloat(cleanValue) || 0;
+};
+
+export const formatQuantityWithDecimal = (value: string): string => {
+  if (!value) return "";
+
+  let cleanValue = value.replace(/[^\d,]/g, "");
+
+  const parts = cleanValue.split(",");
+  if (parts.length > 2) {
+    cleanValue = parts[0] + "," + parts.slice(1).join("");
+  }
+
+  if (parts.length === 2) {
+    const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    const decimalPart = parts[1].slice(0, 3);
+    return `${integerPart},${decimalPart}`;
+  }
+
+  return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
+export const numberToQuantityString = (value: number | string): string => {
+  if (!value && value !== 0) return "";
+
+  let numValue: number;
+
+  if (typeof value === "string") {
+    if (value.includes(",")) {
+      numValue = parseQuantityToNumber(value);
+    } else {
+      numValue = parseFloat(value);
+    }
+  } else {
+    numValue = value;
+  }
+
+  if (isNaN(numValue)) return "";
+
+  const integerPart = Math.floor(numValue);
+  const decimalPart = numValue - integerPart;
+
+  if (decimalPart === 0) {
+    return integerPart.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
+
+  const formattedDecimal = decimalPart.toFixed(3).substring(2);
+  const stringValue = `${integerPart},${formattedDecimal}`;
+
+  return formatQuantityWithDecimal(stringValue);
 };
