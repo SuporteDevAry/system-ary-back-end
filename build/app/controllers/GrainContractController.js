@@ -61,6 +61,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GrainContractController = void 0;
 var GrainContractRepository_1 = require("../repositories/GrainContractRepository");
 var calcCommission_1 = require("../../utills/calcCommission");
+var convertPrice_1 = require("../../utills/convertPrice");
 var calculateTotalContractValue_1 = require("../../utills/calculateTotalContractValue");
 var GrainContractController = /** @class */ (function () {
     function GrainContractController() {
@@ -132,7 +133,7 @@ var GrainContractController = /** @class */ (function () {
             });
         }); };
         this.updateGrainContract = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var id, otherFields, grainContract, validNumberContract, match, currentProduct, currentBroker, currentIncrement, currentYear, isProductDifferent, isBrokerDifferent, updatedProduct, updatedBroker, listProducts, siglaProduct, productToCheck, quantityToUse, priceFromRequest, total_contract_value, updatedGrainContract, result, error_4;
+            var id, otherFields, grainContract, validNumberContract, match, currentProduct, currentBroker, currentIncrement, currentYear, isProductDifferent, isBrokerDifferent, updatedProduct, updatedBroker, listProducts, siglaProduct, productToCheck, quantityToUse, priceFromRequest, currencyToCheck, exchangeRateToCheck, price, total_contract_value, updatedGrainContract, result, error_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -183,7 +184,10 @@ var GrainContractController = /** @class */ (function () {
                         priceFromRequest = otherFields.price !== undefined
                             ? otherFields.price
                             : grainContract.price;
-                        total_contract_value = (0, calculateTotalContractValue_1.calculateTotalContractValue)(productToCheck, quantityToUse, priceFromRequest);
+                        currencyToCheck = otherFields.type_currency || grainContract.type_currency;
+                        exchangeRateToCheck = otherFields.day_exchange_rate || grainContract.day_exchange_rate;
+                        price = (0, convertPrice_1.convertPrice)(priceFromRequest, currencyToCheck, exchangeRateToCheck);
+                        total_contract_value = (0, calculateTotalContractValue_1.calculateTotalContractValue)(productToCheck, quantityToUse, price);
                         updatedGrainContract = __assign(__assign({}, otherFields), { number_contract: grainContract.number_contract, number_broker: grainContract.number_broker, product: grainContract.product, price: priceFromRequest, final_quantity: Number(grainContract.quantity), total_contract_value: total_contract_value, quantity_kg: Number(grainContract.quantity_kg), quantity_bag: Number(grainContract.quantity_bag), commission_contract: Number(grainContract.commission_contract), total_received: Number(grainContract.total_received) });
                         // Recalcula a comissão
                         updatedGrainContract.commission_contract = (0, calcCommission_1.calcCommission)(__assign(__assign({}, grainContract), updatedGrainContract));
@@ -227,12 +231,12 @@ var GrainContractController = /** @class */ (function () {
             });
         }); };
         this.updateContractAdjustments = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var id, _a, final_quantity, payment_date, charge_date, expected_receipt_date, internal_communication, status_received, total_received, grainContract, updatedFields, total_contract_value, filteredUpdates, result, error_6;
+            var id, _a, final_quantity, payment_date, charge_date, expected_receipt_date, internal_communication, status_received, total_received, number_external_contract_buyer, day_exchange_rate, grainContract, updatedFields, type_currency, exchangeRateChanged, finalQuantityChanged, priceConverted, total_contract_value, filteredUpdates, result, error_6;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         id = req.params.id;
-                        _a = req.body, final_quantity = _a.final_quantity, payment_date = _a.payment_date, charge_date = _a.charge_date, expected_receipt_date = _a.expected_receipt_date, internal_communication = _a.internal_communication, status_received = _a.status_received, total_received = _a.total_received;
+                        _a = req.body, final_quantity = _a.final_quantity, payment_date = _a.payment_date, charge_date = _a.charge_date, expected_receipt_date = _a.expected_receipt_date, internal_communication = _a.internal_communication, status_received = _a.status_received, total_received = _a.total_received, number_external_contract_buyer = _a.number_external_contract_buyer, day_exchange_rate = _a.day_exchange_rate;
                         _b.label = 1;
                     case 1:
                         _b.trys.push([1, 4, , 5]);
@@ -250,10 +254,18 @@ var GrainContractController = /** @class */ (function () {
                             internal_communication: internal_communication,
                             status_received: status_received,
                             total_received: total_received,
+                            number_external_contract_buyer: number_external_contract_buyer,
+                            day_exchange_rate: day_exchange_rate,
                         };
-                        if (final_quantity !== undefined &&
-                            Number(final_quantity) !== Number(grainContract.quantity)) {
-                            total_contract_value = (0, calculateTotalContractValue_1.calculateTotalContractValue)(grainContract.product, final_quantity, grainContract.price);
+                        type_currency = req.body.type_currency || grainContract.type_currency;
+                        exchangeRateChanged = typeof day_exchange_rate !== "undefined" &&
+                            Number(day_exchange_rate) !== Number(grainContract.day_exchange_rate);
+                        finalQuantityChanged = typeof final_quantity !== "undefined" &&
+                            Number(final_quantity) !== Number(grainContract.quantity);
+                        if (finalQuantityChanged ||
+                            (type_currency === "Dólar" && exchangeRateChanged)) {
+                            priceConverted = (0, convertPrice_1.convertPrice)(grainContract.price, type_currency, day_exchange_rate || grainContract.day_exchange_rate);
+                            total_contract_value = (0, calculateTotalContractValue_1.calculateTotalContractValue)(grainContract.product, final_quantity || grainContract.quantity, priceConverted);
                             updatedFields.total_contract_value = total_contract_value;
                         }
                         filteredUpdates = Object.fromEntries(Object.entries(updatedFields).filter(function (_a) {

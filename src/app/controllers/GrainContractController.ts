@@ -144,22 +144,22 @@ export class GrainContractController {
         otherFields.price !== undefined
           ? otherFields.price
           : grainContract.price;
-      // const currencyToCheck =
-      //   otherFields.type_currency || grainContract.type_currency;
-      // const exchangeRateToCheck =
-      //   otherFields.day_exchange_rate || grainContract.day_exchange_rate;
+      const currencyToCheck =
+        otherFields.type_currency || grainContract.type_currency;
+      const exchangeRateToCheck =
+        otherFields.day_exchange_rate || grainContract.day_exchange_rate;
 
       //TODO: Ao mudar o status ele atualiza o valor do preço também, preciso validar isso melhor
-      // const price = convertPrice(
-      //   priceFromRequest,
-      //   currencyToCheck,
-      //   exchangeRateToCheck
-      // );
+      const price = convertPrice(
+        priceFromRequest,
+        currencyToCheck,
+        exchangeRateToCheck
+      );
 
       const total_contract_value = calculateTotalContractValue(
         productToCheck,
         quantityToUse,
-        priceFromRequest
+        price
       );
 
       let updatedGrainContract = {
@@ -221,6 +221,8 @@ export class GrainContractController {
       internal_communication, //comunicao interna
       status_received, // Liquidado S ou N
       total_received, // Total Recebido
+      number_external_contract_buyer, // Numero Contrato Externo Comprador
+      day_exchange_rate, // Cotação do Dia
     } = req.body;
 
     try {
@@ -237,25 +239,35 @@ export class GrainContractController {
         internal_communication,
         status_received,
         total_received,
+        number_external_contract_buyer,
+        day_exchange_rate,
       };
 
-      if (
-        final_quantity !== undefined &&
-        Number(final_quantity) !== Number(grainContract.quantity)
-      ) {
-        //TODO: Ao mudar o status ele atualiza o valor do preço também, preciso validar isso melhor
-        // const price = convertPrice(
-        //   grainContract.price,
-        //   grainContract.type_currency,
-        //   grainContract.day_exchange_rate
-        // );
+      // Verifica se precisa recalcular total do contrato e comissão
+      const type_currency =
+        req.body.type_currency || grainContract.type_currency;
+      const exchangeRateChanged =
+        typeof day_exchange_rate !== "undefined" &&
+        Number(day_exchange_rate) !== Number(grainContract.day_exchange_rate);
+      const finalQuantityChanged =
+        typeof final_quantity !== "undefined" &&
+        Number(final_quantity) !== Number(grainContract.quantity);
 
+      if (
+        finalQuantityChanged ||
+        (type_currency === "Dólar" && exchangeRateChanged)
+      ) {
+        // Recalcula o preço convertido se necessário
+        const priceConverted = convertPrice(
+          grainContract.price,
+          type_currency,
+          day_exchange_rate || grainContract.day_exchange_rate
+        );
         const total_contract_value = calculateTotalContractValue(
           grainContract.product,
-          final_quantity,
-          grainContract.price
+          final_quantity || grainContract.quantity,
+          priceConverted
         );
-
         updatedFields.total_contract_value = total_contract_value;
       }
 
