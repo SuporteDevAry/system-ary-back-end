@@ -7,6 +7,7 @@ var react_1 = __importDefault(require("react"));
 var helpers_1 = require("../helpers");
 var path_1 = __importDefault(require("path"));
 var fs_1 = __importDefault(require("fs"));
+var Extenso_1 = require("../helpers/Extenso");
 var logoContrato = path_1.default.resolve(__dirname, "../helpers/Logo_Ary_Completo.jpg");
 var logoBase64 = "data:image/jpeg;base64,".concat(fs_1.default
     .readFileSync(logoContrato)
@@ -21,16 +22,38 @@ var ContratoTemplateSoja = function (_a) {
         return react_1.default.createElement("div", null, "Erro: Dados do contrato n\u00E3o encontrados.");
     }
     // Extraindo as propriedades necessárias de data
-    var seller = data.seller, buyer = data.buyer, number_contract = data.number_contract, product = data.product, number_broker = data.number_broker, quantity = data.quantity, commission_seller = data.commission_seller, commission_buyer = data.commission_buyer, quality = data.quality, price = data.price, type_currency = data.type_currency, complement_destination = data.complement_destination, destination = data.destination, icms = data.icms, payment = data.payment, pickup = data.pickup, pickup_location = data.pickup_location, inspection = data.inspection, observation = data.observation, crop = data.crop, name_product = data.name_product, type_commission_seller = data.type_commission_seller, type_commission_buyer = data.type_commission_buyer, type_pickup = data.type_pickup;
-    // Lógica de formatação
-    var quantity_aux = modeSave
-        ? !quantity.match(/,/g)
-            ? quantity.replace(/[.]/g, "")
-            : quantity.replace(/[,]/g, ".")
-        : quantity;
-    var formattedQtd = (0, helpers_1.formatQuantity)(quantity_aux);
-    var qtde_extenso = (0, helpers_1.Extenso)(quantity_aux);
-    var formattedExtenso = "(".concat(qtde_extenso, ")");
+    var seller = data.seller, buyer = data.buyer, number_contract = data.number_contract, product = data.product, number_broker = data.number_broker, quantity = data.quantity, commission_seller = data.commission_seller, commission_buyer = data.commission_buyer, quality = data.quality, price = data.price, type_currency = data.type_currency, complement_destination = data.complement_destination, destination = data.destination, icms = data.icms, payment = data.payment, pickup = data.pickup, pickup_location = data.pickup_location, inspection = data.inspection, observation = data.observation, type_quantity = data.type_quantity, name_product = data.name_product, type_commission_seller = data.type_commission_seller, type_commission_buyer = data.type_commission_buyer, type_pickup = data.type_pickup;
+    var quantityValue = typeof quantity === "number" ? quantity : (0, helpers_1.parseQuantityToNumber)(quantity);
+    var formattedQtd = (0, helpers_1.numberToQuantityString)(quantity);
+    // montar extenso dependendo do tipo de quantidade
+    var formattedExtenso = "";
+    if (type_quantity === "toneladas métricas") {
+        // tratar como toneladas métricas: parte inteira = toneladas, parte decimal = quilos (3 casas decimais)
+        var raw = String(formattedQtd)
+            .trim()
+            .replace(/\./g, "")
+            .replace(/,/g, ".");
+        var parts = raw.split(".");
+        var inteiro = Number(parts[0]) || 0;
+        var decimais = parts[1] ? parts[1].padEnd(3, "0").slice(0, 3) : ""; // gramas/quilos em 3 dígitos
+        var toneladasText = inteiro > 0
+            ? (0, Extenso_1.Extenso)(inteiro, "F") +
+                (inteiro === 1 ? " tonelada métrica" : " toneladas métricas")
+            : "";
+        var kilosFromDecimals = decimais ? Number(decimais) : 0;
+        var kilosText = kilosFromDecimals > 0
+            ? (0, Extenso_1.Extenso)(kilosFromDecimals, "M") +
+                (kilosFromDecimals === 1 ? " quilo" : " quilos")
+            : "";
+        var combined = [toneladasText, kilosText].filter(Boolean).join(" e ");
+        formattedExtenso = combined ? "(".concat(combined, ")") : "";
+    }
+    else {
+        // tratar como quilos (masculino)
+        var inteiro = Math.round(quantityValue);
+        var ext = (0, Extenso_1.Extenso)(inteiro, "M");
+        formattedExtenso = "(".concat(ext, ")");
+    }
     var formattedSellerCNPJ = (seller === null || seller === void 0 ? void 0 : seller.cnpj_cpf)
         ? (0, helpers_1.insertMaskInCnpj)(seller.cnpj_cpf)
         : "";
@@ -92,9 +115,7 @@ var ContratoTemplateSoja = function (_a) {
     var formattedSafra = validProductsForMetricTon
         ? " "
         : " - Safra: ".concat(data.crop);
-    var formattedMetrica = data.type_quantity === "toneladas métricas"
-        ? " toneladas m\u00E9tricas."
-        : " quilos.";
+    var formattedMetrica = data.type_quantity === "toneladas métricas" ? "." : " quilos.";
     var Dot = data.destination === "Nenhum" ||
         (data.destination === "" && ((_b = data.complement_destination) === null || _b === void 0 ? void 0 : _b.length) === 0)
         ? "."

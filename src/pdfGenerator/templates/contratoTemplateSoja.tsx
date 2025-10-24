@@ -1,13 +1,15 @@
 import React from "react";
 import {
   formatCurrency,
-  Extenso,
   insertMaskInCnpj,
   formatDateWithLongMonth,
   formatQuantity,
+  parseQuantityToNumber,
+  numberToQuantityString,
 } from "../helpers";
 import path from "path";
 import fs from "fs";
+import { Extenso } from "../helpers/Extenso";
 
 const logoContrato = path.resolve(
   __dirname,
@@ -57,23 +59,51 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
     pickup_location,
     inspection,
     observation,
-    crop,
+    type_quantity,
     name_product,
     type_commission_seller,
     type_commission_buyer,
     type_pickup,
   } = data;
 
-  // Lógica de formatação
-  let quantity_aux = modeSave
-    ? !quantity.match(/,/g)
-      ? quantity.replace(/[.]/g, "")
-      : quantity.replace(/[,]/g, ".")
-    : quantity;
+  const quantityValue =
+    typeof quantity === "number" ? quantity : parseQuantityToNumber(quantity);
 
-  let formattedQtd = formatQuantity(quantity_aux);
-  const qtde_extenso = Extenso(quantity_aux);
-  let formattedExtenso = `(${qtde_extenso})`;
+  const formattedQtd = numberToQuantityString(quantity);
+
+  // montar extenso dependendo do tipo de quantidade
+  let formattedExtenso = "";
+
+  if (type_quantity === "toneladas métricas") {
+    // tratar como toneladas métricas: parte inteira = toneladas, parte decimal = quilos (3 casas decimais)
+    const raw = String(formattedQtd)
+      .trim()
+      .replace(/\./g, "")
+      .replace(/,/g, ".");
+    const parts = raw.split(".");
+    const inteiro = Number(parts[0]) || 0;
+    const decimais = parts[1] ? parts[1].padEnd(3, "0").slice(0, 3) : ""; // gramas/quilos em 3 dígitos
+
+    const toneladasText =
+      inteiro > 0
+        ? Extenso(inteiro, "F") +
+          (inteiro === 1 ? " tonelada métrica" : " toneladas métricas")
+        : "";
+    const kilosFromDecimals = decimais ? Number(decimais) : 0;
+    const kilosText =
+      kilosFromDecimals > 0
+        ? Extenso(kilosFromDecimals, "M") +
+          (kilosFromDecimals === 1 ? " quilo" : " quilos")
+        : "";
+
+    const combined = [toneladasText, kilosText].filter(Boolean).join(" e ");
+    formattedExtenso = combined ? `(${combined})` : "";
+  } else {
+    // tratar como quilos (masculino)
+    const inteiro = Math.round(quantityValue);
+    const ext = Extenso(inteiro, "M");
+    formattedExtenso = `(${ext})`;
+  }
 
   let formattedSellerCNPJ = seller?.cnpj_cpf
     ? insertMaskInCnpj(seller.cnpj_cpf)
@@ -111,33 +141,33 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
   //     .join("");
   // }
 
- function formatObservationText(observation: string) {
-  if (!observation) {
-    return "";
-  }
-
-  // Divide e remove linhas vazias
-  const lines = observation
-    .split("\n")
-    .map(line => line.trim())
-    .filter(line => line !== "");
-
-  const hasMultipleLines = lines.length > 1;
-
-  const formattedLines = lines.map((line) => {
-    // Se a linha começar com número seguido de hífen (ex: 1-, 2-)
-    if (/^\d+-/.test(line)) {
-      return `<div style="margin-left: 0; line-height: 1.2;">${line}</div>`;
-    } else if (hasMultipleLines) {
-      // Adiciona leve indentação para linhas subsequentes
-      return `<div style="margin-left: 20px; line-height: 1.2;">${line}</div>`;
-    } else {
-      return `<div style="line-height: 1.2;">${line}</div>`;
+  function formatObservationText(observation: string) {
+    if (!observation) {
+      return "";
     }
-  });
 
-  return formattedLines.join("");
-}
+    // Divide e remove linhas vazias
+    const lines = observation
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line !== "");
+
+    const hasMultipleLines = lines.length > 1;
+
+    const formattedLines = lines.map((line) => {
+      // Se a linha começar com número seguido de hífen (ex: 1-, 2-)
+      if (/^\d+-/.test(line)) {
+        return `<div style="margin-left: 0; line-height: 1.2;">${line}</div>`;
+      } else if (hasMultipleLines) {
+        // Adiciona leve indentação para linhas subsequentes
+        return `<div style="margin-left: 20px; line-height: 1.2;">${line}</div>`;
+      } else {
+        return `<div style="line-height: 1.2;">${line}</div>`;
+      }
+    });
+
+    return formattedLines.join("");
+  }
 
   const listProductsForMetricTon = ["O", "F", "OC", "OA", "SB", "EP"];
   const validProductsForMetricTon = listProductsForMetricTon.includes(
@@ -149,9 +179,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
     : ` - Safra: ${data.crop}`;
 
   let formattedMetrica =
-    data.type_quantity === "toneladas métricas"
-      ? ` toneladas métricas.`
-      : ` quilos.`;
+    data.type_quantity === "toneladas métricas" ? `.` : ` quilos.`;
 
   let Dot =
     data.destination === "Nenhum" ||
@@ -177,7 +205,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
       <div style={{ margin: 0, textAlign: "center" }}>
         <img src={logoBase64} alt="logo Ary Completo" width={300} />
       </div>
-     
+
       <h3>
         <div style={{ paddingLeft: "250px" }}>
           São Paulo,{" "}
@@ -187,7 +215,6 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
           Confirmação de negociação <span> {numberContract} </span>
         </div>
       </h3>
-     
 
       {/* VENDEDOR */}
       <div style={{ display: "table", width: "100%", marginBottom: "20px" }}>
@@ -253,7 +280,6 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
         </div>
       </div>
 
-      
       <div style={{ textAlign: "left", margin: "0" }}>
         <strong>Mercadoria:</strong>
         <div style={{ textAlign: "left" }}>
