@@ -82,6 +82,11 @@ routes.delete(
 );
 
 // Contracts
+
+routes.get(
+  "/api/grain-contracts/report",
+  new GrainContractController().getReport
+);
 routes.get(
   "/api/grain-contracts",
   new GrainContractController().getGrainContracts
