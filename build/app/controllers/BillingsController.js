@@ -84,17 +84,19 @@ exports.BillingController = {
     },
     findBillingByNumberContract: function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var rps_number, billing;
+            var number_contract, billings;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        rps_number = req.params.rps_number;
-                        return [4 /*yield*/, BillingsRepository_1.BillingRepository.findByNumberContract(rps_number)];
+                        number_contract = req.params.number_contract;
+                        return [4 /*yield*/, BillingsRepository_1.BillingRepository.findByNumberContract(number_contract)];
                     case 1:
-                        billing = _a.sent();
-                        if (!billing)
-                            return [2 /*return*/, res.status(404).json({ message: "Recebimento não encontrada para o Contrato" })];
-                        return [2 /*return*/, res.json(billing)];
+                        billings = _a.sent();
+                        if (!billings || billings.length === 0)
+                            return [2 /*return*/, res.status(404).json({
+                                    message: "Nenhum recebimento encontrado para o contrato informado",
+                                })];
+                        return [2 /*return*/, res.json(billings)];
                 }
             });
         });
@@ -110,7 +112,9 @@ exports.BillingController = {
                     case 1:
                         billing = _a.sent();
                         if (!billing)
-                            return [2 /*return*/, res.status(404).json({ message: "Recebimento não encontrado para a RPS" })];
+                            return [2 /*return*/, res
+                                    .status(404)
+                                    .json({ message: "Recebimento não encontrado para a RPS" })];
                         return [2 /*return*/, res.json(billing)];
                 }
             });
@@ -127,8 +131,29 @@ exports.BillingController = {
                     case 1:
                         billing = _a.sent();
                         if (!billing)
-                            return [2 /*return*/, res.status(404).json({ message: "Recebimento não encontrado para a NF" })];
+                            return [2 /*return*/, res
+                                    .status(404)
+                                    .json({ message: "Recebimento não encontrado para a NF" })];
                         return [2 /*return*/, res.json(billing)];
+                }
+            });
+        });
+    },
+    findBillingsByNumberContract: function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var number_contract, billings;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        number_contract = req.body.number_contract;
+                        if (!number_contract)
+                            return [2 /*return*/, res
+                                    .status(400)
+                                    .json({ message: "Parâmetro 'number_contract' é obrigatório no body" })];
+                        return [4 /*yield*/, BillingsRepository_1.BillingRepository.findByNumberContract(number_contract)];
+                    case 1:
+                        billings = _a.sent();
+                        return [2 /*return*/, res.json(billings)];
                 }
             });
         });

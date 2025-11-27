@@ -54,6 +54,7 @@ routes.get("/api/notifications/user/:user", new NotificationsController_1.Notifi
 routes.patch("/api/notification/:id", new NotificationsController_1.NotificationController().updateNotification);
 routes.delete("/api/notification/:id", new NotificationsController_1.NotificationController().deleteNotification);
 // Contracts
+routes.get("/api/grain-contracts/report", new GrainContractController_1.GrainContractController().getReport);
 routes.get("/api/grain-contracts", new GrainContractController_1.GrainContractController().getGrainContracts);
 routes.get("/api/grain-contracts/:id", new GrainContractController_1.GrainContractController().getGrainContractById);
 routes.post("/api/grain-contracts", new GrainContractController_1.GrainContractController().createGrainContract);
@@ -85,6 +86,7 @@ routes.patch("/api/invoices/:id", InvoicesController_1.InvoiceController.updateI
 routes.delete("/api/invoices/:id", InvoicesController_1.InvoiceController.deleteInvoice);
 // Billing
 routes.post("/api/billings", BillingsController_1.BillingController.createBilling);
+routes.post("/api/billings/number-contract", BillingsController_1.BillingController.findBillingsByNumberContract);
 routes.get("/api/billings", BillingsController_1.BillingController.findAllBillings);
 routes.get("/api/billings/:id", BillingsController_1.BillingController.findBillingById);
 routes.get("/api/billings/contract/:number_contract", BillingsController_1.BillingController.findBillingByNumberContract);

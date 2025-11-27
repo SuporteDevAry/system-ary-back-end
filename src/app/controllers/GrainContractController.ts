@@ -7,8 +7,185 @@ import { calcCommission } from "../../utills/calcCommission";
 import { convertPrice } from "../../utills/convertPrice";
 import { calculateTotalContractValue } from "../../utills/calculateTotalContractValue";
 import { GrainContract } from "../entities/GrainContracts";
+import { Console } from "console";
 
 export class GrainContractController {
+  getReport = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const {
+        seller,
+        buyer,
+        year,
+        month,
+        date,
+        product,
+        name_product,
+        page,
+        per_page,
+      } = req.query as any;
+
+      const qb = grainContractRepository.createQueryBuilder("gc");
+
+      // Filtrar por seller — suporta objeto com campo `name` ou arrays; aceita valores separados por vírgula
+      if (seller) {
+        const sellers = String(seller)
+          .split(",")
+          .map((s: string) => s.trim())
+          .filter((s: string) => s.length > 0);
+
+        if (sellers.length > 0) {
+          const conds: string[] = [];
+          const params: any = {};
+
+          // condições para buscar pelo campo name ou nickname dentro do objeto seller
+          sellers.forEach((s: string, i: number) => {
+            const keyName = `sellerName${i}`;
+            const keyNick = `sellerNick${i}`;
+            conds.push(`gc.seller->>'name' ILIKE :${keyName}`);
+            conds.push(`gc.seller->>'nickname' ILIKE :${keyNick}`);
+            params[keyName] = `%${s}%`;
+            params[keyNick] = `%${s}%`;
+          });
+
+          // condição adicional para compatibilidade com seller sendo um array JSONB de strings
+          conds.push(`gc.seller @> :sellersArray`);
+          params.sellersArray = JSON.stringify(sellers);
+
+          qb.andWhere(`(${conds.join(" OR ")})`, params);
+        }
+      }
+
+      // Filtrar por buyer — suporta objeto com campo `name` ou arrays; aceita valores separados por vírgula
+      if (buyer) {
+        const buyers = String(buyer)
+          .split(",")
+          .map((b: string) => b.trim())
+          .filter((b: string) => b.length > 0);
+
+        if (buyers.length > 0) {
+          const conds: string[] = [];
+          const params: any = {};
+
+          buyers.forEach((b: string, i: number) => {
+            const keyName = `buyerName${i}`;
+            const keyNick = `buyerNick${i}`;
+            conds.push(`gc.buyer->>'name' ILIKE :${keyName}`);
+            conds.push(`gc.buyer->>'nickname' ILIKE :${keyNick}`);
+            params[keyName] = `%${b}%`;
+            params[keyNick] = `%${b}%`;
+          });
+
+          conds.push(`gc.buyer @> :buyersArray`);
+          params.buyersArray = JSON.stringify(buyers);
+
+          qb.andWhere(`(${conds.join(" OR ")})`, params);
+        }
+      }
+
+      // Filtrar por produto (prefixo) e nome do produto (busca parcial)
+      if (product) {
+        qb.andWhere("gc.product = :product", { product });
+      }
+
+      if (name_product) {
+        qb.andWhere("gc.name_product ILIKE :name_product", {
+          name_product: `%${String(name_product)}%`,
+        });
+      }
+
+      // Filtrar por data completa (DD/MM/YYYY ou YYYY-MM-DD) — compara a parte DATE de created_at
+      if (date) {
+        let parsedDate: string | null = null;
+        const d = String(date).trim();
+        // Aceita formato DD/MM/YYYY
+        const brMatch = /^\d{2}\/\d{2}\/\d{4}$/.test(d);
+        const isoMatch = /^\d{4}-\d{2}-\d{2}$/.test(d);
+        if (brMatch) {
+          const [day, monthP, yearP] = d.split("/");
+          parsedDate = `${yearP}-${monthP}-${day}`; // YYYY-MM-DD
+        } else if (isoMatch) {
+          parsedDate = d;
+        } else {
+          // Tentativa de parse genérico
+          const dt = new Date(d);
+          if (!Number.isNaN(dt.getTime())) {
+            parsedDate = dt.toISOString().slice(0, 10);
+          }
+        }
+
+        if (parsedDate) {
+          qb.andWhere(
+            "(CASE WHEN gc.contract_emission_date ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' THEN to_date(gc.contract_emission_date, 'DD/MM/YYYY') ELSE CAST(gc.contract_emission_date AS date) END) = to_date(:createdDate, 'YYYY-MM-DD')",
+            {
+              createdDate: parsedDate,
+            }
+          );
+        }
+      } else {
+        // Filtrar por ano/mês a partir do created_at
+        if (year) {
+          const y = Number(year);
+          if (!Number.isNaN(y)) {
+            qb.andWhere(
+              "EXTRACT(YEAR FROM (CASE WHEN gc.contract_emission_date ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' THEN to_date(gc.contract_emission_date, 'DD/MM/YYYY') ELSE CAST(gc.contract_emission_date AS date) END)) = :year",
+              {
+                year: y,
+              }
+            );
+          }
+        }
+
+        if (month) {
+          const m = Number(month);
+          if (!Number.isNaN(m)) {
+            qb.andWhere(
+              "EXTRACT(MONTH FROM (CASE WHEN gc.contract_emission_date ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' THEN to_date(gc.contract_emission_date, 'DD/MM/YYYY') ELSE CAST(gc.contract_emission_date AS date) END)) = :month",
+              {
+                month: m,
+              }
+            );
+          }
+        }
+      }
+
+      // Paginação opcional: se `page` ou `per_page` for informado, retorna paginado;
+      // caso contrário, retorna todos os resultados.
+      const pageProvided = typeof page !== "undefined";
+      const perPageProvided = typeof per_page !== "undefined";
+
+      let data: any[] = [];
+      let total = 0;
+
+      if (pageProvided || perPageProvided) {
+        const pageNum = Number(page) >= 1 ? Number(page) : 1;
+        const perPage = Number(per_page) >= 1 ? Number(per_page) : 50;
+        const offset = (pageNum - 1) * perPage;
+
+        [data, total] = await qb
+          .orderBy(
+            "(CASE WHEN gc.contract_emission_date ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' THEN to_date(gc.contract_emission_date, 'DD/MM/YYYY') ELSE CAST(gc.contract_emission_date AS timestamp) END)",
+            "DESC"
+          )
+          .skip(offset)
+          .take(perPage)
+          .getManyAndCount();
+
+        return res.json({ data, total, page: pageNum, per_page: perPage });
+      }
+
+      // Sem paginação: retornar todos os resultados
+      [data, total] = await qb
+        .orderBy(
+          "(CASE WHEN gc.contract_emission_date ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' THEN to_date(gc.contract_emission_date, 'DD/MM/YYYY') ELSE CAST(gc.contract_emission_date AS timestamp) END)",
+          "DESC"
+        )
+        .getManyAndCount();
+      return res.json({ data, total });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  };
+
   getGrainContracts = async (
     req: Request,
     res: Response
