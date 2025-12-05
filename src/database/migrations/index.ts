@@ -35,5 +35,4 @@ export const migrationDir = {
   Taxes,
   Invoices,
   Billings,
-  ChangeTypeContractEmissionDate,
 };
