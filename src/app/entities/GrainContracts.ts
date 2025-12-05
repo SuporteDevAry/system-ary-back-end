@@ -113,8 +113,8 @@ export class GrainContract {
     }[];
   };
 
-  @Column({ type: "timestamp", nullable: true })
-  contract_emission_date: Date;
+  @Column({ nullable: true })
+  contract_emission_date: string;
 
   @Column({ nullable: true })
   destination: string;
