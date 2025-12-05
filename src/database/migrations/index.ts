@@ -15,7 +15,6 @@ import { AddReceiptFields1756778991841 as AddReceiptFields } from "./17567789918
 import { Taxes1756780745306 as Taxes } from "./1756780745306-Taxes";
 import { Invoices1757045893213 as Invoices } from "./1757045893213-Invoices";
 import { Billing1757048894259 as Billings } from "./1757048894259-Billing";
-import { ChangeTypeContractEmissionDate1764895713589 as ChangeTypeContractEmissionDate } from "./1764895713589-ChangeTypeContractEmissionDate";
 
 export const migrationDir = {
   CreatePermissions,

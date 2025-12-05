@@ -150,8 +150,8 @@ var GrainContract = /** @class */ (function () {
         __metadata("design:type", Object)
     ], GrainContract.prototype, "status", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: "timestamp", nullable: true }),
-        __metadata("design:type", Date)
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
     ], GrainContract.prototype, "contract_emission_date", void 0);
     __decorate([
         (0, typeorm_1.Column)({ nullable: true }),
