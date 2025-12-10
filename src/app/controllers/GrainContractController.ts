@@ -250,7 +250,32 @@ export class GrainContractController {
         commission_contract: commissionValue,
       });
 
-      const result = await grainContractRepository.save(grainContract);
+      const result = (await grainContractRepository.save(
+        grainContract
+      )) as unknown as GrainContract;
+
+      // Atualiza contract_emission_datetime com a data de emissão e hora do created_at
+      if (result.contract_emission_date && result.created_at) {
+        const dateStr = result.contract_emission_date;
+        const match = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        let dateIso = "";
+        if (match) {
+          dateIso = `${match[3]}-${match[2]}-${match[1]}`;
+        } else {
+          dateIso = dateStr;
+        }
+
+        const createdAt = new Date(result.created_at);
+        const hourStr = createdAt.getHours().toString().padStart(2, "0");
+        const minStr = createdAt.getMinutes().toString().padStart(2, "0");
+        const secStr = createdAt.getSeconds().toString().padStart(2, "0");
+        const msStr = createdAt.getMilliseconds().toString().padStart(3, "0");
+        result.contract_emission_datetime = new Date(
+          `${dateIso}T${hourStr}:${minStr}:${secStr}.${msStr}`
+        );
+
+        await grainContractRepository.save(result);
+      }
 
       return res.status(201).json(result);
     } catch (error) {

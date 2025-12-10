@@ -47,15 +47,15 @@ function seedProductTables(dataSource) {
                     productTableRepository = dataSource.getRepository(ProductsTable_1.ProductTable);
                     tables = [
                         {
-                            name: "Soja",
+                            name: "GRÃOS",
                             product_types: ["S", "T", "SG", "CN"],
                         },
                         {
-                            name: "Óleo",
+                            name: "ÓLEO",
                             product_types: ["O", "OC", "OA", "SB", "EP"],
                         },
                         {
-                            name: "Farelo",
+                            name: "FARELO",
                             product_types: ["F"],
                         },
                     ];

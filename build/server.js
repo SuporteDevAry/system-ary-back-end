@@ -51,6 +51,7 @@ var error_1 = require("./app/middlewares/error");
 // Seeds
 var SeedProducts_1 = require("./database/seeds/SeedProducts");
 var SeedProductsTables_1 = require("./database/seeds/SeedProductsTables");
+var UpdateContractEmissionDatetime_1 = require("./database/seeds/UpdateContractEmissionDatetime");
 var port = process.env.SERVER_PORT;
 var app = (0, express_1.default)();
 app.use((0, cors_1.default)());
@@ -77,6 +78,14 @@ data_source_1.AppDataSource.initialize()
                 _a.sent();
                 _a.label = 3;
             case 3:
+                if (!(process.env.RUN_UPDATE_CONTRACT_DATETIME === "true")) return [3 /*break*/, 5];
+                return [4 /*yield*/, (0, UpdateContractEmissionDatetime_1.updateContractEmissionDatetime)(data_source_1.AppDataSource)];
+            case 4:
+                _a.sent();
+                // Desativa a flag após executar (você pode remover manualmente do .env depois)
+                console.log("⚠️  Script executado! Remova RUN_UPDATE_CONTRACT_DATETIME=true do .env para evitar execuções futuras.");
+                _a.label = 5;
+            case 5:
                 app.listen(port, function () {
                     console.log("Server is running on port: ".concat(port));
                 });

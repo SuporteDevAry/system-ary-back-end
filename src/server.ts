@@ -12,6 +12,7 @@ import { errorMiddleware } from "./app/middlewares/error";
 // Seeds
 import { seedProducts } from "./database/seeds/SeedProducts";
 import { seedProductTables } from "./database/seeds/SeedProductsTables";
+import { updateContractEmissionDatetime } from "./database/seeds/UpdateContractEmissionDatetime";
 
 const port = process.env.SERVER_PORT;
 const app = express();
@@ -34,6 +35,15 @@ AppDataSource.initialize()
     if (process.env.NODE_ENV === "dev") {
       await seedProducts(AppDataSource);
       await seedProductTables(AppDataSource);
+    }
+
+    // Executa script de atualização apenas se habilitado via ENV
+    if (process.env.RUN_UPDATE_CONTRACT_DATETIME === "true") {
+      await updateContractEmissionDatetime(AppDataSource);
+      // Desativa a flag após executar (você pode remover manualmente do .env depois)
+      console.log(
+        "⚠️  Script executado! Remova RUN_UPDATE_CONTRACT_DATETIME=true do .env para evitar execuções futuras."
+      );
     }
 
     app.listen(port, () => {
