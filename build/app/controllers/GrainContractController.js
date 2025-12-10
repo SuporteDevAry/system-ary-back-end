@@ -247,11 +247,11 @@ var GrainContractController = /** @class */ (function () {
             });
         }); };
         this.createGrainContract = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var numberContract, total_contract_value, dataWithConvertedPrice, commissionValue, grainContract, result, error_4;
+            var numberContract, total_contract_value, dataWithConvertedPrice, commissionValue, grainContract, result, dateStr, match, dateIso, createdAt, hourStr, minStr, secStr, msStr, error_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 3, , 4]);
+                        _a.trys.push([0, 5, , 6]);
                         return [4 /*yield*/, (0, GrainContractRepository_1.generateNumberContract)(req.body)];
                     case 1:
                         numberContract = _a.sent();
@@ -261,12 +261,32 @@ var GrainContractController = /** @class */ (function () {
                         grainContract = GrainContractRepository_1.grainContractRepository.create(__assign(__assign({}, dataWithConvertedPrice), { number_contract: numberContract, final_quantity: req.body.quantity, status_received: "Não", commission_contract: commissionValue }));
                         return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.save(grainContract)];
                     case 2:
-                        result = _a.sent();
-                        return [2 /*return*/, res.status(201).json(result)];
+                        result = (_a.sent());
+                        if (!(result.contract_emission_date && result.created_at)) return [3 /*break*/, 4];
+                        dateStr = result.contract_emission_date;
+                        match = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+                        dateIso = "";
+                        if (match) {
+                            dateIso = "".concat(match[3], "-").concat(match[2], "-").concat(match[1]);
+                        }
+                        else {
+                            dateIso = dateStr;
+                        }
+                        createdAt = new Date(result.created_at);
+                        hourStr = createdAt.getHours().toString().padStart(2, "0");
+                        minStr = createdAt.getMinutes().toString().padStart(2, "0");
+                        secStr = createdAt.getSeconds().toString().padStart(2, "0");
+                        msStr = createdAt.getMilliseconds().toString().padStart(3, "0");
+                        result.contract_emission_datetime = new Date("".concat(dateIso, "T").concat(hourStr, ":").concat(minStr, ":").concat(secStr, ".").concat(msStr));
+                        return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.save(result)];
                     case 3:
+                        _a.sent();
+                        _a.label = 4;
+                    case 4: return [2 /*return*/, res.status(201).json(result)];
+                    case 5:
                         error_4 = _a.sent();
                         return [2 /*return*/, res.status(500).json({ message: error_4.message })];
-                    case 4: return [2 /*return*/];
+                    case 6: return [2 /*return*/];
                 }
             });
         }); };

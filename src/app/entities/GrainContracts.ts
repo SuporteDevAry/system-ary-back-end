@@ -167,6 +167,9 @@ export class GrainContract {
   @Column({ nullable: true })
   expected_receipt_date: string;
 
+  @Column({ nullable: true })
+  contract_emission_datetime: Date;
+
   @CreateDateColumn()
   created_at: Date;
 

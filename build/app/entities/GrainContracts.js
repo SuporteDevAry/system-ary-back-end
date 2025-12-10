@@ -222,6 +222,10 @@ var GrainContract = /** @class */ (function () {
         __metadata("design:type", String)
     ], GrainContract.prototype, "expected_receipt_date", void 0);
     __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", Date)
+    ], GrainContract.prototype, "contract_emission_datetime", void 0);
+    __decorate([
         (0, typeorm_1.CreateDateColumn)(),
         __metadata("design:type", Date)
     ], GrainContract.prototype, "created_at", void 0);
