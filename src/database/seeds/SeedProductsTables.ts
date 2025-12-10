@@ -1,21 +1,20 @@
 import { DataSource } from "typeorm";
 import { ProductTable } from "../../app/entities/ProductsTable";
 
-
 export async function seedProductTables(dataSource: DataSource) {
   const productTableRepository = dataSource.getRepository(ProductTable);
 
   const tables = [
     {
-      name: "Soja",
+      name: "GRÃOS",
       product_types: ["S", "T", "SG", "CN"],
     },
     {
-      name: "Óleo",
+      name: "ÓLEO",
       product_types: ["O", "OC", "OA", "SB", "EP"],
     },
     {
-      name: "Farelo",
+      name: "FARELO",
       product_types: ["F"],
     },
   ];
