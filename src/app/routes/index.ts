@@ -25,7 +25,7 @@ const routes = Router();
 routes.post("/api/login", new SessionController().login);
 
 // Routes protected
-routes.use(authMiddleware); // comentar ao usar local
+//routes.use(authMiddleware); // comentar ao usar local
 routes.get("/api/profile", new UserController().getProfile);
 routes.post("/api/reset-password", new SessionController().resetPassword);
 
@@ -115,6 +115,7 @@ routes.patch(
 
 // Send Emails
 routes.post("/api/send-emails", new EmailController().SendEmails);
+routes.get("/api/email-indicators", new EmailController().GetEmailIndicators);
 
 // Products
 routes.post("/api/products", ProductController.createProduct);

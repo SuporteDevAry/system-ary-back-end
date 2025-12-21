@@ -226,4 +226,197 @@ export class EmailController {
       res.status(500).send({ error: "Erro ao enviar os e-mails." });
     }
   }
+
+  async GetEmailIndicators(req: Request, res: Response): Promise<void> {
+    try {
+      // Buscar todos os logs de e-mail ordenados por data
+      const emailLogs = await EmailLogRepository.find({
+        order: { sent_at: "DESC" },
+      });
+
+      console.log("📊 Total de registros na base:", emailLogs.length);
+
+      // Grupos de siglas por mesa
+      const group1 = ["S", "T", "SG", "CN"]; // Grãos
+      const group2 = ["O", "OC", "OA", "SB", "EP"]; // Óleo
+      const group3 = ["F"]; // Farelo
+
+      // Usar Set para contratos únicos (elimina duplicatas de reenvios)
+      const contratosUnicos = new Set<string>();
+      const contratosUnicosGraos = new Set<string>();
+      const contratosUnicosOleo = new Set<string>();
+      const contratosUnicosFarelo = new Set<string>();
+      const contratosUnicosME = new Set<string>();
+      const siglasSemClassificacao: string[] = [];
+
+      // Estrutura para agrupar por ano e mês
+      const porAno: Record<
+        string,
+        {
+          total: number;
+          por_mes: Record<
+            string,
+            {
+              total: number;
+              contratos: Array<{
+                sigla: string;
+                number_contract: string;
+                data_hora: string;
+                enviado_por: string;
+                sent_at_timestamp?: Date;
+              }>;
+            }
+          >;
+        }
+      > = {};
+
+      // Processar cada log
+      emailLogs.forEach((log) => {
+        const sigla = log.number_contract.split(".")[0].toUpperCase();
+        const numeroContrato = log.number_contract;
+
+        // Adicionar ao total de contratos únicos
+        contratosUnicos.add(numeroContrato);
+
+        // Classificar por mesa e mercado
+        if (group1.includes(sigla)) {
+          contratosUnicosGraos.add(numeroContrato);
+        } else if (group2.includes(sigla)) {
+          contratosUnicosOleo.add(numeroContrato);
+        } else if (group3.includes(sigla)) {
+          contratosUnicosFarelo.add(numeroContrato);
+        } else {
+          // Siglas não reconhecidas serão classificadas como Mercado Externo no futuro
+          contratosUnicosME.add(numeroContrato);
+          if (!siglasSemClassificacao.includes(sigla)) {
+            siglasSemClassificacao.push(sigla);
+          }
+        }
+
+        // Agrupar por ano e mês
+        const data = new Date(log.sent_at);
+        const ano = data.getFullYear().toString();
+        const mesesAbreviados = [
+          "Jan",
+          "Fev",
+          "Mar",
+          "Abr",
+          "Mai",
+          "Jun",
+          "Jul",
+          "Ago",
+          "Set",
+          "Out",
+          "Nov",
+          "Dez",
+        ];
+        const mes = mesesAbreviados[data.getMonth()];
+        const dataHora = data.toLocaleString("pt-BR", {
+          timeZone: "America/Sao_Paulo",
+        });
+
+        // Inicializar ano se não existir
+        if (!porAno[ano]) {
+          porAno[ano] = { total: 0, por_mes: {} };
+        }
+
+        // Inicializar mês se não existir
+        if (!porAno[ano].por_mes[mes]) {
+          porAno[ano].por_mes[mes] = { total: 0, contratos: [] };
+        }
+
+        // Adicionar contrato ao mês
+        porAno[ano].por_mes[mes].contratos.push({
+          sigla,
+          number_contract: numeroContrato,
+          data_hora: dataHora,
+          enviado_por: log.email_sender,
+          sent_at_timestamp: log.sent_at, // Guardar timestamp para ordenação
+        });
+
+        // Incrementar contadores
+        porAno[ano].por_mes[mes].total++;
+        porAno[ano].total++;
+      });
+
+      // Ordenar os contratos dentro de cada mês por data crescente
+      Object.keys(porAno).forEach((ano) => {
+        Object.keys(porAno[ano].por_mes).forEach((mes) => {
+          porAno[ano].por_mes[mes].contratos.sort(
+            (a: any, b: any) =>
+              new Date(a.sent_at_timestamp).getTime() -
+              new Date(b.sent_at_timestamp).getTime()
+          );
+          // Remover o timestamp auxiliar após ordenar
+          porAno[ano].por_mes[mes].contratos.forEach((contrato: any) => {
+            delete contrato.sent_at_timestamp;
+          });
+        });
+      });
+
+      const totalContratos = contratosUnicos.size;
+      const mesaGraos = contratosUnicosGraos.size;
+      const mesaOleo = contratosUnicosOleo.size;
+      const mesaFarelo = contratosUnicosFarelo.size;
+      const totalMI = mesaGraos + mesaOleo + mesaFarelo; // Mercado Interno
+      const totalME = contratosUnicosME.size; // Mercado Externo
+
+      console.log(
+        "📊 Total envios:",
+        emailLogs.length,
+        "| Contratos únicos:",
+        totalContratos
+      );
+      console.log("🔍 Siglas sem classificação:", siglasSemClassificacao);
+
+      // Ordenar os meses dentro de cada ano (Jan a Dez)
+      const mesesOrdem = [
+        "Jan",
+        "Fev",
+        "Mar",
+        "Abr",
+        "Mai",
+        "Jun",
+        "Jul",
+        "Ago",
+        "Set",
+        "Out",
+        "Nov",
+        "Dez",
+      ];
+      const porAnoOrdenado: Record<string, any> = {};
+      Object.keys(porAno)
+        .sort()
+        .forEach((ano) => {
+          const mesesOrdenados: Record<string, any> = {};
+          // Ordenar meses conforme a ordem do array
+          mesesOrdem.forEach((mes) => {
+            if (porAno[ano].por_mes[mes]) {
+              mesesOrdenados[mes] = porAno[ano].por_mes[mes];
+            }
+          });
+          porAnoOrdenado[ano] = {
+            total: porAno[ano].total,
+            por_mes: mesesOrdenados,
+          };
+        });
+
+      res.status(200).json({
+        total_envios: emailLogs.length,
+        total_contratos_enviados: totalContratos,
+        mercado_interno: totalMI,
+        mercado_externo: totalME,
+        por_mesa: {
+          graos: mesaGraos,
+          oleo: mesaOleo,
+          farelo: mesaFarelo,
+        },
+        por_ano: porAnoOrdenado,
+        siglas_sem_classificacao: siglasSemClassificacao,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error: "Erro ao buscar indicadores de e-mails." });
+    }
+  }
 }
