@@ -3,7 +3,7 @@ import "reflect-metadata";
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { AppDataSource } from "./database/data-source";
+import { AppDataSource, initializeDataSource } from "./database/data-source";
 import routes from "./app/routes";
 
 //Error middleware fazer aqui para eliminar try catch no app
@@ -29,7 +29,7 @@ app.use(express.urlencoded({ limit: "100mb", extended: true }));
 //   });
 // });
 
-AppDataSource.initialize()
+initializeDataSource()
   .then(async () => {
     // Executa seeds apenas em ambiente de desenvolvimento
     if (process.env.NODE_ENV === "dev") {
@@ -51,5 +51,9 @@ AppDataSource.initialize()
     });
   })
   .catch((err) => {
-    console.error("Erro ao inicializar AppDataSource:", err);
+    console.error("💥 Erro fatal ao inicializar AppDataSource:", err);
+    console.error(
+      "🔄 O processo será encerrado. O container deve reiniciar automaticamente."
+    );
+    process.exit(1); // Força o container a reiniciar
   });
