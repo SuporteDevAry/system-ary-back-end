@@ -1,0 +1,7 @@
+# Certificados digitais - NÃO COMMITAR
+*.pfx
+*.pem
+*.p12
+*.key
+*.crt
+*.cer

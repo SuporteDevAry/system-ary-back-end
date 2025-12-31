@@ -19,6 +19,7 @@
       "ts-prune": "ts-prune"
    },
    "dependencies": {
+      "@xmldom/xmldom": "^0.8.11",
       "bcrypt": "^5.1.1",
       "cors": "^2.8.5",
       "dotenv": "^16.3.1",
@@ -26,14 +27,18 @@
       "express": "^4.18.2",
       "express-async-errors": "^3.1.1",
       "jsonwebtoken": "^9.0.2",
+      "list": "^2.0.19",
       "nodemailer": "^7.0.10",
       "pg": "^8.4.0",
       "puppeteer": "^23.10.4",
       "react": "^19.0.0",
       "react-dom": "^19.0.0",
       "reflect-metadata": "^0.1.13",
+      "soap": "^1.6.1",
       "typeorm": "^0.3.27",
-      "uuid": "^9.0.0"
+      "uuid": "^9.0.0",
+      "xml-crypto": "^6.1.2",
+      "xml2js": "^0.6.2"
    },
    "devDependencies": {
       "@types/bcrypt": "^5.0.0",
@@ -46,6 +51,7 @@
       "@types/react": "^19.0.1",
       "@types/react-dom": "^19.0.2",
       "@types/uuid": "^9.0.3",
+      "@types/xml2js": "^0.4.14",
       "ts-node": "^10.7.0",
       "ts-node-dev": "^2.0.0",
       "ts-prune": "^0.10.3",
