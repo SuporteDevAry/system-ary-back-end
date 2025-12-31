@@ -11,6 +11,7 @@ import { EmailController } from "../controllers/EmailController";
 import { ProductController } from "../controllers/ProductController";
 import { ProductTablesController } from "../controllers/ProductTablesController";
 import { InvoiceController } from "../controllers/InvoicesController";
+import { NfseController } from "../controllers/NfseController";
 import { BillingController } from "../controllers/BillingsController";
 
 const routes = Router();
@@ -25,7 +26,7 @@ const routes = Router();
 routes.post("/api/login", new SessionController().login);
 
 // Routes protected
-routes.use(authMiddleware); // comentar ao usar local
+//routes.use(authMiddleware); // comentar ao usar local
 routes.get("/api/profile", new UserController().getProfile);
 routes.post("/api/reset-password", new SessionController().resetPassword);
 
@@ -145,6 +146,12 @@ routes.get(
 );
 routes.patch("/api/invoices/:id", InvoiceController.updateInvoice);
 routes.delete("/api/invoices/:id", InvoiceController.deleteInvoice);
+
+// NFS-e - Emissão de Nota Fiscal Eletrônica SP
+routes.post("/api/nfse/enviar-lote", NfseController.enviarLoteRps);
+routes.get("/api/nfse/consultar-lote/:protocolo", NfseController.consultarLote);
+routes.post("/api/nfse/cancelar", NfseController.cancelarNfse);
+routes.get("/api/nfse/testar-conexao", NfseController.testarConexao);
 
 // Billing
 routes.post("/api/billings", BillingController.createBilling);
