@@ -38,88 +38,110 @@ export class NfseSpService {
     }
   }
 
-  /**
-   * Assina XML com certificado digital conforme padrão da Prefeitura de SP
-   * A assinatura deve ser inserida após todos os RPS, antes de fechar </PedidoEnvioRPS>
-   */
-  private signXml(xml: string): string {
-    try {
-      // Parse o XML usando xmldom
-      const doc = new DOMParser().parseFromString(xml, "text/xml");
+  // Adicione esta função auxiliar para garantir que o certificado seja APENAS base64
+  private obterCertificadoLimpo(): string {
+    const matches = this.cert.match(/-----BEGIN CERTIFICATE-----([\s\S]*?)-----END CERTIFICATE-----/);
+    const base64 = matches ? matches[1] : this.cert;
+    return base64.replace(/\s+/g, ""); // Remove espaços, tabs e quebras de linha
+  }
 
-      const sig = new SignedXml({
-        privateKey: this.key,
-        canonicalizationAlgorithm: "http://www.w3.org/2001/10/xml-exc-c14n#",
-        signatureAlgorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
-      });
-
-      // Adiciona referência para todo o documento PedidoEnvioRPS
-      sig.addReference({
-        xpath: "//*[local-name(.)='PedidoEnvioRPS']",
-        digestAlgorithm: "http://www.w3.org/2001/04/xmlenc#sha256",
-        transforms: [
-          "http://www.w3.org/2000/09/xmldsig#enveloped-signature",
-          "http://www.w3.org/2001/10/xml-exc-c14n#",
-        ],
-      });
-
-      // Computa a assinatura passando o documento DOM
-      sig.computeSignature(xml, {
-        location: {
-          reference: "//*[local-name(.)='PedidoEnvioRPS']",
-          action: "append",
-        },
-      });
-
-      const signedXml = sig.getSignedXml();
-
-      // Remover quebras de linha e espaços extras para enviar compactado
-      const minifiedXml = signedXml
-        .replace(/>\s+</g, "><") // Remove espaços entre tags
-        .replace(/\n/g, "") // Remove quebras de linha
-        .replace(/\r/g, ""); // Remove carriage returns
-
-      console.log("✅ XML assinado e minificado com sucesso");
-      return minifiedXml;
-    } catch (error) {
-      console.error("❌ Erro ao assinar XML:", error);
-      throw new Error(`Falha ao assinar XML: ${error}`);
+  private cleanCertificate(cert: string): string {
+    // Remove tudo que não está entre os marcadores BEGIN e END
+    const matches = cert.match(/-----BEGIN CERTIFICATE-----([\s\S]*?)-----END CERTIFICATE-----/);
+    if (matches && matches[1]) {
+      return matches[1].replace(/\s+/g, ""); // Remove quebras de linha e espaços
     }
+    // Fallback caso o arquivo já venha limpo, mas removendo lixo de "BagAttributes"
+    return cert.replace(/BagAttributes[\s\S]*?MII/g, "MII").replace(/\s+/g, "");
   }
 
   /**
-   * Envia lote de RPS para a Prefeitura de SP
-   * @param xml - XML já formatado do PedidoEnvioRPS
+   * Assina XML com certificado digital conforme padrão da Prefeitura de SP
+   * A assinatura deve ser inserida após todos os RPS, antes de fechar </PedidoEnvioLoteRPS>
    */
+  // Se estiver usando TypeScript, defina o tipo para o certificado se necessário
+  private signXml(xml: string): string {
+    try {
+      const certLimpo = this.obterCertificadoLimpo();
+
+      // 1. Minificação Radical - Sem isso, SP não aceita.
+      const xmlMinificado = xml
+        .replace(/>\s+</g, "><")
+        .replace(/\r?\n|\r/g, "")
+        .trim();
+
+      const sig = new SignedXml({
+        privateKey: this.key,
+        // SP exige C14N inclusivo (20010315)
+        canonicalizationAlgorithm: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
+        signatureAlgorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+      });
+
+      // 2. A Referência deve ser exatamente assim:
+      sig.addReference({
+        xpath: "//*[local-name(.)='PedidoEnvioLoteRPS']",
+        uri: "", // Assina o documento todo
+        digestAlgorithm: "http://www.w3.org/2001/04/xmlenc#sha256",
+        transforms: [
+          "http://www.w3.org/2000/09/xmldsig#enveloped-signature",
+          "http://www.w3.org/TR/2001/REC-xml-c14n-20010315", // Canonicalização no transform
+        ],
+      });
+
+      // 3. Calcula a Assinatura
+      sig.computeSignature(xmlMinificado, {
+        location: { reference: "//*[local-name(.)='PedidoEnvioLoteRPS']", action: "append" },
+        prefix: ""
+      });
+
+      let signedXml = sig.getSignedXml();
+
+      // 4. LIMPEZA MANUAL CIRÚRGICA (Não use bibliotecas aqui, use Replace)
+      // Removemos qualquer Id que a lib tenha tentado criar (ex: Id="_0")
+      signedXml = signedXml.replace(/\sId="[^"]*"/g, "");
+
+      // SP exige que as tags DS não tenham prefixo
+      signedXml = signedXml.replace(/<ds:/g, "<").replace(/<\/ds:/g, "</");
+
+      // Garante que a Signature tenha o namespace correto e esteja colada no conteúdo
+      signedXml = signedXml.replace(/<Signature[^>]*>/, '<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">');
+
+      // 5. Injeta o KeyInfo (Certificado) que você já limpou do erro 1001
+      const keyInfoTag = `<KeyInfo><X509Data><X509Certificate>${certLimpo}</X509Certificate></X509Data></KeyInfo>`;
+      signedXml = signedXml.replace("</SignatureValue>", `</SignatureValue>${keyInfoTag}`);
+
+      // Remove declaração XML e garante que não existam novos espaços
+      return signedXml.replace(/<\?xml.*?\?>/i, "").replace(/>\s+</g, "><");
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async enviarLoteRps(xml: string): Promise<any> {
     try {
-      // Assinar o XML antes de enviar
       const xmlSigned = this.signXml(xml);
 
-      // Usar WSDL local para evitar erro 403
       const wsdlPath = path.resolve(__dirname, "../../wsdl/lotenfe.wsdl");
-
-      // Criar cliente SOAP usando arquivo WSDL local
       const client = await soap.createClientAsync(wsdlPath, {
         endpoint: this.config.soapEndpoint,
         disableCache: true,
+        // FORÇA O SOAP A NÃO FORMATAR O XML (CRUCIAL)
+        preserveWhitespace: true,
       });
 
-      // Adicionar certificado ao cliente SOAP (passar caminhos dos arquivos)
       client.setSecurity(
         new soap.ClientSSLSecurity(
           path.resolve(this.config.keyPath),
           path.resolve(this.config.certPath),
-          {
-            rejectUnauthorized: false,
-          }
+          { rejectUnauthorized: false }
         )
       );
 
-      // Enviar lote - XML como string simples
+      // 3. ENVIO BLINDADO
+      // Usamos o objeto com _xml para dizer ao node-soap: "não processe esta string, apenas envie"
       const result = await client.EnvioLoteRPSAsync({
         VersaoSchema: 1,
-        MensagemXML: xmlSigned,
+        MensagemXML: { _xml: `<![CDATA[${xmlSigned}]]>` },
       });
 
       return this.parseResponse(result);

@@ -7,7 +7,7 @@ export const NfseController = {
   /**
    * Envia lote de RPS para a Prefeitura de SP
    * POST /api/nfse/enviar-lote
-   * Body: { xml: string } - XML completo do PedidoEnvioRPS
+   * Body: { xml: string } - XML completo do PedidoEnvioLoteRPS
    */
   async enviarLoteRps(req: Request, res: Response) {
     try {
@@ -19,6 +19,7 @@ export const NfseController = {
 
       // Enviar para a prefeitura (service vai assinar e enviar)
       const nfseService = new NfseSpService();
+
 
       // Se debug=true, retorna apenas o XML assinado sem enviar
       if (debug) {
