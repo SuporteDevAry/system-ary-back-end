@@ -42,7 +42,7 @@ export const InvoiceRepository = {
 
     async nextNumberRps() {
         const result = await repo.query(
-            `SELECT MAX(rps_number) as last_rps FROM invoices`
+            `SELECT MAX(rps_number::BIGINT) AS last_rps FROM invoices`
         );
 
         const lastRps = result?.[0]?.last_rps ?? 0;
