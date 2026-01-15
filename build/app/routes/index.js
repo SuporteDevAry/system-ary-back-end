@@ -13,6 +13,7 @@ var EmailController_1 = require("../controllers/EmailController");
 var ProductController_1 = require("../controllers/ProductController");
 var ProductTablesController_1 = require("../controllers/ProductTablesController");
 var InvoicesController_1 = require("../controllers/InvoicesController");
+var NfseController_1 = require("../controllers/NfseController");
 var BillingsController_1 = require("../controllers/BillingsController");
 var routes = (0, express_1.Router)();
 // Utilizar futuramente para criar métricas de chamadas
@@ -84,6 +85,11 @@ routes.get("/api/invoices/rps/:rps_number", InvoicesController_1.InvoiceControll
 routes.get("/api/invoices/nfs/:nfs_number", InvoicesController_1.InvoiceController.findInvoiceByNfs_number);
 routes.patch("/api/invoices/:id", InvoicesController_1.InvoiceController.updateInvoice);
 routes.delete("/api/invoices/:id", InvoicesController_1.InvoiceController.deleteInvoice);
+// NFS-e - Emissão de Nota Fiscal Eletrônica SP
+routes.post("/api/nfse/enviar-lote", NfseController_1.NfseController.enviarLoteRps);
+routes.get("/api/nfse/consultar-lote/:protocolo", NfseController_1.NfseController.consultarLote);
+routes.post("/api/nfse/cancelar", NfseController_1.NfseController.cancelarNfse);
+routes.get("/api/nfse/testar-conexao", NfseController_1.NfseController.testarConexao);
 // Billing
 routes.post("/api/billings", BillingsController_1.BillingController.createBilling);
 routes.post("/api/billings/number-contract", BillingsController_1.BillingController.findBillingsByNumberContract);

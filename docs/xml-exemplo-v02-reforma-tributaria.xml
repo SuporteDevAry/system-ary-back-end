@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PedidoEnvioLoteRPS xmlns="http://www.prefeitura.sp.gov.br/nfe" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tipos="http://www.prefeitura.sp.gov.br/nfe/tipos">
+  <Cabecalho Versao="2">
+    <CPFCNPJRemetente>
+      <CNPJ>67527655000155</CNPJ>
+    </CPFCNPJRemetente>
+    <transacao>true</transacao>
+    <dtInicio>2026-01-06</dtInicio>
+    <dtFim>2026-01-06</dtFim>
+    <QtdRPS>1</QtdRPS>
+    <ValorTotalServicos>10.00</ValorTotalServicos>
+    <ValorTotalDeducoes>0.00</ValorTotalDeducoes>
+  </Cabecalho>
+  <RPS>
+    <Assinatura></Assinatura>
+    <ChaveRPS>
+      <InscricaoPrestador>67527655</InscricaoPrestador>
+      <SerieRPS>A    </SerieRPS>
+      <NumeroRPS>1</NumeroRPS>
+    </ChaveRPS>
+    <TipoRPS>RPS</TipoRPS>
+    <DataEmissao>2026-01-06</DataEmissao>
+    <StatusRPS>N</StatusRPS>
+    <TributacaoRPS>T</TributacaoRPS>
+    <ValorServicos>10.00</ValorServicos>
+    <ValorDeducoes>0.00</ValorDeducoes>
+    <ValorPIS>0.00</ValorPIS>
+    <ValorCOFINS>0.00</ValorCOFINS>
+    <ValorINSS>0.00</ValorINSS>
+    <ValorIR>0.00</ValorIR>
+    <ValorCSLL>0.00</ValorCSLL>
+    <CodigoServico>02933</CodigoServico>
+    <AliquotaServicos>0.02</AliquotaServicos>
+    <ISSRetido>false</ISSRetido>
+    <CPFCNPJTomador>
+      <CNPJ>88089000155</CNPJ>
+    </CPFCNPJTomador>
+    <InscricaoMunicipalTomador>88089000</InscricaoMunicipalTomador>
+    <RazaoSocialTomador>TOMADOR TESTE</RazaoSocialTomador>
+    <EnderecoTomador>
+      <TipoLogradouro>Rua</TipoLogradouro>
+      <Logradouro>Teste</Logradouro>
+      <NumeroEndereco>123</NumeroEndereco>
+      <Bairro>Centro</Bairro>
+      <Cidade>3550308</Cidade>
+      <UF>SP</UF>
+      <CEP>01000000</CEP>
+    </EnderecoTomador>
+    <EmailTomador>teste@teste.com</EmailTomador>
+    <Discriminacao>SERVICO DE TESTE PARA EMISSAO DE NFS-E</Discriminacao>
+    
+    <!-- NOVOS CAMPOS DA REFORMA TRIBUTÁRIA (IBS/CBS) -->
+    <InfoComplementares>
+      <cClassTrib>01</cClassTrib>
+      <cEnqTribCoop></cEnqTribCoop>
+      <dhEmissao>2026-01-06T10:00:00</dhEmissao>
+      <tpEmissao>1</tpEmissao>
+      <verProc>1.0.0</verProc>
+      
+      <!-- Informações do Serviço com IBS/CBS -->
+      <infServ>
+        <CST>00</CST>
+        <cNBS>1.0101.00.00</cNBS>
+        <vServPrest>10.00</vServPrest>
+        <vBC>10.00</vBC>
+        <pAliq>5.00</pAliq>
+        <vTributo>0.50</vTributo>
+        
+        <!-- Valores de IBS -->
+        <vBCIBS>10.00</vBCIBS>
+        <pAliqIBS>2.50</pAliqIBS>
+        <vIBS>0.25</vIBS>
+        
+        <!-- Valores de CBS -->
+        <vBCCBS>10.00</vBCCBS>
+        <pAliqCBS>2.50</pAliqCBS>
+        <vCBS>0.25</vCBS>
+      </infServ>
+      
+      <!-- Local da Prestação -->
+      <infLocalPrest>
+        <cMunIncid>3550308</cMunIncid>
+        <UF>SP</UF>
+      </infLocalPrest>
+    </InfoComplementares>
+  </RPS>
+</PedidoEnvioLoteRPS>

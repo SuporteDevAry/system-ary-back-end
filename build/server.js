@@ -64,7 +64,7 @@ app.use(express_1.default.urlencoded({ limit: "100mb", extended: true }));
 //     console.log(`Server is running on port: ${port}`);
 //   });
 // });
-data_source_1.AppDataSource.initialize()
+(0, data_source_1.initializeDataSource)()
     .then(function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -94,6 +94,8 @@ data_source_1.AppDataSource.initialize()
     });
 }); })
     .catch(function (err) {
-    console.error("Erro ao inicializar AppDataSource:", err);
+    console.error("💥 Erro fatal ao inicializar AppDataSource:", err);
+    console.error("🔄 O processo será encerrado. O container deve reiniciar automaticamente.");
+    process.exit(1); // Força o container a reiniciar
 });
 //# sourceMappingURL=server.js.map

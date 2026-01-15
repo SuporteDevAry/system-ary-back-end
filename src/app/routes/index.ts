@@ -26,7 +26,7 @@ const routes = Router();
 routes.post("/api/login", new SessionController().login);
 
 // Routes protected
-//routes.use(authMiddleware); // comentar ao usar local
+routes.use(authMiddleware); // comentar ao usar local
 routes.get("/api/profile", new UserController().getProfile);
 routes.post("/api/reset-password", new SessionController().resetPassword);
 
