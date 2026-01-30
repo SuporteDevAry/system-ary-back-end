@@ -18,6 +18,8 @@ interface FocusNfeConfig {
 interface FocusNfeRequest {
   referencia: string;
   data_emissao: string;
+  natureza_operacao: string;
+  optante_simples_nacional: string;
   prestador: {
     cnpj?: string;
     cpf?: string;
@@ -27,6 +29,7 @@ interface FocusNfeRequest {
   tomador: {
     cpf?: string;
     cnpj?: string;
+    //motivo_ausencia_nif: string;
     razao_social: string;
     email?: string;
     endereco: {
@@ -40,20 +43,40 @@ interface FocusNfeRequest {
     };
   };
   servico: {
-    valor_servicos: number;
-    valor_deducoes?: number;
     iss_retido: boolean;
-    valor_iss?: number;
-    base_calculo?: number;
-    aliquota: number;
-    desconto_incondicionado?: number;
-    desconto_condicionado?: number;
-    item_lista_servico: string;
-    codigo_cnae?: string;
-    codigo_tributario_municipio?: string;
+    valor_servicos: number;
+    //valor_iss?: number;
+    //Aliquota: number;
+    //CodigoServico: string;
+    //codigo_tributario_municipio?: string;
     discriminacao: string;
-    codigo_municipio: string;
+    //codigo_municipio: string;
+    //valor_final_cobrado: number;
+    //valor_deducoes?: number;
+    //base_calculo?: number;
+    //desconto_incondicionado?: number;
+    //desconto_condicionado?: number;
+    //codigo_cnae?: string;
+    //tributacao_iss: string;
+    //valor_ipi: number;
+    //codigo_nbs: string;
+    //codigo_indicador_operacao: string;
+    //ibs_cbs_classificacao_tributaria: string;
+    //ibs_cbs_situacao_tributaria: string;
+    //ibs_cbs_base_calculo: number;
+    //ibs_uf_aliquota: string;
+    //ibs_uf_valor: number;
+    //ibs_mun_aliquota: string;
+    //ibs_mun_valor: number;
+    //cbs_aliquota: string;
+    //cbs_valor: number;
   };
+  //exigibilidade_suspensa: string;
+  //pagamento_parcelado_antecipado: string;
+  //finalidade_emissao: string,
+  //consumidor_final: string,
+  //indicador_destinatario: string,
+  //tipo_operacao_governamental: string,
 }
 
 export class FocusNfeService {
@@ -61,7 +84,7 @@ export class FocusNfeService {
 
   constructor() {
     this.config = {
-      apiUrl: process.env.FOCUS_NFE_API_URL || "https://api.focusnfe.com.br/v2",
+      apiUrl: process.env.FOCUS_NFE_API_URL || "https://homologacao.focusnfe.com.br/V2", //"https://api.focusnfe.com.br/v2",
       apiToken: process.env.FOCUS_NFE_API_TOKEN || "",
       timeout: 30000,
     };
@@ -228,8 +251,7 @@ export class FocusNfeService {
             } else {
               reject(
                 new Error(
-                  `API Error ${res.statusCode}: ${
-                    response.mensagem || response.message || "Unknown error"
+                  `API Error ${res.statusCode}: ${response.mensagem || response.message || "Unknown error"
                   }`
                 )
               );
@@ -337,10 +359,15 @@ export class FocusNfeService {
             );
 
           const valorServicos = parseFloat(rps.ValorServicos) || 0;
-          const aliquotaFracao = parseFloat(rps.AliquotaServicos) || 0;
-          const aliquotaPercentual =
-            Math.round(aliquotaFracao * 100 * 100) / 100;
+          const aliquotaPercentual = parseFloat(rps.aliquota) || 5;
+          const aliquotaFracao = Math.round(aliquotaPercentual / 100);
           const valorIss = valorServicos * aliquotaFracao;
+          const valorIBS = Math.round(valorServicos * 0.01);
+          const valorCBS = Math.round(valorServicos * 0.09);
+
+          const aliquotaParaEnvio = parseFloat(rps.AliquotaServicos) > 0
+            ? parseFloat(rps.AliquotaServicos)   // Se vier 0.05 vira 5
+            : 5;
 
           // Monta a requisição final
           const prestadorObj: any = {
@@ -369,6 +396,8 @@ export class FocusNfeService {
           const focusRequest: FocusNfeRequest = {
             referencia: `LOTE-${Date.now()}`,
             data_emissao: this.formatarData(rps.DataEmissao),
+            natureza_operacao: "1",
+            optante_simples_nacional: "false",
             prestador: {
               ...(cnpjPrestador && { cnpj: cnpjPrestador }),
               ...(cpfPrestador && { cpf: cpfPrestador }),
@@ -378,10 +407,11 @@ export class FocusNfeService {
             tomador: {
               ...(cnpjTomador && { cnpj: cnpjTomador }),
               ...(cpfTomador && { cpf: cpfTomador }),
+              //motivo_ausencia_nif: "0",
               razao_social: razaoSocialTomador,
               ...(emailTomador && { email: emailTomador }),
               endereco: {
-                logradouro: enderecTomador.Logradouro || "",
+                logradouro: (enderecTomador.Logradouro || "").trim().substring(0, 50),
                 numero: enderecTomador.NumeroEndereco || "S/N",
                 ...(enderecTomador.ComplementoEndereco && {
                   complemento: enderecTomador.ComplementoEndereco,
@@ -393,20 +423,44 @@ export class FocusNfeService {
               },
             },
             servico: {
-              valor_servicos: valorServicos,
-              ...(parseFloat(rps.ValorDeducoes) > 0 && {
-                valor_deducoes: parseFloat(rps.ValorDeducoes),
-              }),
               iss_retido: rps.ISSRetido === "true",
-              valor_iss: valorIss,
-              aliquota: aliquotaPercentual,
-              item_lista_servico: this.deriveItemListaServico(rps),
-              ...(codigoTribMun && {
-                codigo_tributario_municipio: codigoTribMun,
-              }),
+              valor_servicos: valorServicos,
+              //Aliquota: 5,
+              //CodigoServico: "06298",
+              //...(codigoTribMun && {
+              //  codigo_tributario_municipio: codigoTribMun,
+              //}),
               discriminacao: rps.Discriminacao || "Serviço não especificado",
-              codigo_municipio: String(codigoMunicipioServico),
+              //codigo_municipio: String(codigoMunicipioServico),
+              //base_calculo: valorServicos,
+              //valor_final_cobrado: valorServicos,
+              //...(parseFloat(rps.ValorDeducoes) > 0 && {
+              //  valor_deducoes: parseFloat(rps.ValorDeducoes),
+              //}),
+              //...(parseFloat(rps.ValorDeducoes) > 0 && {
+              //  valor_deducoes: parseFloat(rps.ValorDeducoes),
+              //}),
+              //valor_iss: valorIss,
+              //tributacao_iss: "1",
+              //codigo_nbs: "109051200",
+              //valor_ipi: 0,
+              //codigo_indicador_operacao: "100101",
+              //ibs_cbs_classificacao_tributaria: "000001",
+              //ibs_cbs_situacao_tributaria: "100",
+              //ibs_cbs_base_calculo: valorServicos,
+              //ibs_uf_aliquota: "0.01",
+              //ibs_uf_valor: valorIBS,
+              //ibs_mun_aliquota: "",
+              //ibs_mun_valor: 0,
+              //cbs_aliquota: "0.09",
+              //cbs_valor: valorCBS,
             },
+            //exigibilidade_suspensa: "0",
+            //pagamento_parcelado_antecipado: "0",
+            //finalidade_emissao: "0",
+            //consumidor_final: "1",
+            //indicador_destinatario: "0",
+            //tipo_operacao_governamental: "2",
           };
 
           console.log("✅ Conversão XML → Focus NFe concluída");
@@ -596,6 +650,8 @@ export class FocusNfeService {
     const cepParaIBGE: { [key: string]: string } = {
       "90460": "4314902", // Porto Alegre/RS
       "01310": "3550308", // São Paulo/SP
+      "02550": "3550308", // São Paulo/SP
+      "13560": "3548906", // São Carlos/SP
       "20040020": "3304557", // Rio de Janeiro/RJ
     };
 
@@ -661,14 +717,14 @@ export class FocusNfeService {
     const codigoServico = (rps.CodigoServico || "").toString();
     const discr = (rps.Discriminacao || "").toLowerCase();
 
-    if (codigoServico === "06298") return "010700";
-    if (discr.includes("intermedia")) return "010700";
+    if (codigoServico === "06298") return "06298";
+    if (discr.includes("intermedia")) return "06298";
 
     // Ajuste futuro: permitir override via env FOCUS_ITEM_LISTA_SERVICO
     const envOverride = process.env.FOCUS_ITEM_LISTA_SERVICO;
     if (envOverride && /^[0-9]{6}$/.test(envOverride)) return envOverride;
 
-    return "010700";
+    return "06298";
   }
 
   /**
@@ -685,3 +741,4 @@ export class FocusNfeService {
     return null;
   }
 }
+
