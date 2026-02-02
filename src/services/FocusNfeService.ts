@@ -43,13 +43,15 @@ interface FocusNfeRequest {
     };
   };
   servico: {
-    iss_retido: boolean;
     valor_servicos: number;
+    item_lista_servico: string;
+    //codigo_servico: string;
+    iss_retido: boolean;
+    discriminacao: string;
     //valor_iss?: number;
     //Aliquota: number;
     //CodigoServico: string;
     //codigo_tributario_municipio?: string;
-    discriminacao: string;
     //codigo_municipio: string;
     //valor_final_cobrado: number;
     //valor_deducoes?: number;
@@ -294,6 +296,9 @@ export class FocusNfeService {
           return;
         }
 
+        console.log("XML recebido:", xml);
+
+
         try {
           const pedido = result.PedidoEnvioLoteRPS;
           const cabecalho = pedido.Cabecalho || {};
@@ -358,7 +363,18 @@ export class FocusNfeService {
               enderecTomador.CEP || ""
             );
 
-          const valorServicos = parseFloat(rps.ValorServicos) || 0;
+          const servicoXml = rps.Servico || {};
+
+          const valorServicos = parseFloat(
+            servicoXml.ValorServicos || "0"
+          );
+          const codigoServico = servicoXml.CodigoServico || "06298";
+
+          const discriminacao =
+            servicoXml.Discriminacao ||
+            rps.Discriminacao ||
+            "Serviço não especificado";
+
           const aliquotaPercentual = parseFloat(rps.aliquota) || 5;
           const aliquotaFracao = Math.round(aliquotaPercentual / 100);
           const valorIss = valorServicos * aliquotaFracao;
@@ -423,14 +439,15 @@ export class FocusNfeService {
               },
             },
             servico: {
-              iss_retido: rps.ISSRetido === "true",
               valor_servicos: valorServicos,
+              item_lista_servico: codigoServico,
+              //codigo_servico: codigoServico,
+              iss_retido: rps.ISSRetido === "true",
+              discriminacao: discriminacao,
               //Aliquota: 5,
-              //CodigoServico: "06298",
               //...(codigoTribMun && {
               //  codigo_tributario_municipio: codigoTribMun,
               //}),
-              discriminacao: rps.Discriminacao || "Serviço não especificado",
               //codigo_municipio: String(codigoMunicipioServico),
               //base_calculo: valorServicos,
               //valor_final_cobrado: valorServicos,
