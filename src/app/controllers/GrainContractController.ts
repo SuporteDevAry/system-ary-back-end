@@ -236,15 +236,20 @@ export class GrainContractController {
         req.body.price,
         req.body.type_currency,
         req.body.day_exchange_rate,
+        req.body.type_quantity,
       );
-
-      console.log("[createGrainContract] total_contract_value", {
-        total_contract_value,
-      });
 
       const dataWithConvertedPrice = {
         ...req.body,
         total_contract_value,
+        type_commission_seller_currency:
+          req.body.type_commission_seller === "Percentual"
+            ? null
+            : req.body.type_commission_seller_currency,
+        type_commission_buyer_currency:
+          req.body.type_commission_buyer === "Percentual"
+            ? null
+            : req.body.type_commission_buyer_currency,
       };
 
       const commissionValue = calcCommission(dataWithConvertedPrice);
@@ -256,7 +261,9 @@ export class GrainContractController {
       if (req.body.commission_seller) {
         // Usa type_currency do contrato como fallback se type_commission_seller_currency não for preenchido
         const sellerCurrency =
-          req.body.type_commission_seller_currency ||
+          (req.body.type_commission_seller === "Percentual"
+            ? ""
+            : req.body.type_commission_seller_currency) ||
           (req.body.type_currency === "Dólar" ? "Dólar" : "BRL");
 
         // Usa day_exchange_rate do contrato como fallback se commission_seller_exchange_rate não for preenchido
@@ -273,12 +280,18 @@ export class GrainContractController {
           sellerRate,
           total_contract_value,
         );
+
+        // Arredonda para 2 casas decimais
+        commissionSellerContract =
+          Math.round(commissionSellerContract * 100) / 100;
       }
 
       if (req.body.commission_buyer) {
         // Usa type_currency do contrato como fallback se type_commission_buyer_currency não for preenchido
         const buyerCurrency =
-          req.body.type_commission_buyer_currency ||
+          (req.body.type_commission_buyer === "Percentual"
+            ? ""
+            : req.body.type_commission_buyer_currency) ||
           (req.body.type_currency === "Dólar" ? "Dólar" : "BRL");
 
         // Usa day_exchange_rate do contrato como fallback se commission_buyer_exchange_rate não for preenchido
@@ -295,6 +308,10 @@ export class GrainContractController {
           buyerRate,
           total_contract_value,
         );
+
+        // Arredonda para 2 casas decimais
+        commissionBuyerContract =
+          Math.round(commissionBuyerContract * 100) / 100;
       }
 
       // Define commission_contract baseado na lógica: null se houver ambos, senão usar o que existe
@@ -449,41 +466,13 @@ export class GrainContractController {
       const exchangeRateToCheck =
         otherFields.day_exchange_rate || grainContract.day_exchange_rate;
 
-      console.log("[updateGrainContract] input", {
-        number_contract: grainContract.number_contract,
-        price: grainContract.price,
-        product: grainContract.product,
-        quantity: grainContract.quantity,
-        final_quantity: grainContract.final_quantity,
-        day_exchange_rate: grainContract.day_exchange_rate,
-        type_currency: grainContract.type_currency,
-        commission_contract: grainContract.commission_contract,
-        commission_seller: grainContract.commission_seller,
-        type_commission_seller: grainContract.type_commission_seller,
-        type_commission_seller_currency:
-          grainContract.type_commission_seller_currency,
-        commission_seller_exchange_rate:
-          grainContract.commission_seller_exchange_rate,
-        commission_seller_contract_value:
-          grainContract.commission_seller_contract_value,
-        commission_buyer: grainContract.commission_buyer,
-        type_commission_buyer: grainContract.type_commission_buyer,
-        type_commission_buyer_currency:
-          grainContract.type_commission_buyer_currency,
-        commission_buyer_exchange_rate:
-          grainContract.commission_buyer_exchange_rate,
-        commission_buyer_contract_value:
-          grainContract.commission_buyer_contract_value,
-        total_received: grainContract.total_received,
-        total_contract_value: grainContract.total_contract_value,
-      });
-
       const total_contract_value = calculateTotalContractValue(
         productToCheck,
         quantityToUse,
         priceFromRequest,
         currencyToCheck,
         exchangeRateToCheck,
+        grainContract.type_quantity,
       );
 
       console.log("[updateGrainContract] total_contract_value", {
@@ -498,6 +487,7 @@ export class GrainContractController {
         price: priceFromRequest,
         final_quantity: Number(grainContract.quantity),
         total_contract_value,
+        type_quantity: grainContract.type_quantity,
         quantity_kg: Number(grainContract.quantity_kg),
         quantity_bag: Number(grainContract.quantity_bag),
         commission_contract: Number(grainContract.commission_contract),
@@ -510,6 +500,14 @@ export class GrainContractController {
 
       // Recalcula comissões do vendedor e comprador se os valores estiverem preenchidos
       const mergedData = { ...grainContract, ...updatedGrainContract };
+
+      if (mergedData.type_commission_seller === "Percentual") {
+        updatedGrainContract.type_commission_seller_currency = null;
+      }
+
+      if (mergedData.type_commission_buyer === "Percentual") {
+        updatedGrainContract.type_commission_buyer_currency = null;
+      }
 
       if (mergedData.commission_seller) {
         // Usa type_currency do contrato como fallback se type_commission_seller_currency não for preenchido
@@ -534,6 +532,12 @@ export class GrainContractController {
             sellerRate,
             total_contract_value,
           );
+
+        // Arredonda para 2 casas decimais
+        updatedGrainContract.commission_seller_contract_value =
+          Math.round(
+            updatedGrainContract.commission_seller_contract_value * 100,
+          ) / 100;
       }
 
       if (mergedData.commission_buyer) {
@@ -559,6 +563,12 @@ export class GrainContractController {
             buyerRate,
             total_contract_value,
           );
+
+        // Arredonda para 2 casas decimais
+        updatedGrainContract.commission_buyer_contract_value =
+          Math.round(
+            updatedGrainContract.commission_buyer_contract_value * 100,
+          ) / 100;
       }
 
       // Define commission_contract baseado na lógica: null se houver ambos, senão usar o que existe
@@ -705,6 +715,7 @@ export class GrainContractController {
           grainContract.price,
           type_currency,
           day_exchange_rate || grainContract.day_exchange_rate,
+          grainContract.type_quantity,
         );
         updatedFields.total_contract_value = total_contract_value;
       }
@@ -720,6 +731,14 @@ export class GrainContractController {
 
       // Recalcula comissões do vendedor e comprador se os valores estiverem preenchidos
       const mergedData = { ...grainContract, ...filteredUpdates };
+
+      if (mergedData.type_commission_seller === "Percentual") {
+        filteredUpdates.type_commission_seller_currency = null;
+      }
+
+      if (mergedData.type_commission_buyer === "Percentual") {
+        filteredUpdates.type_commission_buyer_currency = null;
+      }
 
       if (mergedData.commission_seller) {
         // Usa type_currency do contrato como fallback se type_commission_seller_currency não for preenchido
@@ -744,6 +763,11 @@ export class GrainContractController {
           updatedFields.total_contract_value ||
             grainContract.total_contract_value,
         );
+
+        // Arredonda para 2 casas decimais
+        filteredUpdates.commission_seller_contract_value =
+          Math.round(filteredUpdates.commission_seller_contract_value * 100) /
+          100;
       }
 
       if (mergedData.commission_buyer) {
@@ -769,6 +793,11 @@ export class GrainContractController {
           updatedFields.total_contract_value ||
             grainContract.total_contract_value,
         );
+
+        // Arredonda para 2 casas decimais
+        filteredUpdates.commission_buyer_contract_value =
+          Math.round(filteredUpdates.commission_buyer_contract_value * 100) /
+          100;
       }
 
       // Define commission_contract baseado na lógica: null se houver ambos, senão usar o que existe

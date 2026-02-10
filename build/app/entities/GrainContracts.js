@@ -208,6 +208,14 @@ var GrainContract = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.Column)("decimal", { nullable: true }),
         __metadata("design:type", Number)
+    ], GrainContract.prototype, "commission_seller_contract_value", void 0);
+    __decorate([
+        (0, typeorm_1.Column)("decimal", { nullable: true }),
+        __metadata("design:type", Number)
+    ], GrainContract.prototype, "commission_buyer_contract_value", void 0);
+    __decorate([
+        (0, typeorm_1.Column)("decimal", { nullable: true }),
+        __metadata("design:type", Number)
     ], GrainContract.prototype, "total_received", void 0);
     __decorate([
         (0, typeorm_1.Column)({ nullable: true }),
@@ -225,6 +233,22 @@ var GrainContract = /** @class */ (function () {
         (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", Date)
     ], GrainContract.prototype, "contract_emission_datetime", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "type_commission_seller_currency", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "commission_seller_exchange_rate", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "type_commission_buyer_currency", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], GrainContract.prototype, "commission_buyer_exchange_rate", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)(),
         __metadata("design:type", Date)

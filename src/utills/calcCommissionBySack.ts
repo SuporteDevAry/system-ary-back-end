@@ -80,11 +80,22 @@ export function calcCommissionBySack(
   if (typeCommission === "Por Saca") {
     let sacas = 0;
 
+    // Fallback para KG se typeQuantity não for preenchido
+    const quantityType = (typeQuantity || "KG").toLowerCase();
+
     // Calcula quantidade em sacas baseado no tipo de quantidade
-    if (typeQuantity === "KG") {
+    if (
+      quantityType === "kg" ||
+      quantityType === "quilos" ||
+      quantityType === "kg"
+    ) {
       // Quilos / 60 = número de sacas
       sacas = quantityNum / 60;
-    } else if (typeQuantity === "TM") {
+    } else if (
+      quantityType === "tm" ||
+      quantityType === "toneladas" ||
+      quantityType === "tonelada"
+    ) {
       // Toneladas métricas * 1000 / 60 = número de sacas
       sacas = (quantityNum * 1000) / 60;
     }
