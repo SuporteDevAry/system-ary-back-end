@@ -135,7 +135,7 @@ exports.InvoiceRepository = {
             var result, lastRps;
             return __generator(this, function (_c) {
                 switch (_c.label) {
-                    case 0: return [4 /*yield*/, repo.query("SELECT MAX(rps_number) as last_rps FROM invoices")];
+                    case 0: return [4 /*yield*/, repo.query("SELECT MAX(rps_number::BIGINT) AS last_rps FROM invoices")];
                     case 1:
                         result = _c.sent();
                         lastRps = (_b = (_a = result === null || result === void 0 ? void 0 : result[0]) === null || _a === void 0 ? void 0 : _a.last_rps) !== null && _b !== void 0 ? _b : 0;

@@ -13,7 +13,7 @@ import { Extenso } from "../helpers/Extenso";
 
 const logoContrato = path.resolve(
   __dirname,
-  "../helpers/Logo_Ary_Completo.jpg"
+  "../helpers/Logo_Ary_Completo.jpg",
 );
 const logoBase64 = `data:image/jpeg;base64,${fs
   .readFileSync(logoContrato)
@@ -48,6 +48,8 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
     quantity,
     commission_seller,
     commission_buyer,
+    commission_seller_contract_value,
+    commission_buyer_contract_value,
     quality,
     price,
     type_currency,
@@ -63,6 +65,8 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
     name_product,
     type_commission_seller,
     type_commission_buyer,
+    type_commission_seller_currency,
+    type_commission_buyer_currency,
     type_pickup,
   } = data;
 
@@ -112,17 +116,71 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
     ? insertMaskInCnpj(buyer.cnpj_cpf)
     : "";
 
-  let formattedCSeller = commission_seller
-    ? type_commission_seller === "Percentual"
-      ? `${commission_seller}%`
-      : `${formatCurrency(commission_seller, type_currency, true)} por saca,`
-    : "";
+  // DEBUG: Log dos valores de comissão recebidos
+  console.log("[PDF Template] Comissões recebidas:", {
+    commission_seller,
+    commission_seller_contract_value,
+    type_commission_seller,
+    type_commission_seller_currency,
+    commission_buyer,
+    commission_buyer_contract_value,
+    type_commission_buyer,
+    type_commission_buyer_currency,
+  });
 
-  let formattedCBuyer = commission_buyer
-    ? type_commission_buyer === "Percentual"
-      ? `${commission_buyer}%`
-      : `${formatCurrency(commission_buyer, type_currency, true)} por saca,`
-    : "";
+  // Formatação da comissão do vendedor
+  let formattedCSeller = "";
+  if (commission_seller) {
+    if (type_commission_seller === "Percentual") {
+      // Percentual: mostra o valor percentual
+      formattedCSeller = `${commission_seller}%`;
+    } else if (commission_seller_contract_value) {
+      // Fixo ou Por Saca: usa o valor calculado do back-end (já convertido para BRL)
+      const valueInBRL =
+        typeof commission_seller_contract_value === "number"
+          ? commission_seller_contract_value.toFixed(2).replace(".", ",")
+          : String(commission_seller_contract_value).replace(".", ",");
+      formattedCSeller = `R$ ${valueInBRL}`;
+      console.log(
+        "[PDF Template] Vendedor - Usando contract_value:",
+        valueInBRL,
+      );
+    } else {
+      // Fallback: usa o valor original (apenas para casos antigos sem cálculo)
+      formattedCSeller = formatCurrency(commission_seller, "Real", true);
+      console.log(
+        "[PDF Template] Vendedor - Usando fallback:",
+        formattedCSeller,
+      );
+    }
+  }
+
+  // Formatação da comissão do comprador
+  let formattedCBuyer = "";
+  if (commission_buyer) {
+    if (type_commission_buyer === "Percentual") {
+      // Percentual: mostra o valor percentual
+      formattedCBuyer = `${commission_buyer}%`;
+    } else if (commission_buyer_contract_value) {
+      // Fixo ou Por Saca: usa o valor calculado do back-end (já convertido para BRL)
+      const valueInBRL =
+        typeof commission_buyer_contract_value === "number"
+          ? commission_buyer_contract_value.toFixed(2).replace(".", ",")
+          : String(commission_buyer_contract_value).replace(".", ",");
+      formattedCBuyer = `R$ ${valueInBRL}`;
+      console.log(
+        "[PDF Template] Comprador - Usando contract_value:",
+        valueInBRL,
+      );
+    } else {
+      // Fallback: usa o valor original (apenas para casos antigos sem cálculo)
+      formattedCBuyer = formatCurrency(commission_buyer, "Real", true);
+      console.log(
+        "[PDF Template] Comprador - Usando fallback:",
+        formattedCBuyer,
+      );
+    }
+  }
 
   const numberContract = number_contract
     ? number_contract
@@ -171,7 +229,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
 
   const listProductsForMetricTon = ["O", "F", "OC", "OA", "SB", "EP"];
   const validProductsForMetricTon = listProductsForMetricTon.includes(
-    data.product
+    data.product,
   );
 
   let formattedSafra = validProductsForMetricTon
@@ -318,7 +376,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
           {data.type_currency === "Dólar"
             ? `${formatCurrency(price, data.type_currency, modeSave).replace(
                 "$",
-                "US$ "
+                "US$ ",
               )}`
             : formatCurrency(price, data.type_currency, modeSave)}
         </strong>{" "}

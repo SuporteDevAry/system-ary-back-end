@@ -156,6 +156,12 @@ export class GrainContract {
   commission_contract: number;
 
   @Column("decimal", { nullable: true })
+  commission_seller_contract_value: number;
+
+  @Column("decimal", { nullable: true })
+  commission_buyer_contract_value: number;
+
+  @Column("decimal", { nullable: true })
   total_received: number;
 
   @Column({ nullable: true })
@@ -169,6 +175,18 @@ export class GrainContract {
 
   @Column({ nullable: true })
   contract_emission_datetime: Date;
+
+  @Column({ nullable: true })
+  type_commission_seller_currency: string;
+
+  @Column({ nullable: true })
+  commission_seller_exchange_rate: string;
+
+  @Column({ nullable: true })
+  type_commission_buyer_currency: string;
+
+  @Column({ nullable: true })
+  commission_buyer_exchange_rate: string;
 
   @CreateDateColumn()
   created_at: Date;

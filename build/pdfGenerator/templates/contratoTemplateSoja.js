@@ -22,7 +22,7 @@ var ContratoTemplateSoja = function (_a) {
         return react_1.default.createElement("div", null, "Erro: Dados do contrato n\u00E3o encontrados.");
     }
     // Extraindo as propriedades necessárias de data
-    var seller = data.seller, buyer = data.buyer, number_contract = data.number_contract, product = data.product, number_broker = data.number_broker, quantity = data.quantity, commission_seller = data.commission_seller, commission_buyer = data.commission_buyer, quality = data.quality, price = data.price, type_currency = data.type_currency, complement_destination = data.complement_destination, destination = data.destination, icms = data.icms, payment = data.payment, pickup = data.pickup, pickup_location = data.pickup_location, inspection = data.inspection, observation = data.observation, type_quantity = data.type_quantity, name_product = data.name_product, type_commission_seller = data.type_commission_seller, type_commission_buyer = data.type_commission_buyer, type_pickup = data.type_pickup;
+    var seller = data.seller, buyer = data.buyer, number_contract = data.number_contract, product = data.product, number_broker = data.number_broker, quantity = data.quantity, commission_seller = data.commission_seller, commission_buyer = data.commission_buyer, commission_seller_contract_value = data.commission_seller_contract_value, commission_buyer_contract_value = data.commission_buyer_contract_value, quality = data.quality, price = data.price, type_currency = data.type_currency, complement_destination = data.complement_destination, destination = data.destination, icms = data.icms, payment = data.payment, pickup = data.pickup, pickup_location = data.pickup_location, inspection = data.inspection, observation = data.observation, type_quantity = data.type_quantity, name_product = data.name_product, type_commission_seller = data.type_commission_seller, type_commission_buyer = data.type_commission_buyer, type_commission_seller_currency = data.type_commission_seller_currency, type_commission_buyer_currency = data.type_commission_buyer_currency, type_pickup = data.type_pickup;
     var quantityValue = typeof quantity === "number" ? quantity : (0, helpers_1.parseQuantityToNumber)(quantity);
     var formattedQtd = (0, helpers_1.numberToQuantityString)(quantity);
     // montar extenso dependendo do tipo de quantidade
@@ -60,16 +60,59 @@ var ContratoTemplateSoja = function (_a) {
     var formattedBuyerCNPJ = (buyer === null || buyer === void 0 ? void 0 : buyer.cnpj_cpf)
         ? (0, helpers_1.insertMaskInCnpj)(buyer.cnpj_cpf)
         : "";
-    var formattedCSeller = commission_seller
-        ? type_commission_seller === "Percentual"
-            ? "".concat(commission_seller, "%")
-            : "".concat((0, helpers_1.formatCurrency)(commission_seller, type_currency, true), " por saca,")
-        : "";
-    var formattedCBuyer = commission_buyer
-        ? type_commission_buyer === "Percentual"
-            ? "".concat(commission_buyer, "%")
-            : "".concat((0, helpers_1.formatCurrency)(commission_buyer, type_currency, true), " por saca,")
-        : "";
+    // DEBUG: Log dos valores de comissão recebidos
+    console.log("[PDF Template] Comissões recebidas:", {
+        commission_seller: commission_seller,
+        commission_seller_contract_value: commission_seller_contract_value,
+        type_commission_seller: type_commission_seller,
+        type_commission_seller_currency: type_commission_seller_currency,
+        commission_buyer: commission_buyer,
+        commission_buyer_contract_value: commission_buyer_contract_value,
+        type_commission_buyer: type_commission_buyer,
+        type_commission_buyer_currency: type_commission_buyer_currency,
+    });
+    // Formatação da comissão do vendedor
+    var formattedCSeller = "";
+    if (commission_seller) {
+        if (type_commission_seller === "Percentual") {
+            // Percentual: mostra o valor percentual
+            formattedCSeller = "".concat(commission_seller, "%");
+        }
+        else if (commission_seller_contract_value) {
+            // Fixo ou Por Saca: usa o valor calculado do back-end (já convertido para BRL)
+            var valueInBRL = typeof commission_seller_contract_value === "number"
+                ? commission_seller_contract_value.toFixed(2).replace(".", ",")
+                : String(commission_seller_contract_value).replace(".", ",");
+            formattedCSeller = "R$ ".concat(valueInBRL);
+            console.log("[PDF Template] Vendedor - Usando contract_value:", valueInBRL);
+        }
+        else {
+            // Fallback: usa o valor original (apenas para casos antigos sem cálculo)
+            formattedCSeller = (0, helpers_1.formatCurrency)(commission_seller, "Real", true);
+            console.log("[PDF Template] Vendedor - Usando fallback:", formattedCSeller);
+        }
+    }
+    // Formatação da comissão do comprador
+    var formattedCBuyer = "";
+    if (commission_buyer) {
+        if (type_commission_buyer === "Percentual") {
+            // Percentual: mostra o valor percentual
+            formattedCBuyer = "".concat(commission_buyer, "%");
+        }
+        else if (commission_buyer_contract_value) {
+            // Fixo ou Por Saca: usa o valor calculado do back-end (já convertido para BRL)
+            var valueInBRL = typeof commission_buyer_contract_value === "number"
+                ? commission_buyer_contract_value.toFixed(2).replace(".", ",")
+                : String(commission_buyer_contract_value).replace(".", ",");
+            formattedCBuyer = "R$ ".concat(valueInBRL);
+            console.log("[PDF Template] Comprador - Usando contract_value:", valueInBRL);
+        }
+        else {
+            // Fallback: usa o valor original (apenas para casos antigos sem cálculo)
+            formattedCBuyer = (0, helpers_1.formatCurrency)(commission_buyer, "Real", true);
+            console.log("[PDF Template] Comprador - Usando fallback:", formattedCBuyer);
+        }
+    }
     var numberContract = number_contract
         ? number_contract
         : "".concat(product, ".").concat(number_broker, "-NNN/").concat(currentYear);
