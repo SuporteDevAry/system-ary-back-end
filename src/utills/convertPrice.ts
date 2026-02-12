@@ -25,7 +25,7 @@ export function convertPrice(
 
     const rateNumber = normalizeRate(dayExchangeRate);
 
-    return Number((priceNumber * rateNumber).toFixed(2));
+    return priceNumber * rateNumber;
   }
 
   return priceNumber;
