@@ -18,7 +18,7 @@ function convertPrice(price, typeCurrency, dayExchangeRate) {
             return Number(raw);
         };
         var rateNumber = normalizeRate(dayExchangeRate);
-        return Number((priceNumber * rateNumber).toFixed(2));
+        return priceNumber * rateNumber;
     }
     return priceNumber;
 }

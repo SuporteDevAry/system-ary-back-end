@@ -27,27 +27,12 @@ export class EmailController {
         return;
       }
 
-      // DEBUG: Log dos dados recebidos do front-end
-      console.log("[EmailController] Dados de comissão recebidos:", {
-        commission_seller: contractData.commission_seller,
-        commission_seller_contract_value:
-          contractData.commission_seller_contract_value,
-        type_commission_seller: contractData.type_commission_seller,
-        commission_buyer: contractData.commission_buyer,
-        commission_buyer_contract_value:
-          contractData.commission_buyer_contract_value,
-        type_commission_buyer: contractData.type_commission_buyer,
-      });
-
       // Se os valores calculados não vieram do front-end, buscar do banco de dados
       if (
         contractData.id &&
         (contractData.commission_seller_contract_value === undefined ||
           contractData.commission_buyer_contract_value === undefined)
       ) {
-        console.log(
-          "[EmailController] Buscando valores calculados do banco de dados..."
-        );
         const dbContract = await grainContractRepository.findOne({
           where: { id: contractData.id },
         });
@@ -62,13 +47,6 @@ export class EmailController {
             dbContract.type_commission_seller_currency;
           contractData.type_commission_buyer_currency =
             dbContract.type_commission_buyer_currency;
-
-          console.log("[EmailController] Valores do banco de dados:", {
-            commission_seller_contract_value:
-              dbContract.commission_seller_contract_value,
-            commission_buyer_contract_value:
-              dbContract.commission_buyer_contract_value,
-          });
         }
       }
 

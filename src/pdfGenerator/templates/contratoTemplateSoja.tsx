@@ -116,18 +116,6 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
     ? insertMaskInCnpj(buyer.cnpj_cpf)
     : "";
 
-  // DEBUG: Log dos valores de comissão recebidos
-  console.log("[PDF Template] Comissões recebidas:", {
-    commission_seller,
-    commission_seller_contract_value,
-    type_commission_seller,
-    type_commission_seller_currency,
-    commission_buyer,
-    commission_buyer_contract_value,
-    type_commission_buyer,
-    type_commission_buyer_currency,
-  });
-
   // Formatação da comissão do vendedor
   let formattedCSeller = "";
   if (commission_seller) {
@@ -141,17 +129,9 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
           ? commission_seller_contract_value.toFixed(2).replace(".", ",")
           : String(commission_seller_contract_value).replace(".", ",");
       formattedCSeller = `R$ ${valueInBRL}`;
-      console.log(
-        "[PDF Template] Vendedor - Usando contract_value:",
-        valueInBRL,
-      );
     } else {
       // Fallback: usa o valor original (apenas para casos antigos sem cálculo)
       formattedCSeller = formatCurrency(commission_seller, "Real", true);
-      console.log(
-        "[PDF Template] Vendedor - Usando fallback:",
-        formattedCSeller,
-      );
     }
   }
 
@@ -168,17 +148,9 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
           ? commission_buyer_contract_value.toFixed(2).replace(".", ",")
           : String(commission_buyer_contract_value).replace(".", ",");
       formattedCBuyer = `R$ ${valueInBRL}`;
-      console.log(
-        "[PDF Template] Comprador - Usando contract_value:",
-        valueInBRL,
-      );
     } else {
       // Fallback: usa o valor original (apenas para casos antigos sem cálculo)
       formattedCBuyer = formatCurrency(commission_buyer, "Real", true);
-      console.log(
-        "[PDF Template] Comprador - Usando fallback:",
-        formattedCBuyer,
-      );
     }
   }
 
