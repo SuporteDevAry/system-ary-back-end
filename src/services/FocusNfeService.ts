@@ -18,8 +18,9 @@ interface FocusNfeConfig {
 interface FocusNfeRequest {
   referencia: string;
   data_emissao: string;
-  natureza_operacao: string;
-  optante_simples_nacional: string;
+  natureza_operacao: number;
+  optante_simples_nacional: boolean;
+  tipo_operacao_governamental: number,
   prestador: {
     cnpj?: string;
     cpf?: string;
@@ -43,27 +44,28 @@ interface FocusNfeRequest {
     };
   };
   servico: {
-    valor_servicos: number;
-    item_lista_servico: string;
-    //codigo_servico: string;
-    iss_retido: boolean;
     discriminacao: string;
-    //valor_iss?: number;
-    //Aliquota: number;
-    //CodigoServico: string;
-    //codigo_tributario_municipio?: string;
+    item_lista_servico: string;
+    codigo_tributacao_municipio: string;
+    tipo_operacao: number;
+    valor_servicos: number;
+    valor_final_cobrado: number;
+    base_calculo: number;
+    aliquota: number;
+    iss_retido: boolean;
+    valor_ipi: number;
+    codigo_nbs: string;
+    codigo_indicador_operacao: string;
+    ibs_cbs_classificacao_tributaria: string;
     //codigo_municipio: string;
-    //valor_final_cobrado: number;
+    //codigo_servico: string;
+    //valor_iss?: number;
+    //CodigoServico: string;
     //valor_deducoes?: number;
-    //base_calculo?: number;
     //desconto_incondicionado?: number;
     //desconto_condicionado?: number;
     //codigo_cnae?: string;
     //tributacao_iss: string;
-    //valor_ipi: number;
-    //codigo_nbs: string;
-    //codigo_indicador_operacao: string;
-    //ibs_cbs_classificacao_tributaria: string;
     //ibs_cbs_situacao_tributaria: string;
     //ibs_cbs_base_calculo: number;
     //ibs_uf_aliquota: string;
@@ -73,12 +75,11 @@ interface FocusNfeRequest {
     //cbs_aliquota: string;
     //cbs_valor: number;
   };
-  //exigibilidade_suspensa: string;
-  //pagamento_parcelado_antecipado: string;
-  //finalidade_emissao: string,
-  //consumidor_final: string,
-  //indicador_destinatario: string,
-  //tipo_operacao_governamental: string,
+  exigibilidade_suspensa: number;
+  pagamento_parcelado_antecipado: number;
+  finalidade_emissao: number,
+  consumidor_final: number,
+  indicador_destinatario: number,
 }
 
 export class FocusNfeService {
@@ -412,8 +413,9 @@ export class FocusNfeService {
           const focusRequest: FocusNfeRequest = {
             referencia: `LOTE-${Date.now()}`,
             data_emissao: this.formatarData(rps.DataEmissao),
-            natureza_operacao: "1",
-            optante_simples_nacional: "false",
+            natureza_operacao: 1,
+            optante_simples_nacional: false,
+            tipo_operacao_governamental: 1,
             prestador: {
               ...(cnpjPrestador && { cnpj: cnpjPrestador }),
               ...(cpfPrestador && { cpf: cpfPrestador }),
@@ -439,15 +441,19 @@ export class FocusNfeService {
               },
             },
             servico: {
-              valor_servicos: valorServicos,
-              item_lista_servico: codigoServico,
-              //codigo_servico: codigoServico,
-              iss_retido: rps.ISSRetido === "true",
               discriminacao: discriminacao,
-              //Aliquota: 5,
-              //...(codigoTribMun && {
-              //  codigo_tributario_municipio: codigoTribMun,
-              //}),
+              item_lista_servico: "06298",
+              codigo_tributacao_municipio: "06298",
+              tipo_operacao: 1,
+              valor_servicos: valorServicos,
+              valor_final_cobrado: valorServicos,
+              base_calculo: valorServicos,
+              aliquota: 5,
+              iss_retido: false,
+              valor_ipi: 0,
+              codigo_nbs: "102010000",
+              codigo_indicador_operacao: "030101",
+              ibs_cbs_classificacao_tributaria: "000001",
               //codigo_municipio: String(codigoMunicipioServico),
               //base_calculo: valorServicos,
               //valor_final_cobrado: valorServicos,
@@ -460,7 +466,6 @@ export class FocusNfeService {
               //valor_iss: valorIss,
               //tributacao_iss: "1",
               //codigo_nbs: "109051200",
-              //valor_ipi: 0,
               //codigo_indicador_operacao: "100101",
               //ibs_cbs_classificacao_tributaria: "000001",
               //ibs_cbs_situacao_tributaria: "100",
@@ -472,12 +477,11 @@ export class FocusNfeService {
               //cbs_aliquota: "0.09",
               //cbs_valor: valorCBS,
             },
-            //exigibilidade_suspensa: "0",
-            //pagamento_parcelado_antecipado: "0",
-            //finalidade_emissao: "0",
-            //consumidor_final: "1",
-            //indicador_destinatario: "0",
-            //tipo_operacao_governamental: "2",
+            exigibilidade_suspensa: 0,
+            pagamento_parcelado_antecipado: 0,
+            finalidade_emissao: 0,
+            consumidor_final: 0,
+            indicador_destinatario: 0,
           };
 
           console.log("✅ Conversão XML → Focus NFe concluída");
