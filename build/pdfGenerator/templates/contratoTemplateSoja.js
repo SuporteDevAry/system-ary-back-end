@@ -22,7 +22,21 @@ var ContratoTemplateSoja = function (_a) {
         return react_1.default.createElement("div", null, "Erro: Dados do contrato n\u00E3o encontrados.");
     }
     // Extraindo as propriedades necessárias de data
-    var seller = data.seller, buyer = data.buyer, number_contract = data.number_contract, product = data.product, number_broker = data.number_broker, quantity = data.quantity, commission_seller = data.commission_seller, commission_buyer = data.commission_buyer, commission_seller_contract_value = data.commission_seller_contract_value, commission_buyer_contract_value = data.commission_buyer_contract_value, quality = data.quality, price = data.price, type_currency = data.type_currency, complement_destination = data.complement_destination, destination = data.destination, icms = data.icms, payment = data.payment, pickup = data.pickup, pickup_location = data.pickup_location, inspection = data.inspection, observation = data.observation, type_quantity = data.type_quantity, name_product = data.name_product, type_commission_seller = data.type_commission_seller, type_commission_buyer = data.type_commission_buyer, type_commission_seller_currency = data.type_commission_seller_currency, type_commission_buyer_currency = data.type_commission_buyer_currency, type_pickup = data.type_pickup;
+    var seller = data.seller, buyer = data.buyer, number_contract = data.number_contract, product = data.product, number_broker = data.number_broker, quantity = data.quantity, commission_seller = data.commission_seller, commission_buyer = data.commission_buyer, quality = data.quality, price = data.price, type_currency = data.type_currency, complement_destination = data.complement_destination, destination = data.destination, icms = data.icms, payment = data.payment, pickup = data.pickup, pickup_location = data.pickup_location, inspection = data.inspection, observation = data.observation, type_quantity = data.type_quantity, name_product = data.name_product, type_commission_seller = data.type_commission_seller, type_commission_buyer = data.type_commission_buyer, type_commission_seller_currency = data.type_commission_seller_currency, type_commission_buyer_currency = data.type_commission_buyer_currency, type_pickup = data.type_pickup;
+    var formatCommissionAmount = function (value, currency) {
+        var cleanValue = String(value)
+            .trim()
+            .replace(/[^\d.,-]/g, "");
+        var normalizedValue = cleanValue.includes(",")
+            ? cleanValue.replace(/\./g, "").replace(",", ".")
+            : cleanValue.replace(/,/g, "");
+        var parsedValue = Number(normalizedValue);
+        if (Number.isNaN(parsedValue)) {
+            return "";
+        }
+        var currencySymbol = currency === "Dólar" ? "$" : "R$";
+        return "".concat(currencySymbol, " ").concat(parsedValue.toFixed(2).replace(".", ","));
+    };
     var quantityValue = typeof quantity === "number" ? quantity : (0, helpers_1.parseQuantityToNumber)(quantity);
     var formattedQtd = (0, helpers_1.numberToQuantityString)(quantity);
     // montar extenso dependendo do tipo de quantidade
@@ -65,18 +79,14 @@ var ContratoTemplateSoja = function (_a) {
     if (commission_seller) {
         if (type_commission_seller === "Percentual") {
             // Percentual: mostra o valor percentual
-            formattedCSeller = "".concat(commission_seller, "%");
-        }
-        else if (commission_seller_contract_value) {
-            // Fixo ou Por Saca: usa o valor calculado do back-end (já convertido para BRL)
-            var valueInBRL = typeof commission_seller_contract_value === "number"
-                ? commission_seller_contract_value.toFixed(2).replace(".", ",")
-                : String(commission_seller_contract_value).replace(".", ",");
-            formattedCSeller = "R$ ".concat(valueInBRL);
+            formattedCSeller = "".concat(String(commission_seller).replace(".", ","), "%");
         }
         else {
-            // Fallback: usa o valor original (apenas para casos antigos sem cálculo)
-            formattedCSeller = (0, helpers_1.formatCurrency)(commission_seller, "Real", true);
+            var formattedAmount = formatCommissionAmount(commission_seller, type_commission_seller_currency || "Real");
+            formattedCSeller =
+                type_commission_seller === "Por Saca"
+                    ? "".concat(formattedAmount, " por saca")
+                    : formattedAmount;
         }
     }
     // Formatação da comissão do comprador
@@ -84,18 +94,14 @@ var ContratoTemplateSoja = function (_a) {
     if (commission_buyer) {
         if (type_commission_buyer === "Percentual") {
             // Percentual: mostra o valor percentual
-            formattedCBuyer = "".concat(commission_buyer, "%");
-        }
-        else if (commission_buyer_contract_value) {
-            // Fixo ou Por Saca: usa o valor calculado do back-end (já convertido para BRL)
-            var valueInBRL = typeof commission_buyer_contract_value === "number"
-                ? commission_buyer_contract_value.toFixed(2).replace(".", ",")
-                : String(commission_buyer_contract_value).replace(".", ",");
-            formattedCBuyer = "R$ ".concat(valueInBRL);
+            formattedCBuyer = "".concat(String(commission_buyer).replace(".", ","), "%");
         }
         else {
-            // Fallback: usa o valor original (apenas para casos antigos sem cálculo)
-            formattedCBuyer = (0, helpers_1.formatCurrency)(commission_buyer, "Real", true);
+            var formattedAmount = formatCommissionAmount(commission_buyer, type_commission_buyer_currency || "Real");
+            formattedCBuyer =
+                type_commission_buyer === "Por Saca"
+                    ? "".concat(formattedAmount, " por saca")
+                    : formattedAmount;
         }
     }
     var numberContract = number_contract
