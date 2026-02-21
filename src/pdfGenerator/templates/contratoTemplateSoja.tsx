@@ -48,8 +48,6 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
     quantity,
     commission_seller,
     commission_buyer,
-    commission_seller_contract_value,
-    commission_buyer_contract_value,
     quality,
     price,
     type_currency,
@@ -69,6 +67,25 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
     type_commission_buyer_currency,
     type_pickup,
   } = data;
+
+  const formatCommissionAmount = (value: string | number, currency: string) => {
+    const cleanValue = String(value)
+      .trim()
+      .replace(/[^\d.,-]/g, "");
+
+    const normalizedValue = cleanValue.includes(",")
+      ? cleanValue.replace(/\./g, "").replace(",", ".")
+      : cleanValue.replace(/,/g, "");
+
+    const parsedValue = Number(normalizedValue);
+
+    if (Number.isNaN(parsedValue)) {
+      return "";
+    }
+
+    const currencySymbol = currency === "Dólar" ? "$" : "R$";
+    return `${currencySymbol} ${parsedValue.toFixed(2).replace(".", ",")}`;
+  };
 
   const quantityValue =
     typeof quantity === "number" ? quantity : parseQuantityToNumber(quantity);
@@ -121,17 +138,17 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
   if (commission_seller) {
     if (type_commission_seller === "Percentual") {
       // Percentual: mostra o valor percentual
-      formattedCSeller = `${commission_seller}%`;
-    } else if (commission_seller_contract_value) {
-      // Fixo ou Por Saca: usa o valor calculado do back-end (já convertido para BRL)
-      const valueInBRL =
-        typeof commission_seller_contract_value === "number"
-          ? commission_seller_contract_value.toFixed(2).replace(".", ",")
-          : String(commission_seller_contract_value).replace(".", ",");
-      formattedCSeller = `R$ ${valueInBRL}`;
+      formattedCSeller = `${String(commission_seller).replace(".", ",")}%`;
     } else {
-      // Fallback: usa o valor original (apenas para casos antigos sem cálculo)
-      formattedCSeller = formatCurrency(commission_seller, "Real", true);
+      const formattedAmount = formatCommissionAmount(
+        commission_seller,
+        type_commission_seller_currency || "Real",
+      );
+
+      formattedCSeller =
+        type_commission_seller === "Por Saca"
+          ? `${formattedAmount} por saca`
+          : formattedAmount;
     }
   }
 
@@ -140,17 +157,17 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
   if (commission_buyer) {
     if (type_commission_buyer === "Percentual") {
       // Percentual: mostra o valor percentual
-      formattedCBuyer = `${commission_buyer}%`;
-    } else if (commission_buyer_contract_value) {
-      // Fixo ou Por Saca: usa o valor calculado do back-end (já convertido para BRL)
-      const valueInBRL =
-        typeof commission_buyer_contract_value === "number"
-          ? commission_buyer_contract_value.toFixed(2).replace(".", ",")
-          : String(commission_buyer_contract_value).replace(".", ",");
-      formattedCBuyer = `R$ ${valueInBRL}`;
+      formattedCBuyer = `${String(commission_buyer).replace(".", ",")}%`;
     } else {
-      // Fallback: usa o valor original (apenas para casos antigos sem cálculo)
-      formattedCBuyer = formatCurrency(commission_buyer, "Real", true);
+      const formattedAmount = formatCommissionAmount(
+        commission_buyer,
+        type_commission_buyer_currency || "Real",
+      );
+
+      formattedCBuyer =
+        type_commission_buyer === "Por Saca"
+          ? `${formattedAmount} por saca`
+          : formattedAmount;
     }
   }
 
