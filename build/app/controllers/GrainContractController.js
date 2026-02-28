@@ -63,6 +63,7 @@ var GrainContractRepository_1 = require("../repositories/GrainContractRepository
 var calcCommission_1 = require("../../utills/calcCommission");
 var convertPrice_1 = require("../../utills/convertPrice");
 var calculateTotalContractValue_1 = require("../../utills/calculateTotalContractValue");
+var calcCommissionBySack_1 = require("../../utills/calcCommissionBySack");
 var GrainContractController = /** @class */ (function () {
     function GrainContractController() {
         var _this = this;
@@ -247,7 +248,7 @@ var GrainContractController = /** @class */ (function () {
             });
         }); };
         this.createGrainContract = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var numberContract, total_contract_value, dataWithConvertedPrice, commissionValue, grainContract, result, dateStr, match, dateIso, createdAt, hourStr, minStr, secStr, msStr, error_4;
+            var numberContract, total_contract_value, dataWithConvertedPrice, commissionValue, commissionSellerContract, commissionBuyerContract, sellerCurrency, sellerRate, buyerCurrency, buyerRate, finalCommissionContract, grainContract, result, dateStr, match, dateIso, createdAt, hourStr, minStr, secStr, msStr, error_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -255,10 +256,52 @@ var GrainContractController = /** @class */ (function () {
                         return [4 /*yield*/, (0, GrainContractRepository_1.generateNumberContract)(req.body)];
                     case 1:
                         numberContract = _a.sent();
-                        total_contract_value = (0, calculateTotalContractValue_1.calculateTotalContractValue)(req.body.product, req.body.quantity, req.body.price);
-                        dataWithConvertedPrice = __assign(__assign({}, req.body), { total_contract_value: total_contract_value });
+                        total_contract_value = (0, calculateTotalContractValue_1.calculateTotalContractValue)(req.body.product, req.body.quantity, req.body.price, req.body.type_currency, req.body.day_exchange_rate, req.body.type_quantity);
+                        dataWithConvertedPrice = __assign(__assign({}, req.body), { total_contract_value: total_contract_value, type_commission_seller_currency: req.body.type_commission_seller === "Percentual"
+                                ? null
+                                : req.body.type_commission_seller_currency, type_commission_buyer_currency: req.body.type_commission_buyer === "Percentual"
+                                ? null
+                                : req.body.type_commission_buyer_currency });
                         commissionValue = (0, calcCommission_1.calcCommission)(dataWithConvertedPrice);
-                        grainContract = GrainContractRepository_1.grainContractRepository.create(__assign(__assign({}, dataWithConvertedPrice), { number_contract: numberContract, final_quantity: req.body.quantity, status_received: "Não", commission_contract: commissionValue }));
+                        commissionSellerContract = null;
+                        commissionBuyerContract = null;
+                        if (req.body.commission_seller) {
+                            sellerCurrency = (req.body.type_commission_seller === "Percentual"
+                                ? ""
+                                : req.body.type_commission_seller_currency) ||
+                                (req.body.type_currency === "Dólar" ? "Dólar" : "BRL");
+                            sellerRate = req.body.commission_seller_exchange_rate ||
+                                (sellerCurrency === "Dólar" ? req.body.day_exchange_rate : undefined);
+                            commissionSellerContract = (0, calcCommissionBySack_1.calcCommissionBySack)(req.body.quantity, req.body.type_quantity, req.body.commission_seller, req.body.type_commission_seller, sellerCurrency, sellerRate, total_contract_value);
+                            // Arredonda para 2 casas decimais
+                            commissionSellerContract =
+                                Math.round(commissionSellerContract * 100) / 100;
+                        }
+                        if (req.body.commission_buyer) {
+                            buyerCurrency = (req.body.type_commission_buyer === "Percentual"
+                                ? ""
+                                : req.body.type_commission_buyer_currency) ||
+                                (req.body.type_currency === "Dólar" ? "Dólar" : "BRL");
+                            buyerRate = req.body.commission_buyer_exchange_rate ||
+                                (buyerCurrency === "Dólar" ? req.body.day_exchange_rate : undefined);
+                            commissionBuyerContract = (0, calcCommissionBySack_1.calcCommissionBySack)(req.body.quantity, req.body.type_quantity, req.body.commission_buyer, req.body.type_commission_buyer, buyerCurrency, buyerRate, total_contract_value);
+                            // Arredonda para 2 casas decimais
+                            commissionBuyerContract =
+                                Math.round(commissionBuyerContract * 100) / 100;
+                        }
+                        finalCommissionContract = commissionValue;
+                        if (commissionSellerContract !== null &&
+                            commissionBuyerContract !== null) {
+                            // Quando há comissão de ambos, deixar null
+                            finalCommissionContract = null;
+                        }
+                        else if (commissionSellerContract !== null) {
+                            finalCommissionContract = commissionSellerContract;
+                        }
+                        else if (commissionBuyerContract !== null) {
+                            finalCommissionContract = commissionBuyerContract;
+                        }
+                        grainContract = GrainContractRepository_1.grainContractRepository.create(__assign(__assign({}, dataWithConvertedPrice), { number_contract: numberContract, final_quantity: req.body.quantity, status_received: "Não", commission_contract: finalCommissionContract, commission_seller_contract_value: commissionSellerContract, commission_buyer_contract_value: commissionBuyerContract }));
                         return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.save(grainContract)];
                     case 2:
                         result = (_a.sent());
@@ -291,18 +334,19 @@ var GrainContractController = /** @class */ (function () {
             });
         }); };
         this.updateGrainContract = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var id, otherFields, grainContract, validNumberContract, match, currentProduct, currentBroker, currentIncrement, currentYear, isProductDifferent, isBrokerDifferent, updatedProduct, updatedBroker, listProducts, siglaProduct, productToCheck, quantityToUse, priceFromRequest, currencyToCheck, exchangeRateToCheck, price, total_contract_value, updatedGrainContract, result, error_5;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var id, otherFields, grainContract, validNumberContract, match, currentProduct, currentBroker, currentIncrement, currentYear, isProductDifferent, isBrokerDifferent, updatedProduct, updatedBroker, listProducts, siglaProduct, productToCheck, quantityToUse, priceFromRequest, currencyToCheck, exchangeRateToCheck, typeQuantityToCheck, total_contract_value, updatedGrainContract, hasOwn_1, sellerCurrencyFieldWasSent, buyerCurrencyFieldWasSent, sellerCommissionEdited, buyerCommissionEdited, mergedData, sellerCurrency, sellerRate, buyerCurrency, buyerRate, sellerComm, buyerComm, result, error_5;
+            var _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
                         id = req.params.id;
                         otherFields = __rest(req.body, []);
-                        _a.label = 1;
+                        _c.label = 1;
                     case 1:
-                        _a.trys.push([1, 4, , 5]);
+                        _c.trys.push([1, 4, , 5]);
                         return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.findOneBy({ id: id })];
                     case 2:
-                        grainContract = _a.sent();
+                        grainContract = _c.sent();
                         if (!grainContract) {
                             return [2 /*return*/, res.status(404).json({ message: "Contrato não encontrado" })];
                         }
@@ -344,17 +388,98 @@ var GrainContractController = /** @class */ (function () {
                             : grainContract.price;
                         currencyToCheck = otherFields.type_currency || grainContract.type_currency;
                         exchangeRateToCheck = otherFields.day_exchange_rate || grainContract.day_exchange_rate;
-                        price = (0, convertPrice_1.convertPrice)(priceFromRequest, currencyToCheck, exchangeRateToCheck);
-                        total_contract_value = (0, calculateTotalContractValue_1.calculateTotalContractValue)(productToCheck, quantityToUse, price);
-                        updatedGrainContract = __assign(__assign({}, otherFields), { number_contract: grainContract.number_contract, number_broker: grainContract.number_broker, product: grainContract.product, price: priceFromRequest, final_quantity: Number(grainContract.quantity), total_contract_value: total_contract_value, quantity_kg: Number(grainContract.quantity_kg), quantity_bag: Number(grainContract.quantity_bag), commission_contract: Number(grainContract.commission_contract), total_received: Number(grainContract.total_received) });
-                        // Recalcula a comissão
-                        updatedGrainContract.commission_contract = (0, calcCommission_1.calcCommission)(__assign(__assign({}, grainContract), updatedGrainContract));
+                        typeQuantityToCheck = otherFields.type_quantity || grainContract.type_quantity;
+                        total_contract_value = (0, calculateTotalContractValue_1.calculateTotalContractValue)(productToCheck, quantityToUse, priceFromRequest, currencyToCheck, exchangeRateToCheck, typeQuantityToCheck);
+                        updatedGrainContract = __assign(__assign({}, otherFields), { number_contract: grainContract.number_contract, number_broker: grainContract.number_broker, product: grainContract.product, price: priceFromRequest, final_quantity: otherFields.final_quantity !== undefined
+                                ? otherFields.final_quantity
+                                : grainContract.final_quantity, total_contract_value: total_contract_value, type_quantity: typeQuantityToCheck, quantity_kg: Number(grainContract.quantity_kg), quantity_bag: Number(grainContract.quantity_bag), commission_contract: Number(grainContract.commission_contract), commission_seller_contract_value: grainContract.commission_seller_contract_value, commission_buyer_contract_value: grainContract.commission_buyer_contract_value, total_received: Number(grainContract.total_received) });
+                        hasOwn_1 = Object.prototype.hasOwnProperty;
+                        sellerCurrencyFieldWasSent = hasOwn_1.call(otherFields, "type_commission_seller_currency");
+                        buyerCurrencyFieldWasSent = hasOwn_1.call(otherFields, "type_commission_buyer_currency");
+                        sellerCommissionEdited = [
+                            "commission_seller",
+                            "type_commission_seller",
+                            "commission_seller_exchange_rate",
+                        ].some(function (field) { return hasOwn_1.call(otherFields, field); });
+                        buyerCommissionEdited = [
+                            "commission_buyer",
+                            "type_commission_buyer",
+                            "commission_buyer_exchange_rate",
+                        ].some(function (field) { return hasOwn_1.call(otherFields, field); });
+                        if (sellerCurrencyFieldWasSent &&
+                            (otherFields.type_commission_seller_currency === "" ||
+                                otherFields.type_commission_seller_currency === null)) {
+                            updatedGrainContract.type_commission_seller_currency = null;
+                        }
+                        else if (sellerCommissionEdited && !sellerCurrencyFieldWasSent) {
+                            updatedGrainContract.type_commission_seller_currency = null;
+                        }
+                        if (buyerCurrencyFieldWasSent &&
+                            (otherFields.type_commission_buyer_currency === "" ||
+                                otherFields.type_commission_buyer_currency === null)) {
+                            updatedGrainContract.type_commission_buyer_currency = null;
+                        }
+                        else if (buyerCommissionEdited && !buyerCurrencyFieldWasSent) {
+                            updatedGrainContract.type_commission_buyer_currency = null;
+                        }
+                        mergedData = __assign(__assign({}, grainContract), updatedGrainContract);
+                        if (mergedData.type_commission_seller === "Percentual") {
+                            updatedGrainContract.type_commission_seller_currency = null;
+                        }
+                        if (mergedData.type_commission_buyer === "Percentual") {
+                            updatedGrainContract.type_commission_buyer_currency = null;
+                        }
+                        if (mergedData.commission_seller) {
+                            sellerCurrency = mergedData.type_commission_seller_currency ||
+                                (mergedData.type_currency === "Dólar" ? "Dólar" : "BRL");
+                            sellerRate = mergedData.commission_seller_exchange_rate ||
+                                (sellerCurrency === "Dólar"
+                                    ? mergedData.day_exchange_rate
+                                    : undefined);
+                            updatedGrainContract.commission_seller_contract_value =
+                                (0, calcCommissionBySack_1.calcCommissionBySack)(mergedData.quantity || mergedData.final_quantity, mergedData.type_quantity, mergedData.commission_seller, mergedData.type_commission_seller, sellerCurrency, sellerRate, total_contract_value);
+                            // Arredonda para 2 casas decimais
+                            updatedGrainContract.commission_seller_contract_value =
+                                Math.round(updatedGrainContract.commission_seller_contract_value * 100) / 100;
+                        }
+                        if (mergedData.commission_buyer) {
+                            buyerCurrency = mergedData.type_commission_buyer_currency ||
+                                (mergedData.type_currency === "Dólar" ? "Dólar" : "BRL");
+                            buyerRate = mergedData.commission_buyer_exchange_rate ||
+                                (buyerCurrency === "Dólar"
+                                    ? mergedData.day_exchange_rate
+                                    : undefined);
+                            updatedGrainContract.commission_buyer_contract_value =
+                                (0, calcCommissionBySack_1.calcCommissionBySack)(mergedData.quantity || mergedData.final_quantity, mergedData.type_quantity, mergedData.commission_buyer, mergedData.type_commission_buyer, buyerCurrency, buyerRate, total_contract_value);
+                            // Arredonda para 2 casas decimais
+                            updatedGrainContract.commission_buyer_contract_value =
+                                Math.round(updatedGrainContract.commission_buyer_contract_value * 100) / 100;
+                        }
+                        sellerComm = (_a = updatedGrainContract.commission_seller_contract_value) !== null && _a !== void 0 ? _a : mergedData.commission_seller_contract_value;
+                        buyerComm = (_b = updatedGrainContract.commission_buyer_contract_value) !== null && _b !== void 0 ? _b : mergedData.commission_buyer_contract_value;
+                        if (sellerComm !== null &&
+                            sellerComm !== undefined &&
+                            buyerComm !== null &&
+                            buyerComm !== undefined) {
+                            // Quando há comissão de ambos, deixar null
+                            updatedGrainContract.commission_contract = null;
+                        }
+                        else if (sellerComm !== null && sellerComm !== undefined) {
+                            updatedGrainContract.commission_contract = sellerComm;
+                        }
+                        else if (buyerComm !== null && buyerComm !== undefined) {
+                            updatedGrainContract.commission_contract = buyerComm;
+                        }
+                        else {
+                            // Se nenhum existir, manter o cálculo padrão
+                            updatedGrainContract.commission_contract = (0, calcCommission_1.calcCommission)(__assign(__assign({}, grainContract), updatedGrainContract));
+                        }
                         return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.save(updatedGrainContract)];
                     case 3:
-                        result = _a.sent();
+                        result = _c.sent();
                         return [2 /*return*/, res.json(result)];
                     case 4:
-                        error_5 = _a.sent();
+                        error_5 = _c.sent();
                         console.log("erro 500", error_5);
                         return [2 /*return*/, res.status(500).json({ message: error_5.message })];
                     case 5: return [2 /*return*/];
@@ -389,56 +514,128 @@ var GrainContractController = /** @class */ (function () {
             });
         }); };
         this.updateContractAdjustments = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var id, _a, final_quantity, payment_date, charge_date, expected_receipt_date, internal_communication, status_received, total_received, number_external_contract_buyer, day_exchange_rate, grainContract, updatedFields, type_currency, exchangeRateChanged, finalQuantityChanged, priceConverted, total_contract_value, filteredUpdates, result, error_7;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var id, grainContract, hasOwn_2, allowedPatchFields, updatedFields_1, finalQuantityWasSent, type_currency, currentFinalQuantity, nextDayExchangeRate, exchangeRateChanged, finalQuantityChanged, shouldRecalculateDerivedFields, finalQuantityForCalc, exchangeRateForCalc, total_contract_value, filteredUpdates, mergedData, sellerCurrency, sellerRate, buyerCurrency, buyerRate, sellerComm, buyerComm, result, error_7;
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+            return __generator(this, function (_l) {
+                switch (_l.label) {
                     case 0:
                         id = req.params.id;
-                        _a = req.body, final_quantity = _a.final_quantity, payment_date = _a.payment_date, charge_date = _a.charge_date, expected_receipt_date = _a.expected_receipt_date, internal_communication = _a.internal_communication, status_received = _a.status_received, total_received = _a.total_received, number_external_contract_buyer = _a.number_external_contract_buyer, day_exchange_rate = _a.day_exchange_rate;
-                        _b.label = 1;
+                        _l.label = 1;
                     case 1:
-                        _b.trys.push([1, 4, , 5]);
+                        _l.trys.push([1, 4, , 5]);
                         return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.findOneBy({ id: id })];
                     case 2:
-                        grainContract = _b.sent();
+                        grainContract = _l.sent();
                         if (!grainContract) {
                             return [2 /*return*/, res.status(404).json({ message: "Contrato não encontrado." })];
                         }
-                        updatedFields = {
-                            final_quantity: final_quantity,
-                            payment_date: payment_date,
-                            charge_date: charge_date,
-                            expected_receipt_date: expected_receipt_date,
-                            internal_communication: internal_communication,
-                            status_received: status_received,
-                            total_received: total_received,
-                            number_external_contract_buyer: number_external_contract_buyer,
-                            day_exchange_rate: day_exchange_rate,
-                        };
+                        hasOwn_2 = Object.prototype.hasOwnProperty;
+                        allowedPatchFields = [
+                            "final_quantity",
+                            "payment_date",
+                            "charge_date",
+                            "expected_receipt_date",
+                            "internal_communication",
+                            "status_received",
+                            "total_received",
+                            "number_external_contract_buyer",
+                            "day_exchange_rate",
+                        ];
+                        updatedFields_1 = {};
+                        allowedPatchFields.forEach(function (field) {
+                            if (hasOwn_2.call(req.body, field) && req.body[field] !== undefined) {
+                                updatedFields_1[field] = req.body[field];
+                            }
+                        });
+                        finalQuantityWasSent = hasOwn_2.call(req.body, "final_quantity") &&
+                            req.body.final_quantity !== undefined;
                         type_currency = req.body.type_currency || grainContract.type_currency;
-                        exchangeRateChanged = typeof day_exchange_rate !== "undefined" &&
-                            Number(day_exchange_rate) !== Number(grainContract.day_exchange_rate);
-                        finalQuantityChanged = typeof final_quantity !== "undefined" &&
-                            Number(final_quantity) !== Number(grainContract.quantity);
-                        if (finalQuantityChanged ||
-                            (type_currency === "Dólar" && exchangeRateChanged)) {
-                            priceConverted = (0, convertPrice_1.convertPrice)(grainContract.price, type_currency, day_exchange_rate || grainContract.day_exchange_rate);
-                            total_contract_value = (0, calculateTotalContractValue_1.calculateTotalContractValue)(grainContract.product, final_quantity || grainContract.quantity, priceConverted);
-                            updatedFields.total_contract_value = total_contract_value;
+                        currentFinalQuantity = grainContract.final_quantity;
+                        nextDayExchangeRate = (_a = updatedFields_1.day_exchange_rate) !== null && _a !== void 0 ? _a : grainContract.day_exchange_rate;
+                        exchangeRateChanged = hasOwn_2.call(updatedFields_1, "day_exchange_rate") &&
+                            Number(nextDayExchangeRate) !== Number(grainContract.day_exchange_rate);
+                        finalQuantityChanged = finalQuantityWasSent &&
+                            Number(updatedFields_1.final_quantity) !== Number(currentFinalQuantity);
+                        shouldRecalculateDerivedFields = finalQuantityChanged ||
+                            (type_currency === "Dólar" && exchangeRateChanged);
+                        if (shouldRecalculateDerivedFields) {
+                            finalQuantityForCalc = finalQuantityWasSent && updatedFields_1.final_quantity !== null
+                                ? updatedFields_1.final_quantity
+                                : grainContract.final_quantity;
+                            exchangeRateForCalc = (_b = updatedFields_1.day_exchange_rate) !== null && _b !== void 0 ? _b : grainContract.day_exchange_rate;
+                            // Recalcula o preço convertido se necessário
+                            (0, convertPrice_1.convertPrice)(grainContract.price, type_currency, exchangeRateForCalc);
+                            if (finalQuantityForCalc !== null &&
+                                typeof finalQuantityForCalc !== "undefined") {
+                                total_contract_value = (0, calculateTotalContractValue_1.calculateTotalContractValue)(grainContract.product, finalQuantityForCalc, grainContract.price, type_currency, exchangeRateForCalc, grainContract.type_quantity);
+                                updatedFields_1.total_contract_value = total_contract_value;
+                            }
                         }
-                        filteredUpdates = Object.fromEntries(Object.entries(updatedFields).filter(function (_a) {
+                        filteredUpdates = Object.fromEntries(Object.entries(updatedFields_1).filter(function (_a) {
                             var _ = _a[0], v = _a[1];
                             return v !== undefined;
                         }));
-                        // Recalcula a comissão também
-                        filteredUpdates.commission_contract = (0, calcCommission_1.calcCommission)(__assign(__assign({}, grainContract), filteredUpdates));
+                        if (shouldRecalculateDerivedFields) {
+                            mergedData = __assign(__assign({}, grainContract), filteredUpdates);
+                            if (mergedData.type_commission_seller === "Percentual") {
+                                filteredUpdates.type_commission_seller_currency = null;
+                            }
+                            if (mergedData.type_commission_buyer === "Percentual") {
+                                filteredUpdates.type_commission_buyer_currency = null;
+                            }
+                            if (mergedData.commission_seller) {
+                                sellerCurrency = mergedData.type_commission_seller_currency ||
+                                    (mergedData.type_currency === "Dólar" ? "Dólar" : "BRL");
+                                sellerRate = (_c = mergedData.commission_seller_exchange_rate) !== null && _c !== void 0 ? _c : (sellerCurrency === "Dólar"
+                                    ? mergedData.day_exchange_rate
+                                    : undefined);
+                                filteredUpdates.commission_seller_contract_value =
+                                    (0, calcCommissionBySack_1.calcCommissionBySack)((_d = mergedData.final_quantity) !== null && _d !== void 0 ? _d : mergedData.quantity, mergedData.type_quantity, mergedData.commission_seller, mergedData.type_commission_seller, sellerCurrency, sellerRate, (_e = updatedFields_1.total_contract_value) !== null && _e !== void 0 ? _e : grainContract.total_contract_value);
+                                // Arredonda para 2 casas decimais
+                                filteredUpdates.commission_seller_contract_value =
+                                    Math.round(filteredUpdates.commission_seller_contract_value * 100) /
+                                        100;
+                            }
+                            if (mergedData.commission_buyer) {
+                                buyerCurrency = mergedData.type_commission_buyer_currency ||
+                                    (mergedData.type_currency === "Dólar" ? "Dólar" : "BRL");
+                                buyerRate = (_f = mergedData.commission_buyer_exchange_rate) !== null && _f !== void 0 ? _f : (buyerCurrency === "Dólar"
+                                    ? mergedData.day_exchange_rate
+                                    : undefined);
+                                filteredUpdates.commission_buyer_contract_value =
+                                    (0, calcCommissionBySack_1.calcCommissionBySack)((_g = mergedData.final_quantity) !== null && _g !== void 0 ? _g : mergedData.quantity, mergedData.type_quantity, mergedData.commission_buyer, mergedData.type_commission_buyer, buyerCurrency, buyerRate, (_h = updatedFields_1.total_contract_value) !== null && _h !== void 0 ? _h : grainContract.total_contract_value);
+                                // Arredonda para 2 casas decimais
+                                filteredUpdates.commission_buyer_contract_value =
+                                    Math.round(filteredUpdates.commission_buyer_contract_value * 100) /
+                                        100;
+                            }
+                            sellerComm = (_j = filteredUpdates.commission_seller_contract_value) !== null && _j !== void 0 ? _j : mergedData.commission_seller_contract_value;
+                            buyerComm = (_k = filteredUpdates.commission_buyer_contract_value) !== null && _k !== void 0 ? _k : mergedData.commission_buyer_contract_value;
+                            if (sellerComm !== null &&
+                                sellerComm !== undefined &&
+                                buyerComm !== null &&
+                                buyerComm !== undefined) {
+                                // Quando há comissão de ambos, deixar null
+                                filteredUpdates.commission_contract = null;
+                            }
+                            else if (sellerComm !== null && sellerComm !== undefined) {
+                                filteredUpdates.commission_contract = sellerComm;
+                            }
+                            else if (buyerComm !== null && buyerComm !== undefined) {
+                                filteredUpdates.commission_contract = buyerComm;
+                            }
+                            else {
+                                // Se nenhum existir, manter o cálculo padrão
+                                filteredUpdates.commission_contract = (0, calcCommission_1.calcCommission)(__assign(__assign({}, grainContract), filteredUpdates));
+                            }
+                        }
                         GrainContractRepository_1.grainContractRepository.merge(grainContract, filteredUpdates);
                         return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.save(grainContract)];
                     case 3:
-                        result = _b.sent();
+                        result = _l.sent();
                         return [2 /*return*/, res.json(result)];
                     case 4:
-                        error_7 = _b.sent();
+                        error_7 = _l.sent();
                         return [2 /*return*/, res.status(500).json({ message: error_7.message })];
                     case 5: return [2 /*return*/];
                 }

@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = require("express");
 var UserController_1 = require("../controllers/UserController");
 var SessionController_1 = require("../controllers/SessionController");
-var authMiddleware_1 = require("../middlewares/authMiddleware");
 var PermissionController_1 = require("../controllers/PermissionController");
 var ClientController_1 = require("../controllers/ClientController");
 var ContactController_1 = require("../controllers/ContactController");
@@ -13,6 +12,7 @@ var EmailController_1 = require("../controllers/EmailController");
 var ProductController_1 = require("../controllers/ProductController");
 var ProductTablesController_1 = require("../controllers/ProductTablesController");
 var InvoicesController_1 = require("../controllers/InvoicesController");
+var NfseController_1 = require("../controllers/NfseController");
 var BillingsController_1 = require("../controllers/BillingsController");
 var routes = (0, express_1.Router)();
 // Utilizar futuramente para criar métricas de chamadas
@@ -23,7 +23,7 @@ var routes = (0, express_1.Router)();
 // IN and OUT application
 routes.post("/api/login", new SessionController_1.SessionController().login);
 // Routes protected
-routes.use(authMiddleware_1.authMiddleware); // comentar ao usar local
+//routes.use(authMiddleware); // comentar ao usar local
 routes.get("/api/profile", new UserController_1.UserController().getProfile);
 routes.post("/api/reset-password", new SessionController_1.SessionController().resetPassword);
 // CRUD USERS
@@ -84,6 +84,11 @@ routes.get("/api/invoices/rps/:rps_number", InvoicesController_1.InvoiceControll
 routes.get("/api/invoices/nfs/:nfs_number", InvoicesController_1.InvoiceController.findInvoiceByNfs_number);
 routes.patch("/api/invoices/:id", InvoicesController_1.InvoiceController.updateInvoice);
 routes.delete("/api/invoices/:id", InvoicesController_1.InvoiceController.deleteInvoice);
+// NFS-e - Emissão de Nota Fiscal Eletrônica SP
+routes.post("/api/nfse/enviar-lote", NfseController_1.NfseController.enviarLoteRps);
+routes.get("/api/nfse/consultar-lote/:protocolo", NfseController_1.NfseController.consultarLote);
+routes.post("/api/nfse/cancelar", NfseController_1.NfseController.cancelarNfse);
+routes.get("/api/nfse/testar-conexao", NfseController_1.NfseController.testarConexao);
 // Billing
 routes.post("/api/billings", BillingsController_1.BillingController.createBilling);
 routes.post("/api/billings/number-contract", BillingsController_1.BillingController.findBillingsByNumberContract);

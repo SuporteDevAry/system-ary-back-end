@@ -5,15 +5,16 @@ import nodemailer from "nodemailer";
 import PdfGeneratorNew from "../../pdfGenerator";
 import { EmailLogRepository } from "../repositories/EmailLogRepository";
 import { folhaDeRostoBuffer } from "../../pdfGenerator/helpers/coverPage";
+import { grainContractRepository } from "../repositories/GrainContractRepository";
 
 const signatureEmailImageSoy = path.resolve(
   __dirname,
-  "../../pdfGenerator/helpers/assinatura_execucao_mi.png"
+  "../../pdfGenerator/helpers/assinatura_execucao_mi.png",
 );
 
 const signatureEmailImageOil = path.resolve(
   __dirname,
-  "../../pdfGenerator/helpers/assinatura_oleo.png"
+  "../../pdfGenerator/helpers/assinatura_oleo.png",
 );
 
 export class EmailController {
@@ -24,6 +25,29 @@ export class EmailController {
       if (!contractData || !templateName || !sender || !number_contract) {
         res.status(400).send({ error: "Campos necessários não informados." });
         return;
+      }
+
+      // Se os valores calculados não vieram do front-end, buscar do banco de dados
+      if (
+        contractData.id &&
+        (contractData.commission_seller_contract_value === undefined ||
+          contractData.commission_buyer_contract_value === undefined)
+      ) {
+        const dbContract = await grainContractRepository.findOne({
+          where: { id: contractData.id },
+        });
+
+        if (dbContract) {
+          // Sobrescrever com os valores do banco
+          contractData.commission_seller_contract_value =
+            dbContract.commission_seller_contract_value;
+          contractData.commission_buyer_contract_value =
+            dbContract.commission_buyer_contract_value;
+          contractData.type_commission_seller_currency =
+            dbContract.type_commission_seller_currency;
+          contractData.type_commission_buyer_currency =
+            dbContract.type_commission_buyer_currency;
+        }
       }
 
       // Extração da sigla
@@ -86,7 +110,7 @@ export class EmailController {
       if (isLocal) {
         console.log(
           "🚫 Ambiente local: remetente configurado para teste.",
-          smtpUser
+          smtpUser,
         );
       }
 

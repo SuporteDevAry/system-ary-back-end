@@ -13,7 +13,7 @@ import { Extenso } from "../helpers/Extenso";
 
 const logoContrato = path.resolve(
   __dirname,
-  "../helpers/Logo_Ary_Completo.jpg"
+  "../helpers/Logo_Ary_Completo.jpg",
 );
 const logoBase64 = `data:image/jpeg;base64,${fs
   .readFileSync(logoContrato)
@@ -63,8 +63,29 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
     name_product,
     type_commission_seller,
     type_commission_buyer,
+    type_commission_seller_currency,
+    type_commission_buyer_currency,
     type_pickup,
   } = data;
+
+  const formatCommissionAmount = (value: string | number, currency: string) => {
+    const cleanValue = String(value)
+      .trim()
+      .replace(/[^\d.,-]/g, "");
+
+    const normalizedValue = cleanValue.includes(",")
+      ? cleanValue.replace(/\./g, "").replace(",", ".")
+      : cleanValue.replace(/,/g, "");
+
+    const parsedValue = Number(normalizedValue);
+
+    if (Number.isNaN(parsedValue)) {
+      return "";
+    }
+
+    const currencySymbol = currency === "Dólar" ? "$" : "R$";
+    return `${currencySymbol} ${parsedValue.toFixed(2).replace(".", ",")}`;
+  };
 
   const quantityValue =
     typeof quantity === "number" ? quantity : parseQuantityToNumber(quantity);
@@ -112,17 +133,43 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
     ? insertMaskInCnpj(buyer.cnpj_cpf)
     : "";
 
-  let formattedCSeller = commission_seller
-    ? type_commission_seller === "Percentual"
-      ? `${commission_seller}%`
-      : `${formatCurrency(commission_seller, type_currency, true)} por saca,`
-    : "";
+  // Formatação da comissão do vendedor
+  let formattedCSeller = "";
+  if (commission_seller) {
+    if (type_commission_seller === "Percentual") {
+      // Percentual: mostra o valor percentual
+      formattedCSeller = `${String(commission_seller).replace(".", ",")}%`;
+    } else {
+      const formattedAmount = formatCommissionAmount(
+        commission_seller,
+        type_commission_seller_currency || "Real",
+      );
 
-  let formattedCBuyer = commission_buyer
-    ? type_commission_buyer === "Percentual"
-      ? `${commission_buyer}%`
-      : `${formatCurrency(commission_buyer, type_currency, true)} por saca,`
-    : "";
+      formattedCSeller =
+        type_commission_seller === "Por Saca"
+          ? `${formattedAmount} por saca`
+          : formattedAmount;
+    }
+  }
+
+  // Formatação da comissão do comprador
+  let formattedCBuyer = "";
+  if (commission_buyer) {
+    if (type_commission_buyer === "Percentual") {
+      // Percentual: mostra o valor percentual
+      formattedCBuyer = `${String(commission_buyer).replace(".", ",")}%`;
+    } else {
+      const formattedAmount = formatCommissionAmount(
+        commission_buyer,
+        type_commission_buyer_currency || "Real",
+      );
+
+      formattedCBuyer =
+        type_commission_buyer === "Por Saca"
+          ? `${formattedAmount} por saca`
+          : formattedAmount;
+    }
+  }
 
   const numberContract = number_contract
     ? number_contract
@@ -171,7 +218,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
 
   const listProductsForMetricTon = ["O", "F", "OC", "OA", "SB", "EP"];
   const validProductsForMetricTon = listProductsForMetricTon.includes(
-    data.product
+    data.product,
   );
 
   let formattedSafra = validProductsForMetricTon
@@ -318,7 +365,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
           {data.type_currency === "Dólar"
             ? `${formatCurrency(price, data.type_currency, modeSave).replace(
                 "$",
-                "US$ "
+                "US$ ",
               )}`
             : formatCurrency(price, data.type_currency, modeSave)}
         </strong>{" "}

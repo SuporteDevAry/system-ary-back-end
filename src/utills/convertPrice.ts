@@ -1,12 +1,31 @@
 export function convertPrice(
   price: number | string,
-  typeCurrency: string,
-  dayExchangeRate?: number | string
+  typeCurrency?: string,
+  dayExchangeRate?: number | string,
 ): number {
   const priceNumber = Number(price);
 
   if (typeCurrency === "Dólar" && dayExchangeRate) {
-    return Number((priceNumber * Number(dayExchangeRate)).toFixed(2));
+    const normalizeRate = (value: number | string): number => {
+      const raw = String(value).trim();
+      if (!raw) {
+        return Number.NaN;
+      }
+
+      if (raw.includes(",")) {
+        return Number(raw.replace(/\./g, "").replace(",", "."));
+      }
+
+      if (raw.includes(".")) {
+        return Number(raw);
+      }
+
+      return Number(raw);
+    };
+
+    const rateNumber = normalizeRate(dayExchangeRate);
+
+    return priceNumber * rateNumber;
   }
 
   return priceNumber;
