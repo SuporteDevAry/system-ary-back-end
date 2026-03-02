@@ -429,6 +429,14 @@ export class GrainContractController {
         otherFields.quantity !== undefined
           ? otherFields.quantity
           : grainContract.quantity;
+      const finalQuantityToUse =
+        otherFields.final_quantity !== undefined
+          ? otherFields.final_quantity
+          : grainContract.final_quantity;
+      const quantityForFinancialCalc =
+        finalQuantityToUse !== null && finalQuantityToUse !== undefined
+          ? finalQuantityToUse
+          : quantityToUse;
       const priceFromRequest =
         otherFields.price !== undefined
           ? otherFields.price
@@ -442,7 +450,7 @@ export class GrainContractController {
 
       const total_contract_value = calculateTotalContractValue(
         productToCheck,
-        quantityToUse,
+        quantityForFinancialCalc,
         priceFromRequest,
         currencyToCheck,
         exchangeRateToCheck,
@@ -540,7 +548,7 @@ export class GrainContractController {
 
         updatedGrainContract.commission_seller_contract_value =
           calcCommissionBySack(
-            mergedData.quantity || mergedData.final_quantity,
+            mergedData.final_quantity ?? mergedData.quantity,
             mergedData.type_quantity,
             mergedData.commission_seller,
             mergedData.type_commission_seller,
@@ -571,7 +579,7 @@ export class GrainContractController {
 
         updatedGrainContract.commission_buyer_contract_value =
           calcCommissionBySack(
-            mergedData.quantity || mergedData.final_quantity,
+            mergedData.final_quantity ?? mergedData.quantity,
             mergedData.type_quantity,
             mergedData.commission_buyer,
             mergedData.type_commission_buyer,
@@ -693,14 +701,14 @@ export class GrainContractController {
         Number(updatedFields.final_quantity) !== Number(currentFinalQuantity);
 
       const shouldRecalculateDerivedFields =
+        finalQuantityWasSent ||
         finalQuantityChanged ||
         (type_currency === "Dólar" && exchangeRateChanged);
 
       if (shouldRecalculateDerivedFields) {
-        const finalQuantityForCalc =
-          finalQuantityWasSent && updatedFields.final_quantity !== null
-            ? updatedFields.final_quantity
-            : grainContract.final_quantity;
+        const finalQuantityForCalc = finalQuantityWasSent
+          ? (updatedFields.final_quantity ?? grainContract.quantity)
+          : (grainContract.final_quantity ?? grainContract.quantity);
         const exchangeRateForCalc =
           updatedFields.day_exchange_rate ?? grainContract.day_exchange_rate;
 
