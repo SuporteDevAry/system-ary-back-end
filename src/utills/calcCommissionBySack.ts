@@ -4,9 +4,48 @@
 function normalizeNumber(
   value: string | number,
   preferDecimalDot = true,
+  options?: { isQuantity?: boolean; typeQuantity?: string },
 ): number {
   const raw = String(value).trim();
   if (!raw) return Number.NaN;
+
+  const isToneladaMetrica = (type?: string): boolean => {
+    if (!type) return false;
+    const quantityType = type.toLowerCase();
+    return (
+      quantityType === "tm" ||
+      quantityType === "toneladas" ||
+      quantityType === "tonelada"
+    );
+  };
+
+  if (options?.isQuantity && isToneladaMetrica(options.typeQuantity)) {
+    const hasComma = raw.includes(",");
+    const hasDot = raw.includes(".");
+
+    if (hasComma && !hasDot) {
+      return Number(raw.replace(/\./g, "").replace(",", "."));
+    }
+
+    if (hasDot && !hasComma) {
+      const parts = raw.split(".");
+
+      // Mais de um ponto: tratar como separador de milhar
+      if (parts.length > 2) {
+        return Number(raw.replace(/\./g, ""));
+      }
+
+      const [integerPart, decimalPart = ""] = parts;
+
+      // Caso clássico de milhar em TM: 1.000, 10.000, 100.000
+      if (decimalPart === "000") {
+        return Number(raw.replace(/\./g, ""));
+      }
+
+      // TM fracionada: 521.170 (521 t e 170 kg), 521.17, 521.1
+      return Number(`${integerPart}.${decimalPart}`);
+    }
+  }
 
   // Se tem vírgula, assume formato brasileiro: 1.000,50 ou 5,000
   if (raw.includes(",")) {
@@ -44,7 +83,10 @@ export function calcCommissionBySack(
   exchangeRate?: string | number,
   totalContractValue?: number | string,
 ): number {
-  const quantityNum = normalizeNumber(quantity, false); // quantidade: dot = thousand separator
+  const quantityNum = normalizeNumber(quantity, false, {
+    isQuantity: true,
+    typeQuantity,
+  });
   const commissionNum = normalizeNumber(commissionValue, true); // comissão: dot = decimal
 
   // Normaliza exchange rate se fornecido

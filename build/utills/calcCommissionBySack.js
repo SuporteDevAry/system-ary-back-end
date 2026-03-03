@@ -4,11 +4,40 @@ exports.calcCommissionBySack = void 0;
 /**
  * Normaliza número formatado removendo separadores de milhar e convertendo vírgula em ponto
  */
-function normalizeNumber(value, preferDecimalDot) {
+function normalizeNumber(value, preferDecimalDot, options) {
     if (preferDecimalDot === void 0) { preferDecimalDot = true; }
     var raw = String(value).trim();
     if (!raw)
         return Number.NaN;
+    var isToneladaMetrica = function (type) {
+        if (!type)
+            return false;
+        var quantityType = type.toLowerCase();
+        return (quantityType === "tm" ||
+            quantityType === "toneladas" ||
+            quantityType === "tonelada");
+    };
+    if ((options === null || options === void 0 ? void 0 : options.isQuantity) && isToneladaMetrica(options.typeQuantity)) {
+        var hasComma = raw.includes(",");
+        var hasDot = raw.includes(".");
+        if (hasComma && !hasDot) {
+            return Number(raw.replace(/\./g, "").replace(",", "."));
+        }
+        if (hasDot && !hasComma) {
+            var parts = raw.split(".");
+            // Mais de um ponto: tratar como separador de milhar
+            if (parts.length > 2) {
+                return Number(raw.replace(/\./g, ""));
+            }
+            var integerPart = parts[0], _a = parts[1], decimalPart = _a === void 0 ? "" : _a;
+            // Caso clássico de milhar em TM: 1.000, 10.000, 100.000
+            if (decimalPart === "000") {
+                return Number(raw.replace(/\./g, ""));
+            }
+            // TM fracionada: 521.170 (521 t e 170 kg), 521.17, 521.1
+            return Number("".concat(integerPart, ".").concat(decimalPart));
+        }
+    }
     // Se tem vírgula, assume formato brasileiro: 1.000,50 ou 5,000
     if (raw.includes(",")) {
         return Number(raw.replace(/\./g, "").replace(",", "."));
@@ -34,7 +63,10 @@ function normalizeNumber(value, preferDecimalDot) {
  * @returns Valor total da comissão calculada
  */
 function calcCommissionBySack(quantity, typeQuantity, commissionValue, typeCommission, typeCurrency, exchangeRate, totalContractValue) {
-    var quantityNum = normalizeNumber(quantity, false); // quantidade: dot = thousand separator
+    var quantityNum = normalizeNumber(quantity, false, {
+        isQuantity: true,
+        typeQuantity: typeQuantity,
+    });
     var commissionNum = normalizeNumber(commissionValue, true); // comissão: dot = decimal
     // Normaliza exchange rate se fornecido
     var normalizedExchangeRate = exchangeRate
