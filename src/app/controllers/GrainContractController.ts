@@ -18,6 +18,8 @@ export class GrainContractController {
         year,
         month,
         date,
+        date_start,
+        date_end,
         product,
         name_product,
         page,
@@ -93,41 +95,79 @@ export class GrainContractController {
         });
       }
 
-      // Filtrar por data completa (DD/MM/YYYY ou YYYY-MM-DD) — compara a parte DATE de created_at
-      if (date) {
-        let parsedDate: string | null = null;
-        const d = String(date).trim();
-        // Aceita formato DD/MM/YYYY
-        const brMatch = /^\d{2}\/\d{2}\/\d{4}$/.test(d);
-        const isoMatch = /^\d{4}-\d{2}-\d{2}$/.test(d);
+      const contractEmissionDateAsDate =
+        "(CASE WHEN gc.contract_emission_date ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' THEN to_date(gc.contract_emission_date, 'DD/MM/YYYY') ELSE CAST(gc.contract_emission_date AS date) END)";
+
+      const parseDateToIso = (value: string): string | null => {
+        const normalizedValue = value.trim();
+        const brMatch = /^\d{2}\/\d{2}\/\d{4}$/.test(normalizedValue);
+        const isoMatch = /^\d{4}-\d{2}-\d{2}$/.test(normalizedValue);
+
         if (brMatch) {
-          const [day, monthP, yearP] = d.split("/");
-          parsedDate = `${yearP}-${monthP}-${day}`; // YYYY-MM-DD
-        } else if (isoMatch) {
-          parsedDate = d;
-        } else {
-          // Tentativa de parse genérico
-          const dt = new Date(d);
-          if (!Number.isNaN(dt.getTime())) {
-            parsedDate = dt.toISOString().slice(0, 10);
-          }
+          const [day, monthPart, yearPart] = normalizedValue.split("/");
+          return `${yearPart}-${monthPart}-${day}`;
         }
+
+        if (isoMatch) {
+          return normalizedValue;
+        }
+
+        const parsedDate = new Date(normalizedValue);
+        if (!Number.isNaN(parsedDate.getTime())) {
+          return parsedDate.toISOString().slice(0, 10);
+        }
+
+        return null;
+      };
+
+      // Quando date_start/date_end vierem preenchidos, prioriza faixa e ignora date/month/year
+      const hasDateRange =
+        (typeof date_start !== "undefined" &&
+          String(date_start).trim() !== "") ||
+        (typeof date_end !== "undefined" && String(date_end).trim() !== "");
+
+      if (hasDateRange) {
+        const parsedStartDate =
+          typeof date_start !== "undefined" && String(date_start).trim() !== ""
+            ? parseDateToIso(String(date_start))
+            : null;
+        const parsedEndDate =
+          typeof date_end !== "undefined" && String(date_end).trim() !== ""
+            ? parseDateToIso(String(date_end))
+            : null;
+
+        if (parsedStartDate) {
+          qb.andWhere(
+            `${contractEmissionDateAsDate} >= to_date(:dateStart, 'YYYY-MM-DD')`,
+            { dateStart: parsedStartDate },
+          );
+        }
+
+        if (parsedEndDate) {
+          qb.andWhere(
+            `${contractEmissionDateAsDate} <= to_date(:dateEnd, 'YYYY-MM-DD')`,
+            { dateEnd: parsedEndDate },
+          );
+        }
+      } else if (date) {
+        // Filtrar por data completa (DD/MM/YYYY ou YYYY-MM-DD)
+        const parsedDate = parseDateToIso(String(date));
 
         if (parsedDate) {
           qb.andWhere(
-            "(CASE WHEN gc.contract_emission_date ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' THEN to_date(gc.contract_emission_date, 'DD/MM/YYYY') ELSE CAST(gc.contract_emission_date AS date) END) = to_date(:createdDate, 'YYYY-MM-DD')",
+            `${contractEmissionDateAsDate} = to_date(:createdDate, 'YYYY-MM-DD')`,
             {
               createdDate: parsedDate,
             },
           );
         }
       } else {
-        // Filtrar por ano/mês a partir do created_at
+        // Compatibilidade antiga: filtrar por ano/mês quando não houver date_start/date_end/date
         if (year) {
           const y = Number(year);
           if (!Number.isNaN(y)) {
             qb.andWhere(
-              "EXTRACT(YEAR FROM (CASE WHEN gc.contract_emission_date ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' THEN to_date(gc.contract_emission_date, 'DD/MM/YYYY') ELSE CAST(gc.contract_emission_date AS date) END)) = :year",
+              `EXTRACT(YEAR FROM ${contractEmissionDateAsDate}) = :year`,
               {
                 year: y,
               },
@@ -139,7 +179,7 @@ export class GrainContractController {
           const m = Number(month);
           if (!Number.isNaN(m)) {
             qb.andWhere(
-              "EXTRACT(MONTH FROM (CASE WHEN gc.contract_emission_date ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' THEN to_date(gc.contract_emission_date, 'DD/MM/YYYY') ELSE CAST(gc.contract_emission_date AS date) END)) = :month",
+              `EXTRACT(MONTH FROM ${contractEmissionDateAsDate}) = :month`,
               {
                 month: m,
               },
