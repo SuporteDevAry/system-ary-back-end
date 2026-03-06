@@ -68,13 +68,13 @@ var GrainContractController = /** @class */ (function () {
     function GrainContractController() {
         var _this = this;
         this.getReport = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var _a, seller, buyer, year, month, date, product, name_product, page, per_page, qb, sellers, conds_1, params_1, buyers, conds_2, params_2, parsedDate, d, brMatch, isoMatch, _b, day, monthP, yearP, dt, y, m, pageProvided, perPageProvided, data, total, pageNum, perPage, offset, error_1;
-            var _c, _d;
-            return __generator(this, function (_e) {
-                switch (_e.label) {
+            var _a, seller, buyer, year, month, date, date_start, date_end, product, name_product, page, per_page, qb, sellers, conds_1, params_1, buyers, conds_2, params_2, contractEmissionDateAsDate, parseDateToIso, hasDateRange, parsedStartDate, parsedEndDate, parsedDate, y, m, pageProvided, perPageProvided, data, total, pageNum, perPage, offset, error_1;
+            var _b, _c;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
                     case 0:
-                        _e.trys.push([0, 4, , 5]);
-                        _a = req.query, seller = _a.seller, buyer = _a.buyer, year = _a.year, month = _a.month, date = _a.date, product = _a.product, name_product = _a.name_product, page = _a.page, per_page = _a.per_page;
+                        _d.trys.push([0, 4, , 5]);
+                        _a = req.query, seller = _a.seller, buyer = _a.buyer, year = _a.year, month = _a.month, date = _a.date, date_start = _a.date_start, date_end = _a.date_end, product = _a.product, name_product = _a.name_product, page = _a.page, per_page = _a.per_page;
                         qb = GrainContractRepository_1.grainContractRepository.createQueryBuilder("gc");
                         // Filtrar por seller — suporta objeto com campo `name` ou arrays; aceita valores separados por vírgula
                         if (seller) {
@@ -131,37 +131,55 @@ var GrainContractController = /** @class */ (function () {
                                 name_product: "%".concat(String(name_product), "%"),
                             });
                         }
-                        // Filtrar por data completa (DD/MM/YYYY ou YYYY-MM-DD) — compara a parte DATE de created_at
-                        if (date) {
-                            parsedDate = null;
-                            d = String(date).trim();
-                            brMatch = /^\d{2}\/\d{2}\/\d{4}$/.test(d);
-                            isoMatch = /^\d{4}-\d{2}-\d{2}$/.test(d);
+                        contractEmissionDateAsDate = "(CASE WHEN gc.contract_emission_date ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' THEN to_date(gc.contract_emission_date, 'DD/MM/YYYY') ELSE CAST(gc.contract_emission_date AS date) END)";
+                        parseDateToIso = function (value) {
+                            var normalizedValue = value.trim();
+                            var brMatch = /^\d{2}\/\d{2}\/\d{4}$/.test(normalizedValue);
+                            var isoMatch = /^\d{4}-\d{2}-\d{2}$/.test(normalizedValue);
                             if (brMatch) {
-                                _b = d.split("/"), day = _b[0], monthP = _b[1], yearP = _b[2];
-                                parsedDate = "".concat(yearP, "-").concat(monthP, "-").concat(day); // YYYY-MM-DD
+                                var _a = normalizedValue.split("/"), day = _a[0], monthPart = _a[1], yearPart = _a[2];
+                                return "".concat(yearPart, "-").concat(monthPart, "-").concat(day);
                             }
-                            else if (isoMatch) {
-                                parsedDate = d;
+                            if (isoMatch) {
+                                return normalizedValue;
                             }
-                            else {
-                                dt = new Date(d);
-                                if (!Number.isNaN(dt.getTime())) {
-                                    parsedDate = dt.toISOString().slice(0, 10);
-                                }
+                            var parsedDate = new Date(normalizedValue);
+                            if (!Number.isNaN(parsedDate.getTime())) {
+                                return parsedDate.toISOString().slice(0, 10);
                             }
+                            return null;
+                        };
+                        hasDateRange = (typeof date_start !== "undefined" &&
+                            String(date_start).trim() !== "") ||
+                            (typeof date_end !== "undefined" && String(date_end).trim() !== "");
+                        if (hasDateRange) {
+                            parsedStartDate = typeof date_start !== "undefined" && String(date_start).trim() !== ""
+                                ? parseDateToIso(String(date_start))
+                                : null;
+                            parsedEndDate = typeof date_end !== "undefined" && String(date_end).trim() !== ""
+                                ? parseDateToIso(String(date_end))
+                                : null;
+                            if (parsedStartDate) {
+                                qb.andWhere("".concat(contractEmissionDateAsDate, " >= to_date(:dateStart, 'YYYY-MM-DD')"), { dateStart: parsedStartDate });
+                            }
+                            if (parsedEndDate) {
+                                qb.andWhere("".concat(contractEmissionDateAsDate, " <= to_date(:dateEnd, 'YYYY-MM-DD')"), { dateEnd: parsedEndDate });
+                            }
+                        }
+                        else if (date) {
+                            parsedDate = parseDateToIso(String(date));
                             if (parsedDate) {
-                                qb.andWhere("(CASE WHEN gc.contract_emission_date ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' THEN to_date(gc.contract_emission_date, 'DD/MM/YYYY') ELSE CAST(gc.contract_emission_date AS date) END) = to_date(:createdDate, 'YYYY-MM-DD')", {
+                                qb.andWhere("".concat(contractEmissionDateAsDate, " = to_date(:createdDate, 'YYYY-MM-DD')"), {
                                     createdDate: parsedDate,
                                 });
                             }
                         }
                         else {
-                            // Filtrar por ano/mês a partir do created_at
+                            // Compatibilidade antiga: filtrar por ano/mês quando não houver date_start/date_end/date
                             if (year) {
                                 y = Number(year);
                                 if (!Number.isNaN(y)) {
-                                    qb.andWhere("EXTRACT(YEAR FROM (CASE WHEN gc.contract_emission_date ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' THEN to_date(gc.contract_emission_date, 'DD/MM/YYYY') ELSE CAST(gc.contract_emission_date AS date) END)) = :year", {
+                                    qb.andWhere("EXTRACT(YEAR FROM ".concat(contractEmissionDateAsDate, ") = :year"), {
                                         year: y,
                                     });
                                 }
@@ -169,7 +187,7 @@ var GrainContractController = /** @class */ (function () {
                             if (month) {
                                 m = Number(month);
                                 if (!Number.isNaN(m)) {
-                                    qb.andWhere("EXTRACT(MONTH FROM (CASE WHEN gc.contract_emission_date ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' THEN to_date(gc.contract_emission_date, 'DD/MM/YYYY') ELSE CAST(gc.contract_emission_date AS date) END)) = :month", {
+                                    qb.andWhere("EXTRACT(MONTH FROM ".concat(contractEmissionDateAsDate, ") = :month"), {
                                         month: m,
                                     });
                                 }
@@ -189,17 +207,17 @@ var GrainContractController = /** @class */ (function () {
                                 .take(perPage)
                                 .getManyAndCount()];
                     case 1:
-                        _c = _e.sent(), data = _c[0], total = _c[1];
+                        _b = _d.sent(), data = _b[0], total = _b[1];
                         return [2 /*return*/, res.json({ data: data, total: total, page: pageNum, per_page: perPage })];
                     case 2: return [4 /*yield*/, qb
                             .orderBy("(CASE WHEN gc.contract_emission_date ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' THEN to_date(gc.contract_emission_date, 'DD/MM/YYYY') ELSE CAST(gc.contract_emission_date AS timestamp) END)", "DESC")
                             .getManyAndCount()];
                     case 3:
                         // Sem paginação: retornar todos os resultados
-                        _d = _e.sent(), data = _d[0], total = _d[1];
+                        _c = _d.sent(), data = _c[0], total = _c[1];
                         return [2 /*return*/, res.json({ data: data, total: total })];
                     case 4:
-                        error_1 = _e.sent();
+                        error_1 = _d.sent();
                         return [2 /*return*/, res.status(500).json({ message: error_1.message })];
                     case 5: return [2 /*return*/];
                 }
