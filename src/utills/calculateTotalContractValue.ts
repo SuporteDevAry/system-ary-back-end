@@ -10,12 +10,16 @@ export function calculateTotalContractValue(
 ): number {
   const isToneladaMetrica = (value?: string): boolean => {
     if (!value) return false;
-    const quantityType = value.toLowerCase();
+    const quantityType = value
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
     return (
       quantityType === "tm" ||
       quantityType === "toneladas" ||
       quantityType === "tonelada" ||
-      quantityType === "toneladas métricas"
+      quantityType === "toneladas metricas"
     );
   };
 
@@ -45,15 +49,14 @@ export function calculateTotalContractValue(
           return Number(raw.replace(/\./g, ""));
         }
 
-        const [integerPart, decimalPart = ""] = parts;
-
-        // Caso clássico de milhar em TM: 1.000, 10.000, 100.000
-        if (decimalPart === "000") {
+        // Um unico ponto: se a parte apos o ponto tem exatamente 3 digitos,
+        // e um separador de milhar brasileiro (ex.: "1.000" = 1000 TM).
+        // Caso contrario, e decimal (ex.: "2.5" = 2.5 TM).
+        const decimalPart = parts[1];
+        if (decimalPart.length === 3) {
           return Number(raw.replace(/\./g, ""));
         }
-
-        // TM fracionada: 521.170 (521 t e 170 kg), 521.17, 521.1
-        return Number(`${integerPart}.${decimalPart}`);
+        return Number(raw);
       }
     }
 
@@ -93,12 +96,16 @@ export function calculateTotalContractValue(
   // Tm (toneladas métricas) = divide por 1 (não divide)
   let divisor = 60; // padrão: quilos
   if (typeQuantity) {
-    const quantityType = typeQuantity.toLowerCase();
+    const quantityType = typeQuantity
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
     if (
       quantityType === "tm" ||
       quantityType === "toneladas" ||
       quantityType === "tonelada" ||
-      quantityType === "toneladas métricas"
+      quantityType === "toneladas metricas"
     ) {
       divisor = 1;
     }

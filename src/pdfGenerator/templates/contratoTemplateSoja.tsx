@@ -83,7 +83,9 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
       return "";
     }
 
-    const currencySymbol = currency === "Dólar" ? "$" : "R$";
+    const isDollarCurrency =
+      currency === "Dólar" || currency === "USD" || currency === "US$";
+    const currencySymbol = isDollarCurrency ? "$" : "R$";
     return `${currencySymbol} ${parsedValue.toFixed(2).replace(".", ",")}`;
   };
 
@@ -148,7 +150,9 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
       formattedCSeller =
         type_commission_seller === "Por Saca"
           ? `${formattedAmount} por saca`
-          : formattedAmount;
+          : type_commission_seller === "Por TM"
+            ? `${formattedAmount} por tonelada métrica`
+            : formattedAmount;
     }
   }
 
@@ -167,7 +171,9 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
       formattedCBuyer =
         type_commission_buyer === "Por Saca"
           ? `${formattedAmount} por saca`
-          : formattedAmount;
+          : type_commission_buyer === "Por TM"
+            ? `${formattedAmount} por tonelada métrica`
+            : formattedAmount;
     }
   }
 
