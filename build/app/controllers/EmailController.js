@@ -116,7 +116,6 @@ var EmailController = /** @class */ (function () {
                                     "exec-mi@aryoleofar.com.br",
                                     "evandro@aryoleofar.com.br",
                                     "gilberto@aryoleofar.com.br",
-                                    "jhony@aryoleofar.com.br",
                                     "talita@aryoleofar.com.br",
                                     "elcio@aryoleofar.com.br",
                                 ];
@@ -143,7 +142,9 @@ var EmailController = /** @class */ (function () {
                             smtpPass = process.env.SMTP_OIL_PASS;
                             bccEmails = isLocal
                                 ? ["andre.camargo500@gmail.com", "carlos@casinfo.com.br"]
-                                : ["ary@aryoleofar.com.br"];
+                                : [
+                                    "ary@aryoleofar.com.br, mauro@aryoleofar.com.br, joseph@aryoleofar.com.br",
+                                ];
                         }
                         if (isLocal) {
                             console.log("🚫 Ambiente local: remetente configurado para teste.", smtpUser);
