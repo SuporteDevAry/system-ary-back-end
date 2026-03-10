@@ -34,7 +34,8 @@ var ContratoTemplateSoja = function (_a) {
         if (Number.isNaN(parsedValue)) {
             return "";
         }
-        var currencySymbol = currency === "Dólar" ? "$" : "R$";
+        var isDollarCurrency = currency === "Dólar" || currency === "USD" || currency === "US$";
+        var currencySymbol = isDollarCurrency ? "$" : "R$";
         return "".concat(currencySymbol, " ").concat(parsedValue.toFixed(2).replace(".", ","));
     };
     var quantityValue = typeof quantity === "number" ? quantity : (0, helpers_1.parseQuantityToNumber)(quantity);
@@ -86,7 +87,9 @@ var ContratoTemplateSoja = function (_a) {
             formattedCSeller =
                 type_commission_seller === "Por Saca"
                     ? "".concat(formattedAmount, " por saca")
-                    : formattedAmount;
+                    : type_commission_seller === "Por TM"
+                        ? "".concat(formattedAmount, " por tonelada m\u00E9trica")
+                        : formattedAmount;
         }
     }
     // Formatação da comissão do comprador
@@ -101,7 +104,9 @@ var ContratoTemplateSoja = function (_a) {
             formattedCBuyer =
                 type_commission_buyer === "Por Saca"
                     ? "".concat(formattedAmount, " por saca")
-                    : formattedAmount;
+                    : type_commission_buyer === "Por TM"
+                        ? "".concat(formattedAmount, " por tonelada m\u00E9trica")
+                        : formattedAmount;
         }
     }
     var numberContract = number_contract

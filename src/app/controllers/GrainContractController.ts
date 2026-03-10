@@ -9,6 +9,31 @@ import { calculateTotalContractValue } from "../../utills/calculateTotalContract
 import { calcCommissionBySack } from "../../utills/calcCommissionBySack";
 import { GrainContract } from "../entities/GrainContracts";
 
+function isZeroLikeValue(value: number | string | null | undefined): boolean {
+  if (value === null || value === undefined) return false;
+
+  const raw = String(value).trim();
+  if (!raw) return false;
+
+  const onlyDigits = raw.replace(/\D/g, "");
+  return onlyDigits.length > 0 && Number(onlyDigits) === 0;
+}
+
+function resolveQuantityForFinancialCalc(
+  finalQuantity: number | string | null | undefined,
+  quantity: number | string,
+): number | string {
+  if (
+    finalQuantity === null ||
+    finalQuantity === undefined ||
+    isZeroLikeValue(finalQuantity)
+  ) {
+    return quantity;
+  }
+
+  return finalQuantity;
+}
+
 export class GrainContractController {
   getReport = async (req: Request, res: Response): Promise<Response> => {
     try {
@@ -262,6 +287,10 @@ export class GrainContractController {
   ): Promise<Response> => {
     try {
       const numberContract = await generateNumberContract(req.body);
+      const initialFinalQuantity = resolveQuantityForFinancialCalc(
+        req.body.final_quantity,
+        req.body.quantity,
+      );
 
       // const price = convertPrice(
       //   req.body.price,
@@ -303,12 +332,20 @@ export class GrainContractController {
           (req.body.type_commission_seller === "Percentual"
             ? ""
             : req.body.type_commission_seller_currency) ||
-          (req.body.type_currency === "Dólar" ? "Dólar" : "BRL");
+          (req.body.type_currency === "Dólar" ||
+          req.body.type_currency === "USD" ||
+          req.body.type_currency === "US$"
+            ? "Dólar"
+            : "BRL");
 
         // Usa day_exchange_rate do contrato como fallback se commission_seller_exchange_rate não for preenchido
         const sellerRate =
           req.body.commission_seller_exchange_rate ||
-          (sellerCurrency === "Dólar" ? req.body.day_exchange_rate : undefined);
+          (sellerCurrency === "Dólar" ||
+          sellerCurrency === "USD" ||
+          sellerCurrency === "US$"
+            ? req.body.day_exchange_rate
+            : undefined);
 
         commissionSellerContract = calcCommissionBySack(
           req.body.quantity,
@@ -331,12 +368,20 @@ export class GrainContractController {
           (req.body.type_commission_buyer === "Percentual"
             ? ""
             : req.body.type_commission_buyer_currency) ||
-          (req.body.type_currency === "Dólar" ? "Dólar" : "BRL");
+          (req.body.type_currency === "Dólar" ||
+          req.body.type_currency === "USD" ||
+          req.body.type_currency === "US$"
+            ? "Dólar"
+            : "BRL");
 
         // Usa day_exchange_rate do contrato como fallback se commission_buyer_exchange_rate não for preenchido
         const buyerRate =
           req.body.commission_buyer_exchange_rate ||
-          (buyerCurrency === "Dólar" ? req.body.day_exchange_rate : undefined);
+          (buyerCurrency === "Dólar" ||
+          buyerCurrency === "USD" ||
+          buyerCurrency === "US$"
+            ? req.body.day_exchange_rate
+            : undefined);
 
         commissionBuyerContract = calcCommissionBySack(
           req.body.quantity,
@@ -370,7 +415,7 @@ export class GrainContractController {
       const grainContract = grainContractRepository.create({
         ...dataWithConvertedPrice,
         number_contract: numberContract,
-        final_quantity: req.body.quantity, // Salvando o mesmo valor que quantity
+        final_quantity: initialFinalQuantity,
         status_received: "Não",
         commission_contract: finalCommissionContract,
         commission_seller_contract_value: commissionSellerContract,
@@ -380,6 +425,15 @@ export class GrainContractController {
       const result = (await grainContractRepository.save(
         grainContract,
       )) as unknown as GrainContract;
+
+      // Na criacao, quantidade final deve espelhar a quantidade do contrato.
+      if (
+        isZeroLikeValue(result.final_quantity) &&
+        !isZeroLikeValue(result.quantity)
+      ) {
+        result.final_quantity = result.quantity;
+        await grainContractRepository.save(result);
+      }
 
       // Atualiza contract_emission_datetime com a data de emissão e hora do created_at
       if (result.contract_emission_date && result.created_at) {
@@ -473,10 +527,10 @@ export class GrainContractController {
         otherFields.final_quantity !== undefined
           ? otherFields.final_quantity
           : grainContract.final_quantity;
-      const quantityForFinancialCalc =
-        finalQuantityToUse !== null && finalQuantityToUse !== undefined
-          ? finalQuantityToUse
-          : quantityToUse;
+      const quantityForFinancialCalc = resolveQuantityForFinancialCalc(
+        finalQuantityToUse,
+        quantityToUse,
+      );
       const priceFromRequest =
         otherFields.price !== undefined
           ? otherFields.price
@@ -505,7 +559,10 @@ export class GrainContractController {
         price: priceFromRequest,
         final_quantity:
           otherFields.final_quantity !== undefined
-            ? otherFields.final_quantity
+            ? resolveQuantityForFinancialCalc(
+                otherFields.final_quantity,
+                quantityToUse,
+              )
             : grainContract.final_quantity,
         total_contract_value,
         type_quantity: typeQuantityToCheck,
@@ -577,18 +634,27 @@ export class GrainContractController {
         // Usa type_currency do contrato como fallback se type_commission_seller_currency não for preenchido
         const sellerCurrency =
           mergedData.type_commission_seller_currency ||
-          (mergedData.type_currency === "Dólar" ? "Dólar" : "BRL");
+          (mergedData.type_currency === "Dólar" ||
+          mergedData.type_currency === "USD" ||
+          mergedData.type_currency === "US$"
+            ? "Dólar"
+            : "BRL");
 
         // Usa day_exchange_rate do contrato como fallback se commission_seller_exchange_rate não for preenchido
         const sellerRate =
           mergedData.commission_seller_exchange_rate ||
-          (sellerCurrency === "Dólar"
+          (sellerCurrency === "Dólar" ||
+          sellerCurrency === "USD" ||
+          sellerCurrency === "US$"
             ? mergedData.day_exchange_rate
             : undefined);
 
         updatedGrainContract.commission_seller_contract_value =
           calcCommissionBySack(
-            mergedData.final_quantity ?? mergedData.quantity,
+            resolveQuantityForFinancialCalc(
+              mergedData.final_quantity,
+              mergedData.quantity,
+            ),
             mergedData.type_quantity,
             mergedData.commission_seller,
             mergedData.type_commission_seller,
@@ -608,18 +674,27 @@ export class GrainContractController {
         // Usa type_currency do contrato como fallback se type_commission_buyer_currency não for preenchido
         const buyerCurrency =
           mergedData.type_commission_buyer_currency ||
-          (mergedData.type_currency === "Dólar" ? "Dólar" : "BRL");
+          (mergedData.type_currency === "Dólar" ||
+          mergedData.type_currency === "USD" ||
+          mergedData.type_currency === "US$"
+            ? "Dólar"
+            : "BRL");
 
         // Usa day_exchange_rate do contrato como fallback se commission_buyer_exchange_rate não for preenchido
         const buyerRate =
           mergedData.commission_buyer_exchange_rate ||
-          (buyerCurrency === "Dólar"
+          (buyerCurrency === "Dólar" ||
+          buyerCurrency === "USD" ||
+          buyerCurrency === "US$"
             ? mergedData.day_exchange_rate
             : undefined);
 
         updatedGrainContract.commission_buyer_contract_value =
           calcCommissionBySack(
-            mergedData.final_quantity ?? mergedData.quantity,
+            resolveQuantityForFinancialCalc(
+              mergedData.final_quantity,
+              mergedData.quantity,
+            ),
             mergedData.type_quantity,
             mergedData.commission_buyer,
             mergedData.type_commission_buyer,
@@ -727,6 +802,13 @@ export class GrainContractController {
         hasOwn.call(req.body, "final_quantity") &&
         req.body.final_quantity !== undefined;
 
+      if (finalQuantityWasSent) {
+        updatedFields.final_quantity = resolveQuantityForFinancialCalc(
+          req.body.final_quantity,
+          grainContract.quantity,
+        ) as number;
+      }
+
       // Verifica se precisa recalcular total do contrato e comissão
       const type_currency =
         req.body.type_currency || grainContract.type_currency;
@@ -740,15 +822,28 @@ export class GrainContractController {
         finalQuantityWasSent &&
         Number(updatedFields.final_quantity) !== Number(currentFinalQuantity);
 
+      const hasCommissionConfigured =
+        !!grainContract.commission_seller || !!grainContract.commission_buyer;
+
       const shouldRecalculateDerivedFields =
         finalQuantityWasSent ||
         finalQuantityChanged ||
-        (type_currency === "Dólar" && exchangeRateChanged);
+        hasCommissionConfigured ||
+        ((type_currency === "Dólar" ||
+          type_currency === "USD" ||
+          type_currency === "US$") &&
+          exchangeRateChanged);
 
       if (shouldRecalculateDerivedFields) {
         const finalQuantityForCalc = finalQuantityWasSent
-          ? (updatedFields.final_quantity ?? grainContract.quantity)
-          : (grainContract.final_quantity ?? grainContract.quantity);
+          ? resolveQuantityForFinancialCalc(
+              updatedFields.final_quantity,
+              grainContract.quantity,
+            )
+          : resolveQuantityForFinancialCalc(
+              grainContract.final_quantity,
+              grainContract.quantity,
+            );
         const exchangeRateForCalc =
           updatedFields.day_exchange_rate ?? grainContract.day_exchange_rate;
 
@@ -792,18 +887,27 @@ export class GrainContractController {
           // Usa type_currency do contrato como fallback se type_commission_seller_currency não for preenchido
           const sellerCurrency =
             mergedData.type_commission_seller_currency ||
-            (mergedData.type_currency === "Dólar" ? "Dólar" : "BRL");
+            (mergedData.type_currency === "Dólar" ||
+            mergedData.type_currency === "USD" ||
+            mergedData.type_currency === "US$"
+              ? "Dólar"
+              : "BRL");
 
           // Usa day_exchange_rate do contrato como fallback se commission_seller_exchange_rate não for preenchido
           const sellerRate =
             mergedData.commission_seller_exchange_rate ??
-            (sellerCurrency === "Dólar"
+            (sellerCurrency === "Dólar" ||
+            sellerCurrency === "USD" ||
+            sellerCurrency === "US$"
               ? mergedData.day_exchange_rate
               : undefined);
 
           filteredUpdates.commission_seller_contract_value =
             calcCommissionBySack(
-              mergedData.final_quantity ?? mergedData.quantity,
+              resolveQuantityForFinancialCalc(
+                mergedData.final_quantity,
+                mergedData.quantity,
+              ),
               mergedData.type_quantity,
               mergedData.commission_seller,
               mergedData.type_commission_seller,
@@ -823,18 +927,27 @@ export class GrainContractController {
           // Usa type_currency do contrato como fallback se type_commission_buyer_currency não for preenchido
           const buyerCurrency =
             mergedData.type_commission_buyer_currency ||
-            (mergedData.type_currency === "Dólar" ? "Dólar" : "BRL");
+            (mergedData.type_currency === "Dólar" ||
+            mergedData.type_currency === "USD" ||
+            mergedData.type_currency === "US$"
+              ? "Dólar"
+              : "BRL");
 
           // Usa day_exchange_rate do contrato como fallback se commission_buyer_exchange_rate não for preenchido
           const buyerRate =
             mergedData.commission_buyer_exchange_rate ??
-            (buyerCurrency === "Dólar"
+            (buyerCurrency === "Dólar" ||
+            buyerCurrency === "USD" ||
+            buyerCurrency === "US$"
               ? mergedData.day_exchange_rate
               : undefined);
 
           filteredUpdates.commission_buyer_contract_value =
             calcCommissionBySack(
-              mergedData.final_quantity ?? mergedData.quantity,
+              resolveQuantityForFinancialCalc(
+                mergedData.final_quantity,
+                mergedData.quantity,
+              ),
               mergedData.type_quantity,
               mergedData.commission_buyer,
               mergedData.type_commission_buyer,
