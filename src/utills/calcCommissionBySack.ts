@@ -11,11 +11,12 @@ function normalizeNumber(
 
   const isToneladaMetrica = (type?: string): boolean => {
     if (!type) return false;
-    const quantityType = type.toLowerCase();
+    const quantityType = normalizeQuantityType(type);
     return (
       quantityType === "tm" ||
       quantityType === "toneladas" ||
-      quantityType === "tonelada"
+      quantityType === "tonelada" ||
+      quantityType === "toneladas metricas"
     );
   };
 
@@ -35,15 +36,14 @@ function normalizeNumber(
         return Number(raw.replace(/\./g, ""));
       }
 
-      const [integerPart, decimalPart = ""] = parts;
-
-      // Caso clássico de milhar em TM: 1.000, 10.000, 100.000
-      if (decimalPart === "000") {
+      // Um unico ponto: se a parte apos o ponto tem exatamente 3 digitos,
+      // e um separador de milhar brasileiro (ex.: "1.000" = 1000 TM).
+      // Caso contrario, e decimal (ex.: "2.5" = 2.5 TM).
+      const decimalPart = parts[1];
+      if (decimalPart.length === 3) {
         return Number(raw.replace(/\./g, ""));
       }
-
-      // TM fracionada: 521.170 (521 t e 170 kg), 521.17, 521.1
-      return Number(`${integerPart}.${decimalPart}`);
+      return Number(raw);
     }
   }
 
@@ -62,13 +62,21 @@ function normalizeNumber(
   return Number(raw);
 }
 
+function normalizeQuantityType(type?: string): string {
+  return String(type || "")
+    .toLowerCase()
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
 /**
  * Calcula a comissão baseada no tipo de comissão, moeda e quantidade
  *
  * @param quantity - Quantidade do contrato
  * @param typeQuantity - Tipo da quantidade ("KG" ou "TM" para toneladas métricas)
  * @param commissionValue - Valor da comissão
- * @param typeCommission - Tipo de comissão ("Fixo", "Percentual", "Por Saca")
+ * @param typeCommission - Tipo de comissão ("Fixo", "Percentual", "Por Saca", "Por TM")
  * @param typeCurrency - Tipo de moeda ("BRL" ou "USD"/"Dólar")
  * @param exchangeRate - Taxa de câmbio (usado quando typeCurrency é "USD"/"Dólar")
  * @param totalContractValue - Valor total do contrato (usado para "Percentual")
@@ -99,7 +107,11 @@ export function calcCommissionBySack(
     ? normalizeNumber(totalContractValue, true)
     : 0;
 
-  const isDollar = typeCurrency === "USD" || typeCurrency === "Dólar";
+  const isDollar =
+    typeCurrency === "USD" ||
+    typeCurrency === "US$" ||
+    typeCurrency === "Dólar";
+  const quantityType = normalizeQuantityType(typeQuantity || "KG");
 
   // REGRA 1: Fixo em Dólar - comissão_valor × exchange_rate
   // Ex.: 1,25 × 5,000 = 6,25
@@ -121,9 +133,6 @@ export function calcCommissionBySack(
   // REGRA 4 e 5: Por Saca
   if (typeCommission === "Por Saca") {
     let sacas = 0;
-
-    // Fallback para KG se typeQuantity não for preenchido
-    const quantityType = (typeQuantity || "KG").toLowerCase();
 
     // Calcula quantidade em sacas baseado no tipo de quantidade
     if (
@@ -151,6 +160,24 @@ export function calcCommissionBySack(
     // REGRA 5: Em Reais por saca - (quantidade / 60) × comissão_R$
     // Ex.: (10.00 / 60) × R$ 10,00 = R$ 1.666,67
     return sacas * commissionNum;
+  }
+
+  // REGRA 6 e 7: Por TM (tonelada metrica)
+  if (typeCommission === "Por TM") {
+    const isQuantityInKg =
+      quantityType === "kg" ||
+      quantityType === "quilos" ||
+      quantityType === "quilo";
+
+    // Se a quantidade vier em KG, converte para TM; caso contrario assume TM.
+    const toneladasMetricas = isQuantityInKg ? quantityNum / 1000 : quantityNum;
+
+    // Regra explicita: quantidade x (valor da comissao x cambio da comissao)
+    const commissionPerTm = isDollar
+      ? commissionNum * normalizedExchangeRate
+      : commissionNum;
+
+    return toneladasMetricas * commissionPerTm;
   }
 
   return 0;

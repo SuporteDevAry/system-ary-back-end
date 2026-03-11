@@ -6,11 +6,15 @@ function calculateTotalContractValue(product, quantity, price, typeCurrency, day
     var isToneladaMetrica = function (value) {
         if (!value)
             return false;
-        var quantityType = value.toLowerCase();
+        var quantityType = value
+            .toLowerCase()
+            .trim()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
         return (quantityType === "tm" ||
             quantityType === "toneladas" ||
             quantityType === "tonelada" ||
-            quantityType === "toneladas métricas");
+            quantityType === "toneladas metricas");
     };
     var normalizeNumber = function (value, preferDecimalDot, options) {
         var raw = String(value).trim();
@@ -29,13 +33,14 @@ function calculateTotalContractValue(product, quantity, price, typeCurrency, day
                 if (parts.length > 2) {
                     return Number(raw.replace(/\./g, ""));
                 }
-                var integerPart = parts[0], _a = parts[1], decimalPart = _a === void 0 ? "" : _a;
-                // Caso clássico de milhar em TM: 1.000, 10.000, 100.000
-                if (decimalPart === "000") {
+                // Um unico ponto: se a parte apos o ponto tem exatamente 3 digitos,
+                // e um separador de milhar brasileiro (ex.: "1.000" = 1000 TM).
+                // Caso contrario, e decimal (ex.: "2.5" = 2.5 TM).
+                var decimalPart = parts[1];
+                if (decimalPart.length === 3) {
                     return Number(raw.replace(/\./g, ""));
                 }
-                // TM fracionada: 521.170 (521 t e 170 kg), 521.17, 521.1
-                return Number("".concat(integerPart, ".").concat(decimalPart));
+                return Number(raw);
             }
         }
         if (raw.includes(",")) {
@@ -63,11 +68,15 @@ function calculateTotalContractValue(product, quantity, price, typeCurrency, day
     // Tm (toneladas métricas) = divide por 1 (não divide)
     var divisor = 60; // padrão: quilos
     if (typeQuantity) {
-        var quantityType = typeQuantity.toLowerCase();
+        var quantityType = typeQuantity
+            .toLowerCase()
+            .trim()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
         if (quantityType === "tm" ||
             quantityType === "toneladas" ||
             quantityType === "tonelada" ||
-            quantityType === "toneladas métricas") {
+            quantityType === "toneladas metricas") {
             divisor = 1;
         }
     }
