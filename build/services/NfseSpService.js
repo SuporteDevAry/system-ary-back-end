@@ -65,11 +65,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NfseSpService = void 0;
 var fs_1 = __importDefault(require("fs"));
 var path_1 = __importDefault(require("path"));
+<<<<<<< HEAD
 var https_1 = __importDefault(require("https"));
 var xml_crypto_1 = require("xml-crypto");
 var xml2js_1 = require("xml2js");
 var soap = __importStar(require("soap"));
 var crypto_1 = __importDefault(require("crypto"));
+=======
+var xml_crypto_1 = require("xml-crypto");
+var xml2js_1 = require("xml2js");
+var soap = __importStar(require("soap"));
+>>>>>>> 0c7451c346de0a6cd9048772d1ca35b9d93f8f32
 var NfseSpService = /** @class */ (function () {
     function NfseSpService() {
         this.config = {
@@ -104,6 +110,7 @@ var NfseSpService = /** @class */ (function () {
         return cert.replace(/BagAttributes[\s\S]*?MII/g, "MII").replace(/\s+/g, "");
     };
     /**
+<<<<<<< HEAD
      * Monta a estrutura InfoComplementares com campos obrigatórios da Reforma Tributária v02
      * Adiciona campos de IBS/CBS conforme exigido desde 01/01/2026
      */
@@ -434,10 +441,62 @@ var NfseSpService = /** @class */ (function () {
         catch (error) {
             console.error("❌ Erro ao assinar XML:", error);
             throw new Error("Falha na assinatura: ".concat(error.message));
+=======
+     * Assina XML com certificado digital conforme padrão da Prefeitura de SP
+     * A assinatura deve ser inserida após todos os RPS, antes de fechar </PedidoEnvioLoteRPS>
+     */
+    // Se estiver usando TypeScript, defina o tipo para o certificado se necessário
+    NfseSpService.prototype.signXml = function (xml) {
+        try {
+            var certLimpo = this.obterCertificadoLimpo();
+            // 1. Minificação Radical - Sem isso, SP não aceita.
+            var xmlMinificado = xml
+                .replace(/>\s+</g, "><")
+                .replace(/\r?\n|\r/g, "")
+                .trim();
+            var sig = new xml_crypto_1.SignedXml({
+                privateKey: this.key,
+                // SP exige C14N inclusivo (20010315)
+                canonicalizationAlgorithm: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
+                signatureAlgorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+            });
+            // 2. A Referência deve ser exatamente assim:
+            sig.addReference({
+                xpath: "//*[local-name(.)='PedidoEnvioLoteRPS']",
+                uri: "",
+                digestAlgorithm: "http://www.w3.org/2001/04/xmlenc#sha256",
+                transforms: [
+                    "http://www.w3.org/2000/09/xmldsig#enveloped-signature",
+                    "http://www.w3.org/TR/2001/REC-xml-c14n-20010315", // Canonicalização no transform
+                ],
+            });
+            // 3. Calcula a Assinatura
+            sig.computeSignature(xmlMinificado, {
+                location: { reference: "//*[local-name(.)='PedidoEnvioLoteRPS']", action: "append" },
+                prefix: ""
+            });
+            var signedXml = sig.getSignedXml();
+            // 4. LIMPEZA MANUAL CIRÚRGICA (Não use bibliotecas aqui, use Replace)
+            // Removemos qualquer Id que a lib tenha tentado criar (ex: Id="_0")
+            signedXml = signedXml.replace(/\sId="[^"]*"/g, "");
+            // SP exige que as tags DS não tenham prefixo
+            signedXml = signedXml.replace(/<ds:/g, "<").replace(/<\/ds:/g, "</");
+            // Garante que a Signature tenha o namespace correto e esteja colada no conteúdo
+            signedXml = signedXml.replace(/<Signature[^>]*>/, '<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">');
+            // 5. Injeta o KeyInfo (Certificado) que você já limpou do erro 1001
+            var keyInfoTag = "<KeyInfo><X509Data><X509Certificate>".concat(certLimpo, "</X509Certificate></X509Data></KeyInfo>");
+            signedXml = signedXml.replace("</SignatureValue>", "</SignatureValue>".concat(keyInfoTag));
+            // Remove declaração XML e garante que não existam novos espaços
+            return signedXml.replace(/<\?xml.*?\?>/i, "").replace(/>\s+</g, "><");
+        }
+        catch (error) {
+            throw error;
+>>>>>>> 0c7451c346de0a6cd9048772d1ca35b9d93f8f32
         }
     };
     NfseSpService.prototype.enviarLoteRps = function (xml) {
         return __awaiter(this, void 0, void 0, function () {
+<<<<<<< HEAD
             var xmlSigned, preEnvioValorTotal, preEnvioValorServico, soapEnvelope_1, response, error_1;
             var _this = this;
             return __generator(this, function (_a) {
@@ -542,6 +601,36 @@ var NfseSpService = /** @class */ (function () {
                         console.error("❌ Erro ao enviar lote RPS:", error_1);
                         throw new Error("Falha no envio: ".concat(error_1.message));
                     case 3: return [2 /*return*/];
+=======
+            var xmlSigned, wsdlPath, client, result, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        xmlSigned = this.signXml(xml);
+                        wsdlPath = path_1.default.resolve(__dirname, "../../wsdl/lotenfe.wsdl");
+                        return [4 /*yield*/, soap.createClientAsync(wsdlPath, {
+                                endpoint: this.config.soapEndpoint,
+                                disableCache: true,
+                                // FORÇA O SOAP A NÃO FORMATAR O XML (CRUCIAL)
+                                preserveWhitespace: true,
+                            })];
+                    case 1:
+                        client = _a.sent();
+                        client.setSecurity(new soap.ClientSSLSecurity(path_1.default.resolve(this.config.keyPath), path_1.default.resolve(this.config.certPath), { rejectUnauthorized: false }));
+                        return [4 /*yield*/, client.EnvioLoteRPSAsync({
+                                VersaoSchema: 1,
+                                MensagemXML: { _xml: "<![CDATA[".concat(xmlSigned, "]]>") },
+                            })];
+                    case 2:
+                        result = _a.sent();
+                        return [2 /*return*/, this.parseResponse(result)];
+                    case 3:
+                        error_1 = _a.sent();
+                        console.error("❌ Erro ao enviar lote RPS:", error_1);
+                        throw new Error("Falha no envio: ".concat(error_1.message));
+                    case 4: return [2 /*return*/];
+>>>>>>> 0c7451c346de0a6cd9048772d1ca35b9d93f8f32
                 }
             });
         });

@@ -54,6 +54,7 @@ var nodemailer_1 = __importDefault(require("nodemailer"));
 var pdfGenerator_1 = __importDefault(require("../../pdfGenerator"));
 var EmailLogRepository_1 = require("../repositories/EmailLogRepository");
 var coverPage_1 = require("../../pdfGenerator/helpers/coverPage");
+var GrainContractRepository_1 = require("../repositories/GrainContractRepository");
 var signatureEmailImageSoy = path_1.default.resolve(__dirname, "../../pdfGenerator/helpers/assinatura_execucao_mi.png");
 var signatureEmailImageOil = path_1.default.resolve(__dirname, "../../pdfGenerator/helpers/assinatura_oleo.png");
 var EmailController = /** @class */ (function () {
@@ -62,16 +63,37 @@ var EmailController = /** @class */ (function () {
     EmailController.prototype.SendEmails = function (req, res) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var _c, contractData, templateName, sender, number_contract, sigla, group1, group2, group3, isLocal, signatureFileName, signatureEmailImage, smtpUser, smtpPass, bccEmails, hasPreviousSent, subjectPrefix, nameSeller, nameBuyer, pdfSeller, pdfBuyer, transporter, error_1;
+            var _c, contractData, templateName, sender, number_contract, dbContract, sigla, group1, group2, group3, isLocal, signatureFileName, signatureEmailImage, smtpUser, smtpPass, bccEmails, hasPreviousSent, subjectPrefix, nameSeller, nameBuyer, pdfSeller, pdfBuyer, transporter, error_1;
             return __generator(this, function (_d) {
                 switch (_d.label) {
                     case 0:
-                        _d.trys.push([0, 6, , 7]);
+                        _d.trys.push([0, 8, , 9]);
                         _c = req.body, contractData = _c.contractData, templateName = _c.templateName, sender = _c.sender, number_contract = _c.number_contract;
                         if (!contractData || !templateName || !sender || !number_contract) {
                             res.status(400).send({ error: "Campos necessários não informados." });
                             return [2 /*return*/];
                         }
+                        if (!(contractData.id &&
+                            (contractData.commission_seller_contract_value === undefined ||
+                                contractData.commission_buyer_contract_value === undefined))) return [3 /*break*/, 2];
+                        return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.findOne({
+                                where: { id: contractData.id },
+                            })];
+                    case 1:
+                        dbContract = _d.sent();
+                        if (dbContract) {
+                            // Sobrescrever com os valores do banco
+                            contractData.commission_seller_contract_value =
+                                dbContract.commission_seller_contract_value;
+                            contractData.commission_buyer_contract_value =
+                                dbContract.commission_buyer_contract_value;
+                            contractData.type_commission_seller_currency =
+                                dbContract.type_commission_seller_currency;
+                            contractData.type_commission_buyer_currency =
+                                dbContract.type_commission_buyer_currency;
+                        }
+                        _d.label = 2;
+                    case 2:
                         sigla = number_contract.split(".")[0].toUpperCase();
                         group1 = ["S", "T", "SG", "CN"];
                         group2 = ["O", "OC", "OA", "SB", "EP"];
@@ -94,7 +116,6 @@ var EmailController = /** @class */ (function () {
                                     "exec-mi@aryoleofar.com.br",
                                     "evandro@aryoleofar.com.br",
                                     "gilberto@aryoleofar.com.br",
-                                    "jhony@aryoleofar.com.br",
                                     "talita@aryoleofar.com.br",
                                     "elcio@aryoleofar.com.br",
                                 ];
@@ -121,7 +142,9 @@ var EmailController = /** @class */ (function () {
                             smtpPass = process.env.SMTP_OIL_PASS;
                             bccEmails = isLocal
                                 ? ["andre.camargo500@gmail.com", "carlos@casinfo.com.br"]
-                                : ["ary@aryoleofar.com.br"];
+                                : [
+                                    "ary@aryoleofar.com.br, mauro@aryoleofar.com.br, joseph@aryoleofar.com.br",
+                                ];
                         }
                         if (isLocal) {
                             console.log("🚫 Ambiente local: remetente configurado para teste.", smtpUser);
@@ -139,14 +162,14 @@ var EmailController = /** @class */ (function () {
                                 typeContract: "Vendedor",
                                 template: templateName,
                             })];
-                    case 1:
+                    case 3:
                         pdfSeller = _d.sent();
                         return [4 /*yield*/, (0, pdfGenerator_1.default)({
                                 data: contractData,
                                 typeContract: "Comprador",
                                 template: templateName,
                             })];
-                    case 2:
+                    case 4:
                         pdfBuyer = _d.sent();
                         transporter = nodemailer_1.default.createTransport({
                             host: process.env.SMTP_HOST,
@@ -183,7 +206,7 @@ var EmailController = /** @class */ (function () {
                                     },
                                 ],
                             })];
-                    case 3:
+                    case 5:
                         // Enviar e-mail para o vendedor
                         _d.sent();
                         // Enviar e-mail para o comprador
@@ -212,7 +235,7 @@ var EmailController = /** @class */ (function () {
                                     },
                                 ],
                             })];
-                    case 4:
+                    case 6:
                         // Enviar e-mail para o comprador
                         _d.sent();
                         // anexar folha de rosto no email
@@ -221,17 +244,17 @@ var EmailController = /** @class */ (function () {
                                 number_contract: number_contract,
                                 sent_at: new Date(),
                             })];
-                    case 5:
+                    case 7:
                         // anexar folha de rosto no email
                         _d.sent();
                         res.status(200).send({ message: "E-mails enviados com sucesso!" });
-                        return [3 /*break*/, 7];
-                    case 6:
+                        return [3 /*break*/, 9];
+                    case 8:
                         error_1 = _d.sent();
                         console.error(error_1);
                         res.status(500).send({ error: "Erro ao enviar os e-mails." });
-                        return [3 /*break*/, 7];
-                    case 7: return [2 /*return*/];
+                        return [3 /*break*/, 9];
+                    case 9: return [2 /*return*/];
                 }
             });
         });

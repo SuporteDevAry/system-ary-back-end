@@ -4,7 +4,21 @@ exports.convertPrice = void 0;
 function convertPrice(price, typeCurrency, dayExchangeRate) {
     var priceNumber = Number(price);
     if (typeCurrency === "Dólar" && dayExchangeRate) {
-        return Number((priceNumber * Number(dayExchangeRate)).toFixed(2));
+        var normalizeRate = function (value) {
+            var raw = String(value).trim();
+            if (!raw) {
+                return Number.NaN;
+            }
+            if (raw.includes(",")) {
+                return Number(raw.replace(/\./g, "").replace(",", "."));
+            }
+            if (raw.includes(".")) {
+                return Number(raw);
+            }
+            return Number(raw);
+        };
+        var rateNumber = normalizeRate(dayExchangeRate);
+        return priceNumber * rateNumber;
     }
     return priceNumber;
 }
