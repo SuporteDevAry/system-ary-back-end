@@ -145,7 +145,7 @@ export class FocusNfeService {
     try {
       console.log(`🔍 Consultando NFS-e ${numeroProtocolo} na Focus NFe...`);
 
-      return await this.fazerRequisicaoApi("GET", `/nfse/${numeroProtocolo}`);
+      return await this.fazerRequisicaoApi("GET", `/nfse/${numeroProtocolo}?completa=0`);
     } catch (error: any) {
       console.error("❌ Erro ao consultar Focus NFe:", error);
       throw new Error(`Falha na consulta: ${error.message}`);

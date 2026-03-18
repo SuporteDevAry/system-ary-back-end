@@ -69,6 +69,8 @@ export const NfseController = {
       const { protocolo } = req.params;
       const { provider } = req.query;
 
+      console.log("back controller = ", protocolo);
+
       if (!protocolo) {
         throw new BadRequestError("Protocolo não informado");
       }
