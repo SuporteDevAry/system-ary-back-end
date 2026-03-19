@@ -1,31 +1,42 @@
 import { Request, Response } from "express";
 import { InvoiceRepository } from "../repositories/InvoiceRepository";
+import { getNfseService } from "../../services/NfseServiceAdapter";
+import { NfseProvider } from "../../services/NfseServiceAdapter";
 import { NfseSpService } from "../../services/NfseSpService";
 import { BadRequestError } from "../helpers/api-errors";
 
 export const NfseController = {
   /**
-   * Envia lote de RPS para a Prefeitura de SP
+   * Envia lote de RPS para a Prefeitura de SP ou Focus NFe (conforme NFSE_PROVIDER)
    * POST /api/nfse/enviar-lote
-   * Body: { xml: string } - XML completo do PedidoEnvioLoteRPS
+   * Body: { xml: string, provider?: "prefeitura"|"focusnfe", debug?: boolean }
    */
   async enviarLoteRps(req: Request, res: Response) {
     try {
-      const { xml, debug } = req.body;
+      const { xml, debug, provider } = req.body;
 
       if (!xml || typeof xml !== "string") {
         throw new BadRequestError("XML do lote não informado");
       }
 
-      // Enviar para a prefeitura (service vai assinar e enviar)
-      const nfseService = new NfseSpService();
+      // Criar serviço (usa adapter para provider switching)
+      const nfseService = getNfseService();
 
+      // Se especificou provider na request, usa esse
+      if (provider) {
+        nfseService.setProvider(provider as NfseProvider);
+      }
 
-      // Se debug=true, retorna apenas o XML assinado sem enviar
-      if (debug) {
-        const xmlSigned = (nfseService as any).signXml(xml);
+      const activeProvider = nfseService.getProvider();
+      console.log(`📨 Enviando via ${activeProvider}...`);
+
+      // Se debug=true, retorna apenas o XML assinado sem enviar (apenas para Prefeitura)
+      if (debug && activeProvider === "prefeitura") {
+        const prefeituraService = new NfseSpService();
+        const xmlSigned = (prefeituraService as any).signXml(xml);
         return res.status(200).json({
           message: "XML assinado (não enviado - modo debug)",
+          provider: activeProvider,
           xmlAssinado: xmlSigned,
         });
       }
@@ -34,7 +45,9 @@ export const NfseController = {
 
       return res.status(200).json({
         message: "Lote enviado com sucesso",
-        protocolo: result.Protocolo || result.NumeroProtocolo,
+        provider: activeProvider,
+        protocolo:
+          result.Protocolo || result.NumeroProtocolo || result.referencia,
         resultado: result,
       });
     } catch (error: any) {
@@ -49,19 +62,34 @@ export const NfseController = {
   /**
    * Consulta status do lote pelo protocolo
    * GET /api/nfse/consultar-lote/:protocolo
+   * Query: { provider?: "prefeitura"|"focusnfe" }
    */
   async consultarLote(req: Request, res: Response) {
     try {
       const { protocolo } = req.params;
+      const { provider } = req.query;
+
+      console.log("back controller = ", protocolo);
 
       if (!protocolo) {
         throw new BadRequestError("Protocolo não informado");
       }
 
-      const nfseService = new NfseSpService();
+      const nfseService = getNfseService();
+
+      if (provider) {
+        nfseService.setProvider(provider as NfseProvider);
+      }
+
+      const activeProvider = nfseService.getProvider();
+      console.log(`🔍 Consultando ${protocolo} via ${activeProvider}...`);
+
       const result = await nfseService.consultarLote(protocolo);
 
-      return res.status(200).json(result);
+      return res.status(200).json({
+        provider: activeProvider,
+        resultado: result,
+      });
     } catch (error: any) {
       console.error("Erro ao consultar lote:", error);
       return res.status(500).json({
@@ -74,16 +102,25 @@ export const NfseController = {
   /**
    * Cancela uma NFS-e
    * POST /api/nfse/cancelar
+   * Body: { nfseNumber: string, motivo: string, provider?: "prefeitura"|"focusnfe" }
    */
   async cancelarNfse(req: Request, res: Response) {
     try {
-      const { nfseNumber, motivo } = req.body;
+      const { nfseNumber, motivo, provider } = req.body;
 
       if (!nfseNumber || !motivo) {
         throw new BadRequestError("Número da NFS-e e motivo são obrigatórios");
       }
 
-      const nfseService = new NfseSpService();
+      const nfseService = getNfseService();
+
+      if (provider) {
+        nfseService.setProvider(provider);
+      }
+
+      const activeProvider = nfseService.getProvider();
+      console.log(`❌ Cancelando ${nfseNumber} via ${activeProvider}...`);
+
       const result = await nfseService.cancelarNfse(nfseNumber, motivo);
 
       // Atualizar status no banco (se necessário)
@@ -95,6 +132,7 @@ export const NfseController = {
 
       return res.status(200).json({
         message: "NFS-e cancelada com sucesso",
+        provider: activeProvider,
         resultado: result,
       });
     } catch (error: any) {
@@ -109,13 +147,23 @@ export const NfseController = {
   /**
    * Testa conexão com o webservice (útil para validar certificado)
    * GET /api/nfse/testar-conexao
+   * Query: { provider?: "prefeitura"|"focusnfe" }
    */
   async testarConexao(req: Request, res: Response) {
     try {
-      const nfseService = new NfseSpService();
+      const { provider } = req.query;
+
+      const nfseService = getNfseService();
+
+      if (provider) {
+        nfseService.setProvider(provider as NfseProvider);
+      }
+
+      const activeProvider = nfseService.getProvider();
 
       return res.status(200).json({
-        message: "Certificados carregados com sucesso",
+        message: "Serviço configurado com sucesso",
+        provider: activeProvider,
         ambiente: process.env.SOAP_ENDPOINT?.includes("homologacao")
           ? "HOMOLOGAÇÃO"
           : "PRODUÇÃO",
