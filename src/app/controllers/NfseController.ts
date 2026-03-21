@@ -35,7 +35,6 @@ export const NfseController = {
         nfseService.setProvider(provider as NfseProvider);
       }
       const activeProvider = nfseService.getProvider();
-      console.log(`🔍 Consultando RPS ${rps_number} via ${activeProvider}...`);
 
       // FocusNFE: consultar_nfse por protocolo_lote/ref
       // https://doc.focusnfe.com.br/reference/consultar_nfse
@@ -66,7 +65,6 @@ export const NfseController = {
               updates.url_danfse = result.url_danfse;
             if (Object.keys(updates).length > 0) {
               await InvoiceRepository.update(invoice.id, updates);
-              console.log(`[DB] Atualizado RPS ${rps_number}:`, updates);
             }
           } catch (errUpdate) {
             console.warn(
@@ -131,7 +129,6 @@ export const NfseController = {
       }
 
       const activeProvider = nfseService.getProvider();
-      console.log(`📨 Enviando via ${activeProvider}...`);
 
       // Se debug=true, retorna apenas o XML assinado sem enviar (apenas para Prefeitura)
       if (debug && activeProvider === "prefeitura") {
@@ -145,15 +142,9 @@ export const NfseController = {
       }
 
       const result = await nfseService.enviarLoteRps(xml);
-      // LOG: Mostra retorno completo da FocusNFE
-      console.log(
-        "[FocusNFE] Retorno enviarLoteRps:",
-        JSON.stringify(result, null, 2),
-      );
       if (result) {
         if (Array.isArray(result)) {
           for (const rps of result) {
-            console.log("[FocusNFE] RPS:", rps);
             if (rps.numero_rps) {
               const invoice = await InvoiceRepository.findByRps_number(
                 rps.numero_rps,
@@ -163,16 +154,12 @@ export const NfseController = {
                   status: rps.status ? mapStatus(rps.status) : null,
                   protocolo_lote: rps.ref || null,
                 });
-                console.log(
-                  `[DB] Atualizado RPS ${rps.numero_rps}: status=${rps.status}, protocolo_lote=${rps.ref}`,
-                );
               } else {
                 console.warn(`[DB] RPS não encontrada: ${rps.numero_rps}`);
               }
             }
           }
         } else if (result.numero_rps) {
-          console.log("[FocusNFE] RPS única:", result);
           const invoice = await InvoiceRepository.findByRps_number(
             result.numero_rps,
           );
@@ -181,9 +168,6 @@ export const NfseController = {
               status: result.status ? mapStatus(result.status) : null,
               protocolo_lote: result.ref || null,
             });
-            console.log(
-              `[DB] Atualizado RPS ${result.numero_rps}: status=${result.status}, protocolo_lote=${result.ref}`,
-            );
           } else {
             console.warn(`[DB] RPS não encontrada: ${result.numero_rps}`);
           }
@@ -223,7 +207,6 @@ export const NfseController = {
         nfseService.setProvider(provider as NfseProvider);
       }
       const activeProvider = nfseService.getProvider();
-      console.log(`🔍 Consultando lote ${protocolo} via ${activeProvider}...`);
 
       let result;
       if (activeProvider === "focusnfe" && rps_number) {
@@ -254,7 +237,6 @@ export const NfseController = {
               updates.url_danfse = obj.url_danfse;
             if (Object.keys(updates).length > 0) {
               await InvoiceRepository.update(invoice.id, updates);
-              console.log(`[DB] Atualizado RPS ${rpsNum}:`, updates);
             }
           };
 
