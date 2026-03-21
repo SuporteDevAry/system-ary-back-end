@@ -86,6 +86,22 @@ var NfseServiceAdapter = /** @class */ (function () {
         });
     };
     /**
+     * Consulta status de uma RPS individual (apenas FocusNFE)
+     */
+    NfseServiceAdapter.prototype.consultarRps = function (rps_number) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                if (this.provider === "focusnfe") {
+                    return [2 /*return*/, this.focusNfeService.consultarRps(rps_number)];
+                }
+                else {
+                    throw new Error("Consulta de RPS individual não suportada para Prefeitura de SP");
+                }
+                return [2 /*return*/];
+            });
+        });
+    };
+    /**
      * Consulta lote usando o provider configurado
      */
     NfseServiceAdapter.prototype.consultarLote = function (numeroProtocolo) {
@@ -125,8 +141,19 @@ var NfseServiceAdapter = /** @class */ (function () {
      * Retorna qual serviço está ativo
      */
     NfseServiceAdapter.prototype.getActiveService = function () {
+        var _this = this;
         if (this.provider === "prefeitura") {
-            return this.prefeituraService;
+            // Retorna objeto que implementa todos métodos da interface
+            return {
+                enviarLoteRps: this.prefeituraService.enviarLoteRps.bind(this.prefeituraService),
+                consultarLote: this.prefeituraService.consultarLote.bind(this.prefeituraService),
+                cancelarNfse: this.prefeituraService.cancelarNfse.bind(this.prefeituraService),
+                consultarRps: function (rps_number) { return __awaiter(_this, void 0, void 0, function () {
+                    return __generator(this, function (_a) {
+                        throw new Error("Consulta de RPS individual não suportada para Prefeitura de SP");
+                    });
+                }); },
+            };
         }
         else {
             return this.focusNfeService;

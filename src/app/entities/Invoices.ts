@@ -60,6 +60,15 @@ export class Invoice {
   @Column({ type: "text" })
   email: string;
 
+  @Column({ type: "varchar", nullable: true })
+  status: string; // Status da NFSe: Processando, Autorizada, Cancelada, Erro Autorização
+
+  @Column({ type: "varchar", nullable: true })
+  protocolo_lote: string; // Protocolo/ref do lote enviado
+
+  @Column({ type: "text", nullable: true })
+  url_danfse: string; // URL do DANFSe gerado pelo provider (FocusNFE)
+
   @Column({ type: "text" })
   service_discrim: string;
 

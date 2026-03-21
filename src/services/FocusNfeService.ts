@@ -20,7 +20,7 @@ interface FocusNfeRequest {
   data_emissao: string;
   natureza_operacao: number;
   optante_simples_nacional: boolean;
-  tipo_operacao_governamental: number,
+  tipo_operacao_governamental: number;
   prestador: {
     cnpj?: string;
     cpf?: string;
@@ -77,24 +77,44 @@ interface FocusNfeRequest {
   };
   exigibilidade_suspensa: number;
   pagamento_parcelado_antecipado: number;
-  finalidade_emissao: number,
-  consumidor_final: number,
-  indicador_destinatario: number,
+  finalidade_emissao: number;
+  consumidor_final: number;
+  indicador_destinatario: number;
 }
 
 export class FocusNfeService {
+  /**
+   * Consulta status de uma RPS individual (por número de RPS)
+   */
+  async consultarRps(rps_number: string): Promise<any> {
+    try {
+      console.log(
+        `🔍 Consultando NFS-e (ref/protocolo_lote): ${rps_number} na Focus NFe...`,
+      );
+      // Conforme doc FocusNFE: GET /nfse/{ref}
+      return await this.fazerRequisicaoApi("GET", `/nfse/${rps_number}`);
+    } catch (error: any) {
+      console.error("❌ Erro ao consultar NFS-e na Focus NFe:", error);
+      throw new Error(`Falha na consulta: ${error.message}`);
+    }
+  }
   private config: FocusNfeConfig;
 
   constructor() {
+    // Sempre usa endpoint oficial FocusNFE até /v2
+    let apiUrl =
+      process.env.FOCUS_NFE_API_URL || "https://api.focusnfe.com.br/v2";
+    // Remove qualquer /nfse no final
+    apiUrl = apiUrl.replace(/\/nfse$/, "");
     this.config = {
-      apiUrl: process.env.FOCUS_NFE_API_URL || "https://homologacao.focusnfe.com.br/V2", //"https://api.focusnfe.com.br/v2",
+      apiUrl,
       apiToken: process.env.FOCUS_NFE_API_TOKEN || "",
       timeout: 30000,
     };
 
     if (!this.config.apiToken) {
       throw new Error(
-        "FOCUS_NFE_API_TOKEN não configurado. Configure a variável de ambiente."
+        "FOCUS_NFE_API_TOKEN não configurado. Configure a variável de ambiente.",
       );
     }
 
@@ -103,8 +123,8 @@ export class FocusNfeService {
     console.log(
       `   Token configurado: ${this.config.apiToken.substring(
         0,
-        5
-      )}...${this.config.apiToken.substring(this.config.apiToken.length - 5)}`
+        5,
+      )}...${this.config.apiToken.substring(this.config.apiToken.length - 5)}`,
     );
 
     // Detectar se está em homologação
@@ -127,10 +147,11 @@ export class FocusNfeService {
       const referencia = focusRequest.referencia;
       const { referencia: _ref, ...body } = focusRequest as any;
 
+      // Envia o parâmetro ref na query string
       return await this.fazerRequisicaoApi(
         "POST",
         `/nfse?ref=${referencia}`,
-        body
+        body,
       );
     } catch (error: any) {
       console.error("❌ Erro ao enviar para Focus NFe:", error);
@@ -145,7 +166,10 @@ export class FocusNfeService {
     try {
       console.log(`🔍 Consultando NFS-e ${numeroProtocolo} na Focus NFe...`);
 
-      return await this.fazerRequisicaoApi("GET", `/nfse/${numeroProtocolo}?completa=0`);
+      return await this.fazerRequisicaoApi(
+        "GET",
+        `/nfse/${numeroProtocolo}?completa=0`,
+      );
     } catch (error: any) {
       console.error("❌ Erro ao consultar Focus NFe:", error);
       throw new Error(`Falha na consulta: ${error.message}`);
@@ -167,7 +191,7 @@ export class FocusNfeService {
       return await this.fazerRequisicaoApi(
         "POST",
         `/nfse/${numeroNfse}/cancelamento`,
-        payload
+        payload,
       );
     } catch (error: any) {
       console.error("❌ Erro ao cancelar NFS-e na Focus NFe:", error);
@@ -181,14 +205,14 @@ export class FocusNfeService {
   private fazerRequisicaoApi(
     method: "GET" | "POST" | "PUT" | "DELETE",
     endpoint: string,
-    payload?: any
+    payload?: any,
   ): Promise<any> {
     return new Promise((resolve, reject) => {
       const url = new URL(this.config.apiUrl + endpoint);
 
       console.log(`\n🔗 Requisição Focus NFe:`);
       console.log(`   Método: ${method}`);
-      console.log(`   URL: ${url.hostname}${url.pathname}${url.search}`);
+      console.log(`   URL: ${url.href}`);
 
       // Tenta HTTP Basic Auth: base64(token:)
       const auth = Buffer.from(`${this.config.apiToken}:`).toString("base64");
@@ -218,7 +242,7 @@ export class FocusNfeService {
           // DEBUG: Log do payload enviado para diagnóstico
           if (payload) {
             console.log(
-              "\n🔍 DEBUG - Payload EXATO enviado no corpo da requisição:"
+              "\n🔍 DEBUG - Payload EXATO enviado no corpo da requisição:",
             );
             console.log(JSON.stringify(payload, null, 2));
           }
@@ -230,13 +254,13 @@ export class FocusNfeService {
             console.error("❌ ERRO DE AUTENTICAÇÃO 401:");
             console.error("   Token pode estar expirado ou inválido");
             console.error(
-              "   Verifique em: https://app.focusnfe.com.br -> Conta -> Integrações -> API"
+              "   Verifique em: https://app.focusnfe.com.br -> Conta -> Integrações -> API",
             );
             console.error("   Resposta recebida:", data);
             reject(
               new Error(
-                "Autenticação falhou (401). Verifique o token FOCUS_NFE_API_TOKEN."
-              )
+                "Autenticação falhou (401). Verifique o token FOCUS_NFE_API_TOKEN.",
+              ),
             );
             return;
           }
@@ -244,7 +268,6 @@ export class FocusNfeService {
           try {
             const response = JSON.parse(data);
             console.log(JSON.stringify(response, null, 2));
-
             if (
               res.statusCode &&
               res.statusCode >= 200 &&
@@ -254,9 +277,8 @@ export class FocusNfeService {
             } else {
               reject(
                 new Error(
-                  `API Error ${res.statusCode}: ${response.mensagem || response.message || "Unknown error"
-                  }`
-                )
+                  `API Error ${res.statusCode}: ${response.error || response.message || "Unknown error"}`,
+                ),
               );
             }
           } catch (e) {
@@ -288,7 +310,7 @@ export class FocusNfeService {
    * Saída: FocusNfeRequest com formato específico da API
    */
   private async converterXmlParaFocusNfe(
-    xml: string
+    xml: string,
   ): Promise<FocusNfeRequest> {
     return new Promise((resolve, reject) => {
       parseString(xml, { explicitArray: false }, (err: any, result: any) => {
@@ -298,7 +320,6 @@ export class FocusNfeService {
         }
 
         console.log("XML recebido:", xml);
-
 
         try {
           const pedido = result.PedidoEnvioLoteRPS;
@@ -338,10 +359,10 @@ export class FocusNfeService {
           console.log(`   📋 Extração Prestador:`);
           console.log(`      IM: ${inscricaoPrestador || "✗ não encontrado"}`);
           console.log(
-            `      CNPJ: ${cnpjPrestador ? "✓ fornecido" : "✗ não fornecido"}`
+            `      CNPJ: ${cnpjPrestador ? "✓ fornecido" : "✗ não fornecido"}`,
           );
           console.log(
-            `      CPF: ${cpfPrestador ? "✓ fornecido" : "✗ não fornecido"}`
+            `      CPF: ${cpfPrestador ? "✓ fornecido" : "✗ não fornecido"}`,
           );
 
           // Extrai dados do tomador a partir do primeiro RPS
@@ -361,30 +382,72 @@ export class FocusNfeService {
             this.validarECorrigirCodigoMunicipio(
               codigoMunicipioTomadorOriginal,
               enderecTomador.UF || "SP",
-              enderecTomador.CEP || ""
+              enderecTomador.CEP || "",
             );
 
+          // Define servicoXml para fallback
           const servicoXml = rps.Servico || {};
 
-          const valorServicos = parseFloat(
-            servicoXml.ValorServicos || "0"
+          // Log detalhado do objeto rps
+          console.log(
+            "🔍 DEBUG - Objeto RPS para extração:",
+            JSON.stringify(rps, null, 2),
           );
-          const codigoServico = servicoXml.CodigoServico || "06298";
+
+          // Busca ValorServicos ignorando case e variações
+          let valorServicos = 0;
+          const valorServicosKeys = [
+            "ValorServicos",
+            "valorservicos",
+            "valor_servicos",
+            "valorServicos",
+          ];
+          for (const key of valorServicosKeys) {
+            if (rps[key] !== undefined) {
+              valorServicos = parseFloat(rps[key]);
+              break;
+            }
+          }
+          if (!valorServicos && servicoXml.ValorServicos) {
+            valorServicos = parseFloat(servicoXml.ValorServicos);
+          }
+          if (!valorServicos && cabecalho.ValorTotalServicos) {
+            valorServicos = parseFloat(cabecalho.ValorTotalServicos);
+          }
+
+          // Busca ValorFinalCobrado ignorando case
+          let valorFinalCobrado = valorServicos;
+          if (rps.ValorFinalCobrado) {
+            valorFinalCobrado = parseFloat(rps.ValorFinalCobrado);
+          } else if (rps.valorfinalcobrado) {
+            valorFinalCobrado = parseFloat(rps.valorfinalcobrado);
+          }
+
+          // Busca BaseCalculo ignorando case
+          let baseCalculo = valorServicos;
+          if (rps.BaseCalculo) {
+            baseCalculo = parseFloat(rps.BaseCalculo);
+          } else if (rps.basecalculo) {
+            baseCalculo = parseFloat(rps.basecalculo);
+          }
+          const codigoServico =
+            rps.CodigoServico || servicoXml.CodigoServico || "06298";
 
           const discriminacao =
-            servicoXml.Discriminacao ||
             rps.Discriminacao ||
+            servicoXml.Discriminacao ||
             "Serviço não especificado";
 
-          const aliquotaPercentual = parseFloat(rps.aliquota) || 5;
+          const aliquotaPercentual = parseFloat(
+            rps.aliquota || rps.AliquotaServicos || "5",
+          );
           const aliquotaFracao = Math.round(aliquotaPercentual / 100);
           const valorIss = valorServicos * aliquotaFracao;
           const valorIBS = Math.round(valorServicos * 0.01);
           const valorCBS = Math.round(valorServicos * 0.09);
 
-          const aliquotaParaEnvio = parseFloat(rps.AliquotaServicos) > 0
-            ? parseFloat(rps.AliquotaServicos)   // Se vier 0.05 vira 5
-            : 5;
+          const aliquotaParaEnvio =
+            aliquotaPercentual > 0 ? aliquotaPercentual : 5;
 
           // Monta a requisição final
           const prestadorObj: any = {
@@ -403,7 +466,7 @@ export class FocusNfeService {
           // Validação: precisa de pelo menos um (cnpj ou cpf)
           if (!prestadorObj.cnpj && !prestadorObj.cpf) {
             throw new Error(
-              "Prestador sem CNPJ nem CPF. Configure CNPJ_PRESTADOR ou CPF_PRESTADOR em .env"
+              "Prestador sem CNPJ nem CPF. Configure CNPJ_PRESTADOR ou CPF_PRESTADOR em .env",
             );
           }
 
@@ -429,7 +492,9 @@ export class FocusNfeService {
               razao_social: razaoSocialTomador,
               ...(emailTomador && { email: emailTomador }),
               endereco: {
-                logradouro: (enderecTomador.Logradouro || "").trim().substring(0, 50),
+                logradouro: (enderecTomador.Logradouro || "")
+                  .trim()
+                  .substring(0, 50),
                 numero: enderecTomador.NumeroEndereco || "S/N",
                 ...(enderecTomador.ComplementoEndereco && {
                   complemento: enderecTomador.ComplementoEndereco,
@@ -442,40 +507,18 @@ export class FocusNfeService {
             },
             servico: {
               discriminacao: discriminacao,
-              item_lista_servico: "06298",
-              codigo_tributacao_municipio: "06298",
+              item_lista_servico: codigoServico,
+              codigo_tributacao_municipio: codigoServico,
               tipo_operacao: 1,
               valor_servicos: valorServicos,
-              valor_final_cobrado: valorServicos,
-              base_calculo: valorServicos,
-              aliquota: 5,
+              valor_final_cobrado: valorFinalCobrado,
+              base_calculo: baseCalculo,
+              aliquota: aliquotaParaEnvio,
               iss_retido: false,
               valor_ipi: 0,
               codigo_nbs: "102010000",
               codigo_indicador_operacao: "030101",
               ibs_cbs_classificacao_tributaria: "000001",
-              //codigo_municipio: String(codigoMunicipioServico),
-              //base_calculo: valorServicos,
-              //valor_final_cobrado: valorServicos,
-              //...(parseFloat(rps.ValorDeducoes) > 0 && {
-              //  valor_deducoes: parseFloat(rps.ValorDeducoes),
-              //}),
-              //...(parseFloat(rps.ValorDeducoes) > 0 && {
-              //  valor_deducoes: parseFloat(rps.ValorDeducoes),
-              //}),
-              //valor_iss: valorIss,
-              //tributacao_iss: "1",
-              //codigo_nbs: "109051200",
-              //codigo_indicador_operacao: "100101",
-              //ibs_cbs_classificacao_tributaria: "000001",
-              //ibs_cbs_situacao_tributaria: "100",
-              //ibs_cbs_base_calculo: valorServicos,
-              //ibs_uf_aliquota: "0.01",
-              //ibs_uf_valor: valorIBS,
-              //ibs_mun_aliquota: "",
-              //ibs_mun_valor: 0,
-              //cbs_aliquota: "0.09",
-              //cbs_valor: valorCBS,
             },
             exigibilidade_suspensa: 0,
             pagamento_parcelado_antecipado: 0,
@@ -488,7 +531,7 @@ export class FocusNfeService {
 
           // DEBUG: Log COMPLETO da requisição que será enviada
           console.log(
-            "\n🔍 DEBUG - PAYLOAD COMPLETO que será enviado para API:"
+            "\n🔍 DEBUG - PAYLOAD COMPLETO que será enviado para API:",
           );
           console.log(JSON.stringify(focusRequest, null, 2));
 
@@ -515,13 +558,13 @@ export class FocusNfeService {
 
       // Se a data é futura (mais de 30 dias à frente), pode estar invertida
       const diffDias = Math.floor(
-        (dataObj.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24)
+        (dataObj.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24),
       );
 
       if (diffDias > 30 && parseInt(mes) > 12) {
         // Mês impossível, está claramente invertido
         console.warn(
-          `⚠️  Data com mês inválido detectada: ${data}, invertendo para ${ano}-${dia}-${mes}`
+          `⚠️  Data com mês inválido detectada: ${data}, invertendo para ${ano}-${dia}-${mes}`,
         );
         return `${ano}-${dia.padStart(2, "0")}-${mes.padStart(2, "0")}`;
       }
@@ -533,7 +576,7 @@ export class FocusNfeService {
       ) {
         // Data no futuro distante + dia <= 12 + mês > dia = provável inversão
         console.warn(
-          `⚠️  Data futura detectada: ${data}, invertendo dia/mês para ${ano}-${dia}-${mes}`
+          `⚠️  Data futura detectada: ${data}, invertendo dia/mês para ${ano}-${dia}-${mes}`,
         );
         return `${ano}-${dia.padStart(2, "0")}-${mes.padStart(2, "0")}`;
       }
@@ -634,7 +677,7 @@ export class FocusNfeService {
   private validarECorrigirCodigoMunicipio(
     codigoIbgeOriginal: string,
     uf: string,
-    cep: string
+    cep: string,
   ): string {
     // Mapa: UF → Prefixo IBGE esperado (primeiros 2 dígitos)
     const ufParaPrefixoIBGE: { [key: string]: string } = {
@@ -689,10 +732,10 @@ export class FocusNfeService {
 
     if (prefixoIBGEOriginal !== prefixoIBGEEsperado) {
       console.warn(
-        `⚠️  AVISO: Código IBGE ${codigoIbgeOriginal} não bate com UF ${uf}`
+        `⚠️  AVISO: Código IBGE ${codigoIbgeOriginal} não bate com UF ${uf}`,
       );
       console.warn(
-        `   IBGE esperado começa com: ${prefixoIBGEEsperado}, mas recebido: ${prefixoIBGEOriginal}`
+        `   IBGE esperado começa com: ${prefixoIBGEEsperado}, mas recebido: ${prefixoIBGEOriginal}`,
       );
       console.warn(`   Usando UF ${uf} com IBGE padrão`);
 
@@ -762,4 +805,3 @@ export class FocusNfeService {
     return null;
   }
 }
-

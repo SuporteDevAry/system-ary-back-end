@@ -44,11 +44,11 @@ routes.post("/api/client", new ClientController().create);
 routes.get("/api/clients", new ClientController().getClients);
 routes.get(
   "/api/client/client-by-id/:code_client",
-  new ClientController().getClientById
+  new ClientController().getClientById,
 );
 routes.get(
   "/api/client/client-by-cnpj-cpf/:cnpj_cpf_client",
-  new ClientController().getClientByCnpj_cpf
+  new ClientController().getClientByCnpj_cpf,
 );
 routes.patch("/api/client/:id", new ClientController().update);
 routes.delete("/api/client/:id", new ClientController().delete);
@@ -57,7 +57,7 @@ routes.delete("/api/client/:id", new ClientController().delete);
 routes.post("/api/contact", new ContactController().create);
 routes.get(
   "/api/contact/:code_client",
-  new ContactController().getContactsByClient
+  new ContactController().getContactsByClient,
 );
 routes.patch("/api/contact/:id", new ContactController().update);
 routes.delete("/api/contact/:id", new ContactController().delete);
@@ -67,51 +67,51 @@ routes.post("/api/notification", new NotificationController().create);
 routes.get("/api/notifications", new NotificationController().getNotifications);
 routes.get(
   "/api/notification/:id",
-  new NotificationController().getNotificationById
+  new NotificationController().getNotificationById,
 );
 routes.get(
   "/api/notifications/user/:user",
-  new NotificationController().getNotificationsByUser
+  new NotificationController().getNotificationsByUser,
 );
 routes.patch(
   "/api/notification/:id",
-  new NotificationController().updateNotification
+  new NotificationController().updateNotification,
 );
 routes.delete(
   "/api/notification/:id",
-  new NotificationController().deleteNotification
+  new NotificationController().deleteNotification,
 );
 
 // Contracts
 
 routes.get(
   "/api/grain-contracts/report",
-  new GrainContractController().getReport
+  new GrainContractController().getReport,
 );
 routes.get(
   "/api/grain-contracts",
-  new GrainContractController().getGrainContracts
+  new GrainContractController().getGrainContracts,
 );
 routes.get(
   "/api/grain-contracts/:id",
-  new GrainContractController().getGrainContractById
+  new GrainContractController().getGrainContractById,
 );
 routes.post(
   "/api/grain-contracts",
-  new GrainContractController().createGrainContract
+  new GrainContractController().createGrainContract,
 );
 routes.patch(
   "/api/grain-contracts/:id",
-  new GrainContractController().updateGrainContract
+  new GrainContractController().updateGrainContract,
 );
 routes.delete(
   "/api/grain-contracts/:id",
-  new GrainContractController().deleteGrainContract
+  new GrainContractController().deleteGrainContract,
 );
 
 routes.patch(
   "/api/grain-contracts/update-contract-adjustments/:id",
-  new GrainContractController().updateContractAdjustments
+  new GrainContractController().updateContractAdjustments,
 );
 
 // Send Emails
@@ -138,11 +138,11 @@ routes.get("/api/invoices", InvoiceController.findAllInvoices);
 routes.get("/api/invoices/:id", InvoiceController.findInvoiceById);
 routes.get(
   "/api/invoices/rps/:rps_number",
-  InvoiceController.findInvoiceByRps_number
+  InvoiceController.findInvoiceByRps_number,
 );
 routes.get(
   "/api/invoices/nfs/:nfs_number",
-  InvoiceController.findInvoiceByNfs_number
+  InvoiceController.findInvoiceByNfs_number,
 );
 routes.patch("/api/invoices/:id", InvoiceController.updateInvoice);
 routes.delete("/api/invoices/:id", InvoiceController.deleteInvoice);
@@ -150,6 +150,7 @@ routes.delete("/api/invoices/:id", InvoiceController.deleteInvoice);
 // NFS-e - Emissão de Nota Fiscal Eletrônica SP
 routes.post("/api/nfse/enviar-lote", NfseController.enviarLoteRps);
 routes.get("/api/nfse/consultar-lote/:protocolo", NfseController.consultarLote);
+routes.get("/api/nfse/consultar-rps/:rps_number", NfseController.consultarRps);
 routes.post("/api/nfse/cancelar", NfseController.cancelarNfse);
 routes.get("/api/nfse/testar-conexao", NfseController.testarConexao);
 
@@ -157,22 +158,22 @@ routes.get("/api/nfse/testar-conexao", NfseController.testarConexao);
 routes.post("/api/billings", BillingController.createBilling);
 routes.post(
   "/api/billings/number-contract",
-  BillingController.findBillingsByNumberContract
+  BillingController.findBillingsByNumberContract,
 );
 routes.get("/api/billings", BillingController.findAllBillings);
 routes.get("/api/billings/:id", BillingController.findBillingById);
 routes.get(
   "/api/billings/contract/:number_contract",
-  BillingController.findBillingByNumberContract
+  BillingController.findBillingByNumberContract,
 );
 
 routes.get(
   "/api/billings/rps/:rps_number",
-  BillingController.findBillingByRps_number
+  BillingController.findBillingByRps_number,
 );
 routes.get(
   "/api/billings/nfs/:nfs_number",
-  BillingController.findBillingByNfs_number
+  BillingController.findBillingByNfs_number,
 );
 routes.patch("/api/billings/:id", BillingController.updateBilling);
 routes.delete("/api/billings/:id", BillingController.deleteBilling);

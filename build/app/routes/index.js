@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = require("express");
 var UserController_1 = require("../controllers/UserController");
 var SessionController_1 = require("../controllers/SessionController");
+var authMiddleware_1 = require("../middlewares/authMiddleware");
 var PermissionController_1 = require("../controllers/PermissionController");
 var ClientController_1 = require("../controllers/ClientController");
 var ContactController_1 = require("../controllers/ContactController");
@@ -23,7 +24,7 @@ var routes = (0, express_1.Router)();
 // IN and OUT application
 routes.post("/api/login", new SessionController_1.SessionController().login);
 // Routes protected
-//routes.use(authMiddleware); // comentar ao usar local
+routes.use(authMiddleware_1.authMiddleware); // comentar ao usar local
 routes.get("/api/profile", new UserController_1.UserController().getProfile);
 routes.post("/api/reset-password", new SessionController_1.SessionController().resetPassword);
 // CRUD USERS
@@ -87,6 +88,7 @@ routes.delete("/api/invoices/:id", InvoicesController_1.InvoiceController.delete
 // NFS-e - Emissão de Nota Fiscal Eletrônica SP
 routes.post("/api/nfse/enviar-lote", NfseController_1.NfseController.enviarLoteRps);
 routes.get("/api/nfse/consultar-lote/:protocolo", NfseController_1.NfseController.consultarLote);
+routes.get("/api/nfse/consultar-rps/:rps_number", NfseController_1.NfseController.consultarRps);
 routes.post("/api/nfse/cancelar", NfseController_1.NfseController.cancelarNfse);
 routes.get("/api/nfse/testar-conexao", NfseController_1.NfseController.testarConexao);
 // Billing
