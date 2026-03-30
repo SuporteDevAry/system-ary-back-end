@@ -12,6 +12,8 @@ import { ProductController } from "../controllers/ProductController";
 import { ProductTablesController } from "../controllers/ProductTablesController";
 import { InvoiceController } from "../controllers/InvoicesController";
 import { NfseController } from "../controllers/NfseController";
+
+import fetch from "node-fetch";
 import { BillingController } from "../controllers/BillingsController";
 
 const routes = Router();
@@ -24,6 +26,22 @@ const routes = Router();
 
 // IN and OUT application
 routes.post("/api/login", new SessionController().login);
+
+// Proxy para ReceitaWS - Consulta CNPJ (público, sem auth)
+routes.get("/api-cnpj/cnpj/:cnpj", async (req, res) => {
+  const { cnpj } = req.params;
+  try {
+    const response = await fetch(`https://receitaws.com.br/v1/cnpj/${cnpj}`);
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (error: any) {
+    res.status(500).json({
+      status: "ERROR",
+      message: "Erro ao consultar CNPJ",
+      error: error.message,
+    });
+  }
+});
 
 // Routes protected
 routes.use(authMiddleware); // comentar ao usar local
