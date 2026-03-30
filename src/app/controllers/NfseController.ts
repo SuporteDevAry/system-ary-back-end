@@ -6,10 +6,10 @@ import { BadRequestError } from "../helpers/api-errors";
 function mapStatus(status?: string) {
   if (!status) return "";
   const s = String(status).toLowerCase();
-  if (s.includes("autoriza") || s.includes("autoriz")) return "autorizada";
-  if (s.includes("cancel")) return "cancelada";
   if (s.includes("erro")) return "erro_autorizacao";
+  if (s.includes("cancel")) return "cancelada";
   if (s.includes("process")) return "processando_autorizacao";
+  if (s.includes("autoriza") || s.includes("autoriz")) return "autorizada";
   return s;
 }
 
@@ -35,7 +35,9 @@ export const NfseController = {
         if (Array.isArray(result)) {
           for (const rps of result) {
             if (rps.numero_rps) {
-              const invoice = await InvoiceRepository.findByRps_number(rps.numero_rps);
+              const invoice = await InvoiceRepository.findByRps_number(
+                rps.numero_rps,
+              );
               if (invoice) {
                 await InvoiceRepository.update(invoice.id, {
                   status: rps.status ? mapStatus(rps.status) : null,
@@ -48,7 +50,9 @@ export const NfseController = {
             }
           }
         } else if (result.numero_rps) {
-          const invoice = await InvoiceRepository.findByRps_number(result.numero_rps);
+          const invoice = await InvoiceRepository.findByRps_number(
+            result.numero_rps,
+          );
           if (invoice) {
             await InvoiceRepository.update(invoice.id, {
               status: result.status ? mapStatus(result.status) : null,
@@ -90,7 +94,8 @@ export const NfseController = {
       const invoice = await InvoiceRepository.findByRps_number(rps_number);
       if (!invoice || !invoice.protocolo_lote) {
         return res.status(404).json({
-          message: "RPS não encontrada ou sem protocolo_lote para consulta na FocusNFE",
+          message:
+            "RPS não encontrada ou sem protocolo_lote para consulta na FocusNFE",
         });
       }
 
@@ -98,7 +103,8 @@ export const NfseController = {
       try {
         result = await focusNfeService.consultarRps(invoice.protocolo_lote);
 
-        const remoteStatus = (result && (result.status || result.Status)) || null;
+        const remoteStatus =
+          (result && (result.status || result.Status)) || null;
         const mapped = mapStatus(remoteStatus);
         const updates: any = {};
         if (mapped && mapped !== invoice.status) updates.status = mapped;
@@ -110,7 +116,8 @@ export const NfseController = {
       } catch (error: any) {
         if (error.message && error.message.includes("API Error 404")) {
           return res.status(404).json({
-            message: "Lote não encontrado ou ainda não processado na FocusNFE. Aguarde alguns minutos e tente novamente.",
+            message:
+              "Lote não encontrado ou ainda não processado na FocusNFE. Aguarde alguns minutos e tente novamente.",
             error: error.message,
           });
         }
@@ -148,7 +155,9 @@ export const NfseController = {
         const handleSingle = async (obj: any) => {
           const rpsNum = obj.numero_rps || obj.numero || null;
           if (!rpsNum) return;
-          const invoice = await InvoiceRepository.findByRps_number(String(rpsNum));
+          const invoice = await InvoiceRepository.findByRps_number(
+            String(rpsNum),
+          );
           if (!invoice) return;
           const mapped = mapStatus(obj.status || obj.Status || null);
           const updates: any = {};
@@ -168,7 +177,10 @@ export const NfseController = {
           await handleSingle(result);
         }
       } catch (errUpdate) {
-        console.warn("Falha ao atualizar invoice após consulta de lote:", errUpdate);
+        console.warn(
+          "Falha ao atualizar invoice após consulta de lote:",
+          errUpdate,
+        );
       }
 
       return res.status(200).json({ resultado: result });

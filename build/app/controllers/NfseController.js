@@ -44,14 +44,14 @@ function mapStatus(status) {
     if (!status)
         return "";
     var s = String(status).toLowerCase();
-    if (s.includes("autoriza") || s.includes("autoriz"))
-        return "autorizada";
-    if (s.includes("cancel"))
-        return "cancelada";
     if (s.includes("erro"))
         return "erro_autorizacao";
+    if (s.includes("cancel"))
+        return "cancelada";
     if (s.includes("process"))
         return "processando_autorizacao";
+    if (s.includes("autoriza") || s.includes("autoriz"))
+        return "autorizada";
     return s;
 }
 var focusNfeService = new FocusNfeService_1.FocusNfeService();
