@@ -35,6 +35,14 @@ interface InfoComplementaresData {
 }
 
 export class NfseSpService {
+  /**
+   * Consulta status de uma RPS individual (não implementado para Prefeitura)
+   */
+  async consultarRps(rps_number: string): Promise<any> {
+    throw new Error(
+      "Consulta de RPS individual não suportada para Prefeitura de SP",
+    );
+  }
   private config: NfseSoapConfig;
   private cert: string;
   private key: string;
@@ -54,7 +62,7 @@ export class NfseSpService {
     } catch (error) {
       console.error("❌ Erro ao carregar certificados:", error);
       throw new Error(
-        "Certificados não encontrados. Execute o script convertPfxToPem.ts primeiro."
+        "Certificados não encontrados. Execute o script convertPfxToPem.ts primeiro.",
       );
     }
   }
@@ -62,7 +70,7 @@ export class NfseSpService {
   // Adicione esta função auxiliar para garantir que o certificado seja APENAS base64
   private obterCertificadoLimpo(): string {
     const matches = this.cert.match(
-      /-----BEGIN CERTIFICATE-----([\s\S]*?)-----END CERTIFICATE-----/
+      /-----BEGIN CERTIFICATE-----([\s\S]*?)-----END CERTIFICATE-----/,
     );
     const base64 = matches ? matches[1] : this.cert;
     return base64.replace(/\s+/g, ""); // Remove espaços, tabs e quebras de linha
@@ -71,7 +79,7 @@ export class NfseSpService {
   private cleanCertificate(cert: string): string {
     // Remove tudo que não está entre os marcadores BEGIN e END
     const matches = cert.match(
-      /-----BEGIN CERTIFICATE-----([\s\S]*?)-----END CERTIFICATE-----/
+      /-----BEGIN CERTIFICATE-----([\s\S]*?)-----END CERTIFICATE-----/,
     );
     if (matches && matches[1]) {
       return matches[1].replace(/\s+/g, ""); // Remove quebras de linha e espaços
@@ -224,7 +232,7 @@ export class NfseSpService {
     console.log(`  CNPJ: [${cpfCnpj}] (${cpfCnpj.length})`);
     console.log(
       `📝 String completa (${stringAssinatura.length} chars):`,
-      stringAssinatura
+      stringAssinatura,
     );
 
     // Calcula SHA-1
@@ -281,13 +289,13 @@ export class NfseSpService {
 
       // Extrai ValorServicos para cálculos
       const valorServicosMatch = rpsConteudo.match(
-        /<ValorServicos>([^<]+)<\/ValorServicos>/
+        /<ValorServicos>([^<]+)<\/ValorServicos>/,
       );
       const valorServicos = valorServicosMatch ? valorServicosMatch[1] : "0.00";
 
       // Extrai código do município (se existir)
       const munPrestMatch = rpsConteudo.match(
-        /<MunicipioPrestacao>([^<]+)<\/MunicipioPrestacao>/
+        /<MunicipioPrestacao>([^<]+)<\/MunicipioPrestacao>/,
       );
       const cMunIncid = munPrestMatch ? munPrestMatch[1] : "3550308";
 
@@ -303,7 +311,7 @@ export class NfseSpService {
       // Posição ideal: após <Discriminacao> ou último campo antes de </RPS>
       const rpsModificado = rpsCompleto.replace(
         "</RPS>",
-        `${infoComplementares}</RPS>`
+        `${infoComplementares}</RPS>`,
       );
 
       xmlModificado = xmlModificado.replace(rpsCompleto, rpsModificado);
@@ -359,8 +367,8 @@ export class NfseSpService {
       rpsData.cpfCnpjTomador = cnpjMatch
         ? cnpjMatch[1].trim()
         : cpfMatch
-        ? cpfMatch[1].trim()
-        : "";
+          ? cpfMatch[1].trim()
+          : "";
 
       // Calcula assinatura
       const assinatura = this.calcularAssinaturaRPS(rpsData);
@@ -370,11 +378,11 @@ export class NfseSpService {
         .replace(/<Assinatura\s*\/>/, `<Assinatura>${assinatura}</Assinatura>`)
         .replace(
           /<Assinatura><\/Assinatura>/,
-          `<Assinatura>${assinatura}</Assinatura>`
+          `<Assinatura>${assinatura}</Assinatura>`,
         )
         .replace(
           /<Assinatura>.*?<\/Assinatura>/,
-          `<Assinatura>${assinatura}</Assinatura>`
+          `<Assinatura>${assinatura}</Assinatura>`,
         );
 
       // Substitui o RPS antigo pelo atualizado no XML completo
@@ -383,8 +391,8 @@ export class NfseSpService {
       console.log(
         `✅ RPS ${rpsData.numeroRPS} assinado: ${assinatura.substring(
           0,
-          20
-        )}...`
+          20,
+        )}...`,
       );
     }
 
@@ -493,7 +501,7 @@ export class NfseSpService {
         const keyInfoTag = `<KeyInfo><X509Data><X509Certificate>${certLimpo}</X509Certificate></X509Data></KeyInfo>`;
         signedXml = signedXml.replace(
           "</SignatureValue>",
-          `</SignatureValue>${keyInfoTag}`
+          `</SignatureValue>${keyInfoTag}`,
         );
       }
 
@@ -502,7 +510,7 @@ export class NfseSpService {
       console.log("📋 Contém KeyInfo:", signedXml.includes("<KeyInfo>"));
       console.log(
         "📋 PedidoEnvioLoteRPS tem Id:",
-        /<PedidoEnvioLoteRPS[^>]*\s+Id=/.test(signedXml)
+        /<PedidoEnvioLoteRPS[^>]*\s+Id=/.test(signedXml),
       );
       console.log("📋 RPS tem Id:", /<RPS[^>]*\s+Id=/.test(signedXml));
       console.log("📋 Contém ds::", signedXml.includes("ds:"));
@@ -510,18 +518,18 @@ export class NfseSpService {
       // DEBUG: Verificar valores após assinatura
       console.log("\n🔍 VERIFICAÇÃO DOS VALORES NO XML FINAL:");
       const valorTotalMatch = signedXml.match(
-        /<ValorTotalServicos>([^<]+)<\/ValorTotalServicos>/
+        /<ValorTotalServicos>([^<]+)<\/ValorTotalServicos>/,
       );
       const valorServicoMatch = signedXml.match(
-        /<ValorServicos>([^<]+)<\/ValorServicos>/
+        /<ValorServicos>([^<]+)<\/ValorServicos>/,
       );
       console.log(
         "  ValorTotalServicos (Cabecalho):",
-        valorTotalMatch ? valorTotalMatch[1] : "NÃO ENCONTRADO"
+        valorTotalMatch ? valorTotalMatch[1] : "NÃO ENCONTRADO",
       );
       console.log(
         "  ValorServicos (RPS):",
-        valorServicoMatch ? valorServicoMatch[1] : "NÃO ENCONTRADO"
+        valorServicoMatch ? valorServicoMatch[1] : "NÃO ENCONTRADO",
       );
       console.log("\n📄 XML COMPLETO ASSINADO:");
       console.log(signedXml);
@@ -548,18 +556,18 @@ export class NfseSpService {
 
       // Verificar se valores estão presentes antes do envio
       const preEnvioValorTotal = xmlSigned.match(
-        /<ValorTotalServicos>([^<]+)<\/ValorTotalServicos>/
+        /<ValorTotalServicos>([^<]+)<\/ValorTotalServicos>/,
       );
       const preEnvioValorServico = xmlSigned.match(
-        /<ValorServicos>([^<]+)<\/ValorServicos>/
+        /<ValorServicos>([^<]+)<\/ValorServicos>/,
       );
       console.log(
         "  ValorTotalServicos antes envio:",
-        preEnvioValorTotal ? preEnvioValorTotal[1] : "❌ NÃO ENCONTRADO"
+        preEnvioValorTotal ? preEnvioValorTotal[1] : "❌ NÃO ENCONTRADO",
       );
       console.log(
         "  ValorServicos antes envio:",
-        preEnvioValorServico ? preEnvioValorServico[1] : "❌ NÃO ENCONTRADO"
+        preEnvioValorServico ? preEnvioValorServico[1] : "❌ NÃO ENCONTRADO",
       );
 
       // 2. Constrói envelope SOAP manualmente
@@ -610,7 +618,7 @@ export class NfseSpService {
 
             // Parse do XML de resposta para extrair erros
             const retornoMatch = data.match(
-              /<RetornoXML>([\s\S]*?)<\/RetornoXML>/
+              /<RetornoXML>([\s\S]*?)<\/RetornoXML>/,
             );
             if (retornoMatch) {
               const retornoXml = retornoMatch[1]
@@ -624,7 +632,7 @@ export class NfseSpService {
 
               // Verificar se há erros
               const sucessoMatch = retornoXml.match(
-                /<Sucesso>(.*?)<\/Sucesso>/
+                /<Sucesso>(.*?)<\/Sucesso>/,
               );
               const sucesso = sucessoMatch ? sucessoMatch[1] : null;
 
@@ -641,7 +649,7 @@ export class NfseSpService {
                   const erro = match[1];
                   const codigoMatch = erro.match(/<Codigo>(.*?)<\/Codigo>/);
                   const mensagemMatch = erro.match(
-                    /<Mensagem>(.*?)<\/Mensagem>/
+                    /<Mensagem>(.*?)<\/Mensagem>/,
                   );
 
                   erros.push({
@@ -654,7 +662,7 @@ export class NfseSpService {
                   console.log("\n❌ ERROS RETORNADOS PELA PREFEITURA:");
                   erros.forEach((erro, index) => {
                     console.log(
-                      `  ${index + 1}. [${erro.codigo}] ${erro.mensagem}`
+                      `  ${index + 1}. [${erro.codigo}] ${erro.mensagem}`,
                     );
                   });
                 }
@@ -697,7 +705,7 @@ export class NfseSpService {
       client.setSecurity(
         new soap.ClientSSLSecurity(this.key, this.cert, {
           rejectUnauthorized: false,
-        })
+        }),
       );
 
       const result = await client.ConsultaLoteRPSAsync({
@@ -724,7 +732,7 @@ export class NfseSpService {
       client.setSecurity(
         new soap.ClientSSLSecurity(this.key, this.cert, {
           rejectUnauthorized: false,
-        })
+        }),
       );
 
       const result = await client.CancelamentoNFSeAsync({

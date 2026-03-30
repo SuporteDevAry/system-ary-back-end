@@ -90,6 +90,22 @@ var Invoice = /** @class */ (function () {
         __metadata("design:type", String)
     ], Invoice.prototype, "email", void 0);
     __decorate([
+        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "status", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "protocolo_lote", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "text", nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "url_danfse", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "text", nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "xml_nfse", void 0);
+    __decorate([
         (0, typeorm_1.Column)({ type: "text" }),
         __metadata("design:type", String)
     ], Invoice.prototype, "service_discrim", void 0);

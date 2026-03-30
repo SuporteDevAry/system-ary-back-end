@@ -73,8 +73,12 @@ var https_1 = __importDefault(require("https"));
 var xml2js_1 = require("xml2js");
 var FocusNfeService = /** @class */ (function () {
     function FocusNfeService() {
+        // Sempre usa endpoint oficial FocusNFE até /v2
+        var apiUrl = process.env.FOCUS_NFE_API_URL || "https://api.focusnfe.com.br/v2";
+        // Remove qualquer /nfse no final
+        apiUrl = apiUrl.replace(/\/nfse$/, "");
         this.config = {
-            apiUrl: process.env.FOCUS_NFE_API_URL || "https://api.focusnfe.com.br/v2",
+            apiUrl: apiUrl,
             apiToken: process.env.FOCUS_NFE_API_TOKEN || "",
             timeout: 30000,
         };
@@ -89,12 +93,36 @@ var FocusNfeService = /** @class */ (function () {
         console.log("   Ambiente: ".concat(isHomolog ? "HOMOLOGAÇÃO" : "PRODUÇÃO"));
     }
     /**
+     * Consulta status de uma RPS individual (por número de RPS)
+     */
+    FocusNfeService.prototype.consultarRps = function (rps_number) {
+        return __awaiter(this, void 0, void 0, function () {
+            var error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        console.log("\uD83D\uDD0D Consultando NFS-e (ref/protocolo_lote): ".concat(rps_number, " na Focus NFe..."));
+                        return [4 /*yield*/, this.fazerRequisicaoApi("GET", "/nfse/".concat(rps_number))];
+                    case 1: 
+                    // Conforme doc FocusNFE: GET /nfse/{ref}
+                    return [2 /*return*/, _a.sent()];
+                    case 2:
+                        error_1 = _a.sent();
+                        console.error("❌ Erro ao consultar NFS-e na Focus NFe:", error_1);
+                        throw new Error("Falha na consulta: ".concat(error_1.message));
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    /**
      * Envia lote de RPS via API Focus NFe
      * Aceita XML gerado pelo frontend e o processa
      */
     FocusNfeService.prototype.enviarLoteRps = function (xml) {
         return __awaiter(this, void 0, void 0, function () {
-            var focusRequest, referencia, _a, _ref, body, error_1;
+            var focusRequest, referencia, _a, _ref, body, error_2;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -107,11 +135,13 @@ var FocusNfeService = /** @class */ (function () {
                         referencia = focusRequest.referencia;
                         _a = focusRequest, _ref = _a.referencia, body = __rest(_a, ["referencia"]);
                         return [4 /*yield*/, this.fazerRequisicaoApi("POST", "/nfse?ref=".concat(referencia), body)];
-                    case 2: return [2 /*return*/, _b.sent()];
+                    case 2: 
+                    // Envia o parâmetro ref na query string
+                    return [2 /*return*/, _b.sent()];
                     case 3:
-                        error_1 = _b.sent();
-                        console.error("❌ Erro ao enviar para Focus NFe:", error_1);
-                        throw new Error("Falha no envio: ".concat(error_1.message));
+                        error_2 = _b.sent();
+                        console.error("❌ Erro ao enviar para Focus NFe:", error_2);
+                        throw new Error("Falha no envio: ".concat(error_2.message));
                     case 4: return [2 /*return*/];
                 }
             });
@@ -122,18 +152,18 @@ var FocusNfeService = /** @class */ (function () {
      */
     FocusNfeService.prototype.consultarLote = function (numeroProtocolo) {
         return __awaiter(this, void 0, void 0, function () {
-            var error_2;
+            var error_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
                         console.log("\uD83D\uDD0D Consultando NFS-e ".concat(numeroProtocolo, " na Focus NFe..."));
-                        return [4 /*yield*/, this.fazerRequisicaoApi("GET", "/nfse/".concat(numeroProtocolo))];
+                        return [4 /*yield*/, this.fazerRequisicaoApi("GET", "/nfse/".concat(numeroProtocolo, "?completa=0"))];
                     case 1: return [2 /*return*/, _a.sent()];
                     case 2:
-                        error_2 = _a.sent();
-                        console.error("❌ Erro ao consultar Focus NFe:", error_2);
-                        throw new Error("Falha na consulta: ".concat(error_2.message));
+                        error_3 = _a.sent();
+                        console.error("❌ Erro ao consultar Focus NFe:", error_3);
+                        throw new Error("Falha na consulta: ".concat(error_3.message));
                     case 3: return [2 /*return*/];
                 }
             });
@@ -144,7 +174,7 @@ var FocusNfeService = /** @class */ (function () {
      */
     FocusNfeService.prototype.cancelarNfse = function (numeroNfse, motivo) {
         return __awaiter(this, void 0, void 0, function () {
-            var payload, error_3;
+            var payload, error_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -157,9 +187,9 @@ var FocusNfeService = /** @class */ (function () {
                         return [4 /*yield*/, this.fazerRequisicaoApi("POST", "/nfse/".concat(numeroNfse, "/cancelamento"), payload)];
                     case 1: return [2 /*return*/, _a.sent()];
                     case 2:
-                        error_3 = _a.sent();
-                        console.error("❌ Erro ao cancelar NFS-e na Focus NFe:", error_3);
-                        throw new Error("Falha no cancelamento: ".concat(error_3.message));
+                        error_4 = _a.sent();
+                        console.error("❌ Erro ao cancelar NFS-e na Focus NFe:", error_4);
+                        throw new Error("Falha no cancelamento: ".concat(error_4.message));
                     case 3: return [2 /*return*/];
                 }
             });
@@ -174,7 +204,7 @@ var FocusNfeService = /** @class */ (function () {
             var url = new URL(_this.config.apiUrl + endpoint);
             console.log("\n\uD83D\uDD17 Requisi\u00E7\u00E3o Focus NFe:");
             console.log("   M\u00E9todo: ".concat(method));
-            console.log("   URL: ".concat(url.hostname).concat(url.pathname).concat(url.search));
+            console.log("   URL: ".concat(url.href));
             // Tenta HTTP Basic Auth: base64(token:)
             var auth = Buffer.from("".concat(_this.config.apiToken, ":")).toString("base64");
             console.log("   Auth: Basic ".concat(auth.substring(0, 10), "..."));
@@ -220,7 +250,7 @@ var FocusNfeService = /** @class */ (function () {
                             resolve(response);
                         }
                         else {
-                            reject(new Error("API Error ".concat(res.statusCode, ": ").concat(response.mensagem || response.message || "Unknown error")));
+                            reject(new Error("API Error ".concat(res.statusCode, ": ").concat(response.error || response.message || "Unknown error")));
                         }
                     }
                     catch (e) {
@@ -256,6 +286,7 @@ var FocusNfeService = /** @class */ (function () {
                                 reject(new Error("Erro ao parsear XML: ".concat(err.message)));
                                 return;
                             }
+                            console.log("XML recebido:", xml);
                             try {
                                 var pedido = result.PedidoEnvioLoteRPS;
                                 var cabecalho = pedido.Cabecalho || {};
@@ -298,10 +329,57 @@ var FocusNfeService = /** @class */ (function () {
                                 var codigoMunicipioServico = rps.MunicipioPrestacao || "3550308";
                                 var codigoMunicipioTomadorOriginal = enderecTomador.Cidade || codigoMunicipioServico;
                                 var codigoMunicipioTomadorCorrigido = _this.validarECorrigirCodigoMunicipio(codigoMunicipioTomadorOriginal, enderecTomador.UF || "SP", enderecTomador.CEP || "");
-                                var valorServicos = parseFloat(rps.ValorServicos) || 0;
-                                var aliquotaFracao = parseFloat(rps.AliquotaServicos) || 0;
-                                var aliquotaPercentual = Math.round(aliquotaFracao * 100 * 100) / 100;
+                                // Define servicoXml para fallback
+                                var servicoXml = rps.Servico || {};
+                                // Log detalhado do objeto rps
+                                console.log("🔍 DEBUG - Objeto RPS para extração:", JSON.stringify(rps, null, 2));
+                                // Busca ValorServicos ignorando case e variações
+                                var valorServicos = 0;
+                                var valorServicosKeys = [
+                                    "ValorServicos",
+                                    "valorservicos",
+                                    "valor_servicos",
+                                    "valorServicos",
+                                ];
+                                for (var _i = 0, valorServicosKeys_1 = valorServicosKeys; _i < valorServicosKeys_1.length; _i++) {
+                                    var key = valorServicosKeys_1[_i];
+                                    if (rps[key] !== undefined) {
+                                        valorServicos = parseFloat(rps[key]);
+                                        break;
+                                    }
+                                }
+                                if (!valorServicos && servicoXml.ValorServicos) {
+                                    valorServicos = parseFloat(servicoXml.ValorServicos);
+                                }
+                                if (!valorServicos && cabecalho.ValorTotalServicos) {
+                                    valorServicos = parseFloat(cabecalho.ValorTotalServicos);
+                                }
+                                // Busca ValorFinalCobrado ignorando case
+                                var valorFinalCobrado = valorServicos;
+                                if (rps.ValorFinalCobrado) {
+                                    valorFinalCobrado = parseFloat(rps.ValorFinalCobrado);
+                                }
+                                else if (rps.valorfinalcobrado) {
+                                    valorFinalCobrado = parseFloat(rps.valorfinalcobrado);
+                                }
+                                // Busca BaseCalculo ignorando case
+                                var baseCalculo = valorServicos;
+                                if (rps.BaseCalculo) {
+                                    baseCalculo = parseFloat(rps.BaseCalculo);
+                                }
+                                else if (rps.basecalculo) {
+                                    baseCalculo = parseFloat(rps.basecalculo);
+                                }
+                                var codigoServico = rps.CodigoServico || servicoXml.CodigoServico || "06298";
+                                var discriminacao = rps.Discriminacao ||
+                                    servicoXml.Discriminacao ||
+                                    "Serviço não especificado";
+                                var aliquotaPercentual = parseFloat(rps.aliquota || rps.AliquotaServicos || "5");
+                                var aliquotaFracao = Math.round(aliquotaPercentual / 100);
                                 var valorIss = valorServicos * aliquotaFracao;
+                                var valorIBS = Math.round(valorServicos * 0.01);
+                                var valorCBS = Math.round(valorServicos * 0.09);
+                                var aliquotaParaEnvio = aliquotaPercentual > 0 ? aliquotaPercentual : 5;
                                 // Monta a requisição final
                                 var prestadorObj = {
                                     inscricao_municipal: inscricaoPrestador,
@@ -323,15 +401,37 @@ var FocusNfeService = /** @class */ (function () {
                                 var focusRequest = {
                                     referencia: "LOTE-".concat(Date.now()),
                                     data_emissao: _this.formatarData(rps.DataEmissao),
+                                    natureza_operacao: 1,
+                                    optante_simples_nacional: false,
+                                    tipo_operacao_governamental: 1,
                                     prestador: __assign(__assign(__assign({}, (cnpjPrestador && { cnpj: cnpjPrestador })), (cpfPrestador && { cpf: cpfPrestador })), { inscricao_municipal: inscricaoPrestador, codigo_municipio: String("3550308") }),
-                                    tomador: __assign(__assign(__assign(__assign(__assign({}, (cnpjTomador && { cnpj: cnpjTomador })), (cpfTomador && { cpf: cpfTomador })), { razao_social: razaoSocialTomador }), (emailTomador && { email: emailTomador })), { endereco: __assign(__assign({ logradouro: enderecTomador.Logradouro || "", numero: enderecTomador.NumeroEndereco || "S/N" }, (enderecTomador.ComplementoEndereco && {
+                                    tomador: __assign(__assign(__assign(__assign(__assign({}, (cnpjTomador && { cnpj: cnpjTomador })), (cpfTomador && { cpf: cpfTomador })), { 
+                                        //motivo_ausencia_nif: "0",
+                                        razao_social: razaoSocialTomador }), (emailTomador && { email: emailTomador })), { endereco: __assign(__assign({ logradouro: (enderecTomador.Logradouro || "")
+                                                .trim()
+                                                .substring(0, 50), numero: enderecTomador.NumeroEndereco || "S/N" }, (enderecTomador.ComplementoEndereco && {
                                             complemento: enderecTomador.ComplementoEndereco,
                                         })), { bairro: enderecTomador.Bairro || "", codigo_municipio: String(codigoMunicipioTomadorCorrigido), uf: enderecTomador.UF || "SP", cep: _this.formatarCEP(enderecTomador.CEP) }) }),
-                                    servico: __assign(__assign(__assign(__assign({ valor_servicos: valorServicos }, (parseFloat(rps.ValorDeducoes) > 0 && {
-                                        valor_deducoes: parseFloat(rps.ValorDeducoes),
-                                    })), { iss_retido: rps.ISSRetido === "true", valor_iss: valorIss, aliquota: aliquotaPercentual, item_lista_servico: _this.deriveItemListaServico(rps) }), (codigoTribMun && {
-                                        codigo_tributario_municipio: codigoTribMun,
-                                    })), { discriminacao: rps.Discriminacao || "Serviço não especificado", codigo_municipio: String(codigoMunicipioServico) }),
+                                    servico: {
+                                        discriminacao: discriminacao,
+                                        item_lista_servico: codigoServico,
+                                        codigo_tributacao_municipio: codigoServico,
+                                        tipo_operacao: 1,
+                                        valor_servicos: valorServicos,
+                                        valor_final_cobrado: valorFinalCobrado,
+                                        base_calculo: baseCalculo,
+                                        aliquota: aliquotaParaEnvio,
+                                        iss_retido: false,
+                                        valor_ipi: 0,
+                                        codigo_nbs: "102010000",
+                                        codigo_indicador_operacao: "100301",
+                                        ibs_cbs_classificacao_tributaria: "000001",
+                                    },
+                                    exigibilidade_suspensa: 0,
+                                    pagamento_parcelado_antecipado: 0,
+                                    finalidade_emissao: 0,
+                                    consumidor_final: 0,
+                                    indicador_destinatario: 0,
                                 };
                                 console.log("✅ Conversão XML → Focus NFe concluída");
                                 // DEBUG: Log COMPLETO da requisição que será enviada
@@ -490,6 +590,8 @@ var FocusNfeService = /** @class */ (function () {
         var cepParaIBGE = {
             "90460": "4314902",
             "01310": "3550308",
+            "02550": "3550308",
+            "13560": "3548906",
             "20040020": "3304557", // Rio de Janeiro/RJ
         };
         // Extrai prefixo do CEP
@@ -541,14 +643,14 @@ var FocusNfeService = /** @class */ (function () {
         var codigoServico = (rps.CodigoServico || "").toString();
         var discr = (rps.Discriminacao || "").toLowerCase();
         if (codigoServico === "06298")
-            return "010700";
+            return "06298";
         if (discr.includes("intermedia"))
-            return "010700";
+            return "06298";
         // Ajuste futuro: permitir override via env FOCUS_ITEM_LISTA_SERVICO
         var envOverride = process.env.FOCUS_ITEM_LISTA_SERVICO;
         if (envOverride && /^[0-9]{6}$/.test(envOverride))
             return envOverride;
-        return "010700";
+        return "06298";
     };
     /**
      * Deriva cTribMun (código tributário municipal) com 3 dígitos [0-9]{3}.

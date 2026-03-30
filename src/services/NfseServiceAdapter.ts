@@ -15,6 +15,7 @@ export interface INfseService {
   enviarLoteRps(xml: string): Promise<any>;
   consultarLote(numeroProtocolo: string): Promise<any>;
   cancelarNfse(numeroNfse: string, motivo: string): Promise<any>;
+  consultarRps(rps_number: string): Promise<any>;
 }
 
 export class NfseServiceAdapter implements INfseService {
@@ -59,6 +60,19 @@ export class NfseServiceAdapter implements INfseService {
   }
 
   /**
+   * Consulta status de uma RPS individual (apenas FocusNFE)
+   */
+  async consultarRps(rps_number: string): Promise<any> {
+    if (this.provider === "focusnfe") {
+      return this.focusNfeService.consultarRps(rps_number);
+    } else {
+      throw new Error(
+        "Consulta de RPS individual não suportada para Prefeitura de SP",
+      );
+    }
+  }
+
+  /**
    * Consulta lote usando o provider configurado
    */
   async consultarLote(numeroProtocolo: string): Promise<any> {
@@ -89,7 +103,23 @@ export class NfseServiceAdapter implements INfseService {
    */
   getActiveService(): INfseService {
     if (this.provider === "prefeitura") {
-      return this.prefeituraService;
+      // Retorna objeto que implementa todos métodos da interface
+      return {
+        enviarLoteRps: this.prefeituraService.enviarLoteRps.bind(
+          this.prefeituraService,
+        ),
+        consultarLote: this.prefeituraService.consultarLote.bind(
+          this.prefeituraService,
+        ),
+        cancelarNfse: this.prefeituraService.cancelarNfse.bind(
+          this.prefeituraService,
+        ),
+        consultarRps: async (rps_number: string) => {
+          throw new Error(
+            "Consulta de RPS individual não suportada para Prefeitura de SP",
+          );
+        },
+      };
     } else {
       return this.focusNfeService;
     }

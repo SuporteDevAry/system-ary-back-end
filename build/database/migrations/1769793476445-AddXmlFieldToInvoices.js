@@ -36,24 +36,30 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ChangeTypeContractEmissionDate1764895713589 = void 0;
-var ChangeTypeContractEmissionDate1764895713589 = /** @class */ (function () {
-    function ChangeTypeContractEmissionDate1764895713589() {
+exports.AddXmlFieldToInvoices1769793476445 = void 0;
+var typeorm_1 = require("typeorm");
+var AddXmlFieldToInvoices1769793476445 = /** @class */ (function () {
+    function AddXmlFieldToInvoices1769793476445() {
     }
-    ChangeTypeContractEmissionDate1764895713589.prototype.up = function (queryRunner) {
+    AddXmlFieldToInvoices1769793476445.prototype.up = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
-            var hasTable, hasColumn;
+            var hasTable, hasXml;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.hasTable("grain_contracts")];
+                    case 0: return [4 /*yield*/, queryRunner.hasTable("invoices")];
                     case 1:
                         hasTable = _a.sent();
-                        if (!hasTable) return [3 /*break*/, 4];
-                        return [4 /*yield*/, queryRunner.hasColumn("grain_contracts", "contract_emission_date")];
+                        if (!hasTable)
+                            return [2 /*return*/];
+                        return [4 /*yield*/, queryRunner.hasColumn("invoices", "xml_nfse")];
                     case 2:
-                        hasColumn = _a.sent();
-                        if (!hasColumn) return [3 /*break*/, 4];
-                        return [4 /*yield*/, queryRunner.query("\n          ALTER TABLE grain_contracts\n          ALTER COLUMN contract_emission_date TYPE TIMESTAMP\n          USING contract_emission_date::timestamp;\n        ")];
+                        hasXml = _a.sent();
+                        if (!!hasXml) return [3 /*break*/, 4];
+                        return [4 /*yield*/, queryRunner.addColumn("invoices", new typeorm_1.TableColumn({
+                                name: "xml_nfse",
+                                type: "text",
+                                isNullable: true,
+                            }))];
                     case 3:
                         _a.sent();
                         _a.label = 4;
@@ -62,20 +68,21 @@ var ChangeTypeContractEmissionDate1764895713589 = /** @class */ (function () {
             });
         });
     };
-    ChangeTypeContractEmissionDate1764895713589.prototype.down = function (queryRunner) {
+    AddXmlFieldToInvoices1769793476445.prototype.down = function (queryRunner) {
         return __awaiter(this, void 0, void 0, function () {
-            var hasTable, hasColumn;
+            var hasTable, hasXml;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, queryRunner.hasTable("grain_contracts")];
+                    case 0: return [4 /*yield*/, queryRunner.hasTable("invoices")];
                     case 1:
                         hasTable = _a.sent();
-                        if (!hasTable) return [3 /*break*/, 4];
-                        return [4 /*yield*/, queryRunner.hasColumn("grain_contracts", "contract_emission_date")];
+                        if (!hasTable)
+                            return [2 /*return*/];
+                        return [4 /*yield*/, queryRunner.hasColumn("invoices", "xml_nfse")];
                     case 2:
-                        hasColumn = _a.sent();
-                        if (!hasColumn) return [3 /*break*/, 4];
-                        return [4 /*yield*/, queryRunner.query("\n          ALTER TABLE grain_contracts\n          ALTER COLUMN contract_emission_date TYPE VARCHAR;\n        ")];
+                        hasXml = _a.sent();
+                        if (!hasXml) return [3 /*break*/, 4];
+                        return [4 /*yield*/, queryRunner.dropColumn("invoices", "xml_nfse")];
                     case 3:
                         _a.sent();
                         _a.label = 4;
@@ -84,7 +91,7 @@ var ChangeTypeContractEmissionDate1764895713589 = /** @class */ (function () {
             });
         });
     };
-    return ChangeTypeContractEmissionDate1764895713589;
+    return AddXmlFieldToInvoices1769793476445;
 }());
-exports.ChangeTypeContractEmissionDate1764895713589 = ChangeTypeContractEmissionDate1764895713589;
-//# sourceMappingURL=1764895713589-ChangeTypeContractEmissionDate.js.map
+exports.AddXmlFieldToInvoices1769793476445 = AddXmlFieldToInvoices1769793476445;
+//# sourceMappingURL=1769793476445-AddXmlFieldToInvoices.js.map
