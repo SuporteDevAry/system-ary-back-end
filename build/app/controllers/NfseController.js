@@ -63,7 +63,7 @@ exports.NfseController = {
      */
     consultarRps: function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var rps_number, provider, nfseService, activeProvider, result, invoice, remoteStatus, mapped, updates, errUpdate_1, error_1, error_2;
+            var rps_number, provider, nfseService, activeProvider, result, invoice, remoteStatus, mapped, updates, caminho, xmlUrl, u, m, idx, base, u, errUpdate_1, error_1, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -78,7 +78,6 @@ exports.NfseController = {
                             nfseService.setProvider(provider);
                         }
                         activeProvider = nfseService.getProvider();
-                        console.log("\uD83D\uDD0D Consultando RPS ".concat(rps_number, " via ").concat(activeProvider, "..."));
                         result = void 0;
                         if (!(activeProvider === "focusnfe")) return [3 /*break*/, 11];
                         return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.findByRps_number(rps_number)];
@@ -107,11 +106,43 @@ exports.NfseController = {
                             result.url_danfse &&
                             result.url_danfse !== invoice.url_danfse)
                             updates.url_danfse = result.url_danfse;
+                        // Monta e salva xml_nfse quando disponível (FocusNFE)
+                        if (result && result.caminho_xml_nota_fiscal && result.url_danfse) {
+                            try {
+                                caminho = String(result.caminho_xml_nota_fiscal || "");
+                                xmlUrl = null;
+                                if (caminho.startsWith("/")) {
+                                    u = new URL(String(result.url_danfse));
+                                    xmlUrl = "".concat(u.origin).concat(caminho);
+                                }
+                                else {
+                                    m = String(result.url_danfse).match(/\/(\d{6})\//);
+                                    if (m && m.index != null) {
+                                        idx = m.index + m[0].length;
+                                        base = String(result.url_danfse).slice(0, idx);
+                                        xmlUrl = base + caminho.replace(/^\//, "");
+                                    }
+                                    else {
+                                        try {
+                                            u = new URL(String(result.url_danfse));
+                                            xmlUrl = "".concat(u.origin, "/").concat(caminho.replace(/^\//, ""));
+                                        }
+                                        catch (e) {
+                                            xmlUrl = null;
+                                        }
+                                    }
+                                }
+                                if (xmlUrl)
+                                    updates.xml_nfse = xmlUrl;
+                            }
+                            catch (e) {
+                                // ignore assembly errors
+                            }
+                        }
                         if (!(Object.keys(updates).length > 0)) return [3 /*break*/, 6];
                         return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.update(invoice.id, updates)];
                     case 5:
                         _a.sent();
-                        console.log("[DB] Atualizado RPS ".concat(rps_number, ":"), updates);
                         _a.label = 6;
                     case 6: return [3 /*break*/, 8];
                     case 7:
@@ -177,7 +208,6 @@ exports.NfseController = {
                             nfseService.setProvider(provider);
                         }
                         activeProvider = nfseService.getProvider();
-                        console.log("\uD83D\uDCE8 Enviando via ".concat(activeProvider, "..."));
                         // Se debug=true, retorna apenas o XML assinado sem enviar (apenas para Prefeitura)
                         if (debug && activeProvider === "prefeitura") {
                             prefeituraService = new NfseSpService_1.NfseSpService();
@@ -191,8 +221,6 @@ exports.NfseController = {
                         return [4 /*yield*/, nfseService.enviarLoteRps(xml)];
                     case 1:
                         result = _b.sent();
-                        // LOG: Mostra retorno completo da FocusNFE
-                        console.log("[FocusNFE] Retorno enviarLoteRps:", JSON.stringify(result, null, 2));
                         if (!result) return [3 /*break*/, 12];
                         if (!Array.isArray(result)) return [3 /*break*/, 8];
                         _i = 0, result_1 = result;
@@ -200,7 +228,6 @@ exports.NfseController = {
                     case 2:
                         if (!(_i < result_1.length)) return [3 /*break*/, 7];
                         rps = result_1[_i];
-                        console.log("[FocusNFE] RPS:", rps);
                         if (!rps.numero_rps) return [3 /*break*/, 6];
                         return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.findByRps_number(rps.numero_rps)];
                     case 3:
@@ -209,10 +236,10 @@ exports.NfseController = {
                         return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.update(invoice.id, {
                                 status: rps.status ? mapStatus(rps.status) : null,
                                 protocolo_lote: rps.ref || null,
+                                xml_nfse: xml,
                             })];
                     case 4:
                         _b.sent();
-                        console.log("[DB] Atualizado RPS ".concat(rps.numero_rps, ": status=").concat(rps.status, ", protocolo_lote=").concat(rps.ref));
                         return [3 /*break*/, 6];
                     case 5:
                         console.warn("[DB] RPS n\u00E3o encontrada: ".concat(rps.numero_rps));
@@ -223,7 +250,6 @@ exports.NfseController = {
                     case 7: return [3 /*break*/, 12];
                     case 8:
                         if (!result.numero_rps) return [3 /*break*/, 12];
-                        console.log("[FocusNFE] RPS única:", result);
                         return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.findByRps_number(result.numero_rps)];
                     case 9:
                         invoice = _b.sent();
@@ -231,10 +257,10 @@ exports.NfseController = {
                         return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.update(invoice.id, {
                                 status: result.status ? mapStatus(result.status) : null,
                                 protocolo_lote: result.ref || null,
+                                xml_nfse: xml,
                             })];
                     case 10:
                         _b.sent();
-                        console.log("[DB] Atualizado RPS ".concat(result.numero_rps, ": status=").concat(result.status, ", protocolo_lote=").concat(result.ref));
                         return [3 /*break*/, 12];
                     case 11:
                         console.warn("[DB] RPS n\u00E3o encontrada: ".concat(result.numero_rps));
@@ -280,7 +306,6 @@ exports.NfseController = {
                             nfseService.setProvider(provider);
                         }
                         activeProvider = nfseService.getProvider();
-                        console.log("\uD83D\uDD0D Consultando lote ".concat(protocolo, " via ").concat(activeProvider, "..."));
                         result = void 0;
                         if (!(activeProvider === "focusnfe" && rps_number)) return [3 /*break*/, 2];
                         rpsNum = Array.isArray(rps_number)
@@ -300,7 +325,7 @@ exports.NfseController = {
                     case 4:
                         _b.trys.push([4, 12, , 13]);
                         handleSingle = function (obj) { return __awaiter(_this, void 0, void 0, function () {
-                            var rpsNum, invoice, remoteStatus, mapped, updates;
+                            var rpsNum, invoice, remoteStatus, mapped, updates, caminho, xmlUrl, u, m, idx, base, u;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0:
@@ -319,11 +344,43 @@ exports.NfseController = {
                                             updates.status = mapped;
                                         if (obj && obj.url_danfse && obj.url_danfse !== invoice.url_danfse)
                                             updates.url_danfse = obj.url_danfse;
+                                        // Monta e salva xml_nfse quando disponível (FocusNFE)
+                                        if (obj && obj.caminho_xml_nota_fiscal && obj.url_danfse) {
+                                            try {
+                                                caminho = String(obj.caminho_xml_nota_fiscal || "");
+                                                xmlUrl = null;
+                                                if (caminho.startsWith("/")) {
+                                                    u = new URL(String(obj.url_danfse));
+                                                    xmlUrl = "".concat(u.origin).concat(caminho);
+                                                }
+                                                else {
+                                                    m = String(obj.url_danfse).match(/\/(\d{6})\//);
+                                                    if (m && m.index != null) {
+                                                        idx = m.index + m[0].length;
+                                                        base = String(obj.url_danfse).slice(0, idx);
+                                                        xmlUrl = base + caminho.replace(/^\//, "");
+                                                    }
+                                                    else {
+                                                        try {
+                                                            u = new URL(String(obj.url_danfse));
+                                                            xmlUrl = "".concat(u.origin, "/").concat(caminho.replace(/^\//, ""));
+                                                        }
+                                                        catch (e) {
+                                                            xmlUrl = null;
+                                                        }
+                                                    }
+                                                }
+                                                if (xmlUrl)
+                                                    updates.xml_nfse = xmlUrl;
+                                            }
+                                            catch (e) {
+                                                // ignore
+                                            }
+                                        }
                                         if (!(Object.keys(updates).length > 0)) return [3 /*break*/, 3];
                                         return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.update(invoice.id, updates)];
                                     case 2:
                                         _a.sent();
-                                        console.log("[DB] Atualizado RPS ".concat(rpsNum, ":"), updates);
                                         _a.label = 3;
                                     case 3: return [2 /*return*/];
                                 }

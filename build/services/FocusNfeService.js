@@ -424,7 +424,7 @@ var FocusNfeService = /** @class */ (function () {
                                         iss_retido: false,
                                         valor_ipi: 0,
                                         codigo_nbs: "102010000",
-                                        codigo_indicador_operacao: "030101",
+                                        codigo_indicador_operacao: "100301",
                                         ibs_cbs_classificacao_tributaria: "000001",
                                     },
                                     exigibilidade_suspensa: 0,
