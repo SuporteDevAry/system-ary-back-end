@@ -16,6 +16,9 @@ import { Taxes1756780745306 as Taxes } from "./1756780745306-Taxes";
 import { Invoices1757045893213 as Invoices } from "./1757045893213-Invoices";
 import { Billing1757048894259 as Billings } from "./1757048894259-Billing";
 import { AddContractEmissionDatetime1756778999999 as AddContractEmissionDatetime } from "./1756778999999-AddContractEmissionDatetime";
+import { AddCommissionCurrencyFields1769793476443 as AddCommissionCurrencyFields } from "./1769793476443-AddCommissionCurrencyFields";
+import { AddFieldsToInvoices1769793476444 as AddFieldsToInvoices } from "./1769793476444-AddFieldsToInvoices";
+import { AddXmlFieldToInvoices1769793476445 as AddXmlFieldToInvoices } from "./1769793476445-AddXmlFieldToInvoices";
 
 export const migrationDir = {
   CreatePermissions,
@@ -35,5 +38,8 @@ export const migrationDir = {
   Taxes,
   Invoices,
   Billings,
+  AddCommissionCurrencyFields,
+  AddFieldsToInvoices,
+  AddXmlFieldToInvoices,
   AddContractEmissionDatetime,
 };

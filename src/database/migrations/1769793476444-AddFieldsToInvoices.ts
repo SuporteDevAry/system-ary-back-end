@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, TableColumn } from "typeorm";
 
-export class AddFieldsToInvoices20260320 implements MigrationInterface {
+export class AddFieldsToInvoices1769793476444 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const hasTable = await queryRunner.hasTable("invoices");
     if (!hasTable) return;

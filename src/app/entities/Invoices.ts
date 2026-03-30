@@ -69,6 +69,9 @@ export class Invoice {
   @Column({ type: "text", nullable: true })
   url_danfse: string; // URL do DANFSe gerado pelo provider (FocusNFE)
 
+  @Column({ type: "text", nullable: true })
+  xml_nfse: string; // Conteúdo XML enviado/recebido da NFSe
+
   @Column({ type: "text" })
   service_discrim: string;
 

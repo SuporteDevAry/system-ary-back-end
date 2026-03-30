@@ -63,6 +63,34 @@ export const NfseController = {
               result.url_danfse !== invoice.url_danfse
             )
               updates.url_danfse = result.url_danfse;
+            // Monta e salva xml_nfse quando disponível (FocusNFE)
+            if (result && result.caminho_xml_nota_fiscal && result.url_danfse) {
+              try {
+                const caminho = String(result.caminho_xml_nota_fiscal || "");
+                let xmlUrl: string | null = null;
+                if (caminho.startsWith("/")) {
+                  const u = new URL(String(result.url_danfse));
+                  xmlUrl = `${u.origin}${caminho}`;
+                } else {
+                  const m = String(result.url_danfse).match(/\/(\d{6})\//);
+                  if (m && m.index != null) {
+                    const idx = m.index + m[0].length;
+                    const base = String(result.url_danfse).slice(0, idx);
+                    xmlUrl = base + caminho.replace(/^\//, "");
+                  } else {
+                    try {
+                      const u = new URL(String(result.url_danfse));
+                      xmlUrl = `${u.origin}/${caminho.replace(/^\//, "")}`;
+                    } catch (e) {
+                      xmlUrl = null;
+                    }
+                  }
+                }
+                if (xmlUrl) updates.xml_nfse = xmlUrl;
+              } catch (e) {
+                // ignore assembly errors
+              }
+            }
             if (Object.keys(updates).length > 0) {
               await InvoiceRepository.update(invoice.id, updates);
             }
@@ -153,6 +181,7 @@ export const NfseController = {
                 await InvoiceRepository.update(invoice.id, {
                   status: rps.status ? mapStatus(rps.status) : null,
                   protocolo_lote: rps.ref || null,
+                  xml_nfse: xml,
                 });
               } else {
                 console.warn(`[DB] RPS não encontrada: ${rps.numero_rps}`);
@@ -167,6 +196,7 @@ export const NfseController = {
             await InvoiceRepository.update(invoice.id, {
               status: result.status ? mapStatus(result.status) : null,
               protocolo_lote: result.ref || null,
+              xml_nfse: xml,
             });
           } else {
             console.warn(`[DB] RPS não encontrada: ${result.numero_rps}`);
@@ -235,6 +265,34 @@ export const NfseController = {
             if (mapped && mapped !== invoice.status) updates.status = mapped;
             if (obj && obj.url_danfse && obj.url_danfse !== invoice.url_danfse)
               updates.url_danfse = obj.url_danfse;
+            // Monta e salva xml_nfse quando disponível (FocusNFE)
+            if (obj && obj.caminho_xml_nota_fiscal && obj.url_danfse) {
+              try {
+                const caminho = String(obj.caminho_xml_nota_fiscal || "");
+                let xmlUrl: string | null = null;
+                if (caminho.startsWith("/")) {
+                  const u = new URL(String(obj.url_danfse));
+                  xmlUrl = `${u.origin}${caminho}`;
+                } else {
+                  const m = String(obj.url_danfse).match(/\/(\d{6})\//);
+                  if (m && m.index != null) {
+                    const idx = m.index + m[0].length;
+                    const base = String(obj.url_danfse).slice(0, idx);
+                    xmlUrl = base + caminho.replace(/^\//, "");
+                  } else {
+                    try {
+                      const u = new URL(String(obj.url_danfse));
+                      xmlUrl = `${u.origin}/${caminho.replace(/^\//, "")}`;
+                    } catch (e) {
+                      xmlUrl = null;
+                    }
+                  }
+                }
+                if (xmlUrl) updates.xml_nfse = xmlUrl;
+              } catch (e) {
+                // ignore
+              }
+            }
             if (Object.keys(updates).length > 0) {
               await InvoiceRepository.update(invoice.id, updates);
             }
