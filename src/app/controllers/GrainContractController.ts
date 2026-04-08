@@ -34,6 +34,124 @@ function resolveQuantityForFinancialCalc(
   return finalQuantity;
 }
 
+function roundCurrencyValue(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function enrichContractFinancialFields<T extends Partial<GrainContract>>(
+  contract: T,
+): T {
+  if (
+    contract.quantity === undefined ||
+    contract.price === undefined ||
+    !contract.type_quantity
+  ) {
+    return contract;
+  }
+
+  const quantityForFinancialCalc = resolveQuantityForFinancialCalc(
+    contract.final_quantity,
+    contract.quantity,
+  );
+
+  const totalContractValue = calculateTotalContractValue(
+    contract.product || "",
+    quantityForFinancialCalc,
+    contract.price,
+    contract.type_currency,
+    contract.day_exchange_rate,
+    contract.type_quantity,
+  );
+
+  const toCommissionCurrency = (value?: string | null) => {
+    if (value === "Dólar" || value === "USD" || value === "US$") {
+      return "Dólar";
+    }
+
+    return "BRL";
+  };
+
+  let commissionSellerContractValue: number | null = null;
+  let commissionBuyerContractValue: number | null = null;
+
+  if (contract.commission_seller) {
+    const sellerCurrency =
+      contract.type_commission_seller === "Percentual"
+        ? ""
+        : contract.type_commission_seller_currency ||
+          toCommissionCurrency(contract.type_currency);
+
+    const sellerRate =
+      contract.commission_seller_exchange_rate ||
+      (sellerCurrency === "Dólar" ? contract.day_exchange_rate : undefined);
+
+    commissionSellerContractValue = roundCurrencyValue(
+      calcCommissionBySack(
+        quantityForFinancialCalc,
+        contract.type_quantity,
+        contract.commission_seller,
+        contract.type_commission_seller || "",
+        sellerCurrency,
+        sellerRate,
+        totalContractValue,
+      ),
+    );
+  }
+
+  if (contract.commission_buyer) {
+    const buyerCurrency =
+      contract.type_commission_buyer === "Percentual"
+        ? ""
+        : contract.type_commission_buyer_currency ||
+          toCommissionCurrency(contract.type_currency);
+
+    const buyerRate =
+      contract.commission_buyer_exchange_rate ||
+      (buyerCurrency === "Dólar" ? contract.day_exchange_rate : undefined);
+
+    commissionBuyerContractValue = roundCurrencyValue(
+      calcCommissionBySack(
+        quantityForFinancialCalc,
+        contract.type_quantity,
+        contract.commission_buyer,
+        contract.type_commission_buyer || "",
+        buyerCurrency,
+        buyerRate,
+        totalContractValue,
+      ),
+    );
+  }
+
+  let commissionContract: number | null;
+  if (
+    commissionSellerContractValue !== null &&
+    commissionBuyerContractValue !== null
+  ) {
+    commissionContract = null;
+  } else if (commissionSellerContractValue !== null) {
+    commissionContract = commissionSellerContractValue;
+  } else if (commissionBuyerContractValue !== null) {
+    commissionContract = commissionBuyerContractValue;
+  } else {
+    commissionContract = roundCurrencyValue(
+      calcCommission({
+        ...contract,
+        total_contract_value: totalContractValue,
+        commission_seller_contract_value: null,
+        commission_buyer_contract_value: null,
+      }),
+    );
+  }
+
+  return {
+    ...contract,
+    total_contract_value: totalContractValue,
+    commission_contract: commissionContract,
+    commission_seller_contract_value: commissionSellerContractValue,
+    commission_buyer_contract_value: commissionBuyerContractValue,
+  };
+}
+
 export class GrainContractController {
   getReport = async (req: Request, res: Response): Promise<Response> => {
     try {
@@ -235,7 +353,12 @@ export class GrainContractController {
           .take(perPage)
           .getManyAndCount();
 
-        return res.json({ data, total, page: pageNum, per_page: perPage });
+        return res.json({
+          data: data.map((contract) => enrichContractFinancialFields(contract)),
+          total,
+          page: pageNum,
+          per_page: perPage,
+        });
       }
 
       // Sem paginação: retornar todos os resultados
@@ -245,7 +368,10 @@ export class GrainContractController {
           "DESC",
         )
         .getManyAndCount();
-      return res.json({ data, total });
+      return res.json({
+        data: data.map((contract) => enrichContractFinancialFields(contract)),
+        total,
+      });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
@@ -257,7 +383,11 @@ export class GrainContractController {
   ): Promise<Response> => {
     try {
       const grainContracts = await grainContractRepository.find();
-      return res.json(grainContracts);
+      return res.json(
+        grainContracts.map((contract) =>
+          enrichContractFinancialFields(contract),
+        ),
+      );
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
@@ -275,7 +405,7 @@ export class GrainContractController {
       if (!grainContract) {
         return res.status(404).json({ message: "GrainContract not found" });
       }
-      return res.json(grainContract);
+      return res.json(enrichContractFinancialFields(grainContract));
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
