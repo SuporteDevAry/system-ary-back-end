@@ -28,6 +28,10 @@ export function calculateTotalContractValue(
     preferDecimalDot: boolean,
     options?: { isQuantity?: boolean; typeQuantity?: string },
   ): number => {
+    if (typeof value === "number") {
+      return Number.isFinite(value) ? value : Number.NaN;
+    }
+
     const raw = String(value).trim();
     if (!raw) {
       return Number.NaN;

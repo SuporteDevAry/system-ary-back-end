@@ -81,6 +81,59 @@ function resolveQuantityForFinancialCalc(finalQuantity, quantity) {
     }
     return finalQuantity;
 }
+function roundCurrencyValue(value) {
+    return Math.round(value * 100) / 100;
+}
+function enrichContractFinancialFields(contract) {
+    if (contract.quantity === undefined ||
+        contract.price === undefined ||
+        !contract.type_quantity) {
+        return contract;
+    }
+    var quantityForFinancialCalc = resolveQuantityForFinancialCalc(contract.final_quantity, contract.quantity);
+    var totalContractValue = (0, calculateTotalContractValue_1.calculateTotalContractValue)(contract.product || "", quantityForFinancialCalc, contract.price, contract.type_currency, contract.day_exchange_rate, contract.type_quantity);
+    var toCommissionCurrency = function (value) {
+        if (value === "Dólar" || value === "USD" || value === "US$") {
+            return "Dólar";
+        }
+        return "BRL";
+    };
+    var commissionSellerContractValue = null;
+    var commissionBuyerContractValue = null;
+    if (contract.commission_seller) {
+        var sellerCurrency = contract.type_commission_seller === "Percentual"
+            ? ""
+            : contract.type_commission_seller_currency ||
+                toCommissionCurrency(contract.type_currency);
+        var sellerRate = contract.commission_seller_exchange_rate ||
+            (sellerCurrency === "Dólar" ? contract.day_exchange_rate : undefined);
+        commissionSellerContractValue = roundCurrencyValue((0, calcCommissionBySack_1.calcCommissionBySack)(quantityForFinancialCalc, contract.type_quantity, contract.commission_seller, contract.type_commission_seller || "", sellerCurrency, sellerRate, totalContractValue));
+    }
+    if (contract.commission_buyer) {
+        var buyerCurrency = contract.type_commission_buyer === "Percentual"
+            ? ""
+            : contract.type_commission_buyer_currency ||
+                toCommissionCurrency(contract.type_currency);
+        var buyerRate = contract.commission_buyer_exchange_rate ||
+            (buyerCurrency === "Dólar" ? contract.day_exchange_rate : undefined);
+        commissionBuyerContractValue = roundCurrencyValue((0, calcCommissionBySack_1.calcCommissionBySack)(quantityForFinancialCalc, contract.type_quantity, contract.commission_buyer, contract.type_commission_buyer || "", buyerCurrency, buyerRate, totalContractValue));
+    }
+    var commissionContract;
+    if (commissionSellerContractValue !== null &&
+        commissionBuyerContractValue !== null) {
+        commissionContract = null;
+    }
+    else if (commissionSellerContractValue !== null) {
+        commissionContract = commissionSellerContractValue;
+    }
+    else if (commissionBuyerContractValue !== null) {
+        commissionContract = commissionBuyerContractValue;
+    }
+    else {
+        commissionContract = roundCurrencyValue((0, calcCommission_1.calcCommission)(__assign(__assign({}, contract), { total_contract_value: totalContractValue, commission_seller_contract_value: null, commission_buyer_contract_value: null })));
+    }
+    return __assign(__assign({}, contract), { total_contract_value: totalContractValue, commission_contract: commissionContract, commission_seller_contract_value: commissionSellerContractValue, commission_buyer_contract_value: commissionBuyerContractValue });
+}
 var GrainContractController = /** @class */ (function () {
     function GrainContractController() {
         var _this = this;
@@ -225,14 +278,22 @@ var GrainContractController = /** @class */ (function () {
                                 .getManyAndCount()];
                     case 1:
                         _b = _d.sent(), data = _b[0], total = _b[1];
-                        return [2 /*return*/, res.json({ data: data, total: total, page: pageNum, per_page: perPage })];
+                        return [2 /*return*/, res.json({
+                                data: data.map(function (contract) { return enrichContractFinancialFields(contract); }),
+                                total: total,
+                                page: pageNum,
+                                per_page: perPage,
+                            })];
                     case 2: return [4 /*yield*/, qb
                             .orderBy("(CASE WHEN gc.contract_emission_date ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' THEN to_date(gc.contract_emission_date, 'DD/MM/YYYY') ELSE CAST(gc.contract_emission_date AS timestamp) END)", "DESC")
                             .getManyAndCount()];
                     case 3:
                         // Sem paginação: retornar todos os resultados
                         _c = _d.sent(), data = _c[0], total = _c[1];
-                        return [2 /*return*/, res.json({ data: data, total: total })];
+                        return [2 /*return*/, res.json({
+                                data: data.map(function (contract) { return enrichContractFinancialFields(contract); }),
+                                total: total,
+                            })];
                     case 4:
                         error_1 = _d.sent();
                         return [2 /*return*/, res.status(500).json({ message: error_1.message })];
@@ -249,7 +310,9 @@ var GrainContractController = /** @class */ (function () {
                         return [4 /*yield*/, GrainContractRepository_1.grainContractRepository.find()];
                     case 1:
                         grainContracts = _a.sent();
-                        return [2 /*return*/, res.json(grainContracts)];
+                        return [2 /*return*/, res.json(grainContracts.map(function (contract) {
+                                return enrichContractFinancialFields(contract);
+                            }))];
                     case 2:
                         error_2 = _a.sent();
                         return [2 /*return*/, res.status(500).json({ message: error_2.message })];
@@ -274,7 +337,7 @@ var GrainContractController = /** @class */ (function () {
                         if (!grainContract) {
                             return [2 /*return*/, res.status(404).json({ message: "GrainContract not found" })];
                         }
-                        return [2 /*return*/, res.json(grainContract)];
+                        return [2 /*return*/, res.json(enrichContractFinancialFields(grainContract))];
                     case 3:
                         error_3 = _a.sent();
                         return [2 /*return*/, res.status(500).json({ message: error_3.message })];

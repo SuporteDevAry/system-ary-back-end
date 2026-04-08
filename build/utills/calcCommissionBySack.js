@@ -6,6 +6,9 @@ exports.calcCommissionBySack = void 0;
  */
 function normalizeNumber(value, preferDecimalDot, options) {
     if (preferDecimalDot === void 0) { preferDecimalDot = true; }
+    if (typeof value === "number") {
+        return Number.isFinite(value) ? value : Number.NaN;
+    }
     var raw = String(value).trim();
     if (!raw)
         return Number.NaN;
