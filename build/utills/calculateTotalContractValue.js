@@ -17,6 +17,9 @@ function calculateTotalContractValue(product, quantity, price, typeCurrency, day
             quantityType === "toneladas metricas");
     };
     var normalizeNumber = function (value, preferDecimalDot, options) {
+        if (typeof value === "number") {
+            return Number.isFinite(value) ? value : Number.NaN;
+        }
         var raw = String(value).trim();
         if (!raw) {
             return Number.NaN;
