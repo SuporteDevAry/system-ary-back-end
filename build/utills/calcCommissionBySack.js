@@ -29,17 +29,12 @@ function normalizeNumber(value, preferDecimalDot, options) {
         }
         if (hasDot && !hasComma) {
             var parts = raw.split(".");
-            // Mais de um ponto: tratar como separador de milhar
+            // Mais de um ponto segue o formato brasileiro com separador de milhar.
             if (parts.length > 2) {
                 return Number(raw.replace(/\./g, ""));
             }
-            // Um unico ponto: se a parte apos o ponto tem exatamente 3 digitos,
-            // e um separador de milhar brasileiro (ex.: "1.000" = 1000 TM).
-            // Caso contrario, e decimal (ex.: "2.5" = 2.5 TM).
-            var decimalPart = parts[1];
-            if (decimalPart.length === 3) {
-                return Number(raw.replace(/\./g, ""));
-            }
+            // Um unico ponto vindo do banco para TM representa casas decimais.
+            // Ex.: "983.281" = 983 toneladas e 281 kg.
             return Number(raw);
         }
     }
