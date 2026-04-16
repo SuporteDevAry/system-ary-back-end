@@ -136,12 +136,6 @@ export class FocusNfeService {
 
     console.log("✅ FocusNfeService inicializado");
     console.log(`   API URL: ${this.config.apiUrl}`);
-    console.log(
-      `   Token configurado: ${this.config.apiToken.substring(
-        0,
-        5,
-      )}...${this.config.apiToken.substring(this.config.apiToken.length - 5)}`,
-    );
 
     // Detectar se está em homologação
     const isHomolog = this.config.apiUrl.includes("homologacao");

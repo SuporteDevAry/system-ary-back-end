@@ -227,6 +227,24 @@ export class GrainContractController {
         }
       }
 
+      // Filtrar por product_types (array de siglas de produtos)
+      if (req.query.product_types) {
+        let productTypesArr: string[] = [];
+        if (Array.isArray(req.query.product_types)) {
+          productTypesArr = req.query.product_types as string[];
+        } else if (typeof req.query.product_types === "string") {
+          productTypesArr = req.query.product_types
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+        }
+        if (productTypesArr.length > 0) {
+          qb.andWhere("gc.product IN (:...productTypesArr)", {
+            productTypesArr,
+          });
+        }
+      }
+
       // Filtrar por produto (prefixo) e nome do produto (busca parcial)
       if (product) {
         qb.andWhere("gc.product = :product", { product });
@@ -813,6 +831,7 @@ export class GrainContractController {
         "final_quantity",
         "payment_date",
         "charge_date",
+        "commission_receipt_date",
         "expected_receipt_date",
         "internal_communication",
         "status_received",
