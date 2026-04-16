@@ -171,6 +171,9 @@ export class GrainContract {
   charge_date: string;
 
   @Column({ nullable: true })
+  commission_receipt_date: string;
+
+  @Column({ nullable: true })
   expected_receipt_date: string;
 
   @Column({ nullable: true })

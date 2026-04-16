@@ -228,6 +228,10 @@ var GrainContract = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", String)
+    ], GrainContract.prototype, "commission_receipt_date", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
     ], GrainContract.prototype, "expected_receipt_date", void 0);
     __decorate([
         (0, typeorm_1.Column)({ nullable: true }),
