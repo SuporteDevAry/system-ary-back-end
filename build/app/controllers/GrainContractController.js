@@ -137,7 +137,7 @@ var GrainContractController = /** @class */ (function () {
     function GrainContractController() {
         var _this = this;
         this.getReport = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var _a, seller, buyer, year, month, date, date_start, date_end, product, name_product, page, per_page, qb, sellers, conds_1, params_1, buyers, conds_2, params_2, contractEmissionDateAsDate, parseDateToIso, hasDateRange, parsedStartDate, parsedEndDate, parsedDate, y, m, pageProvided, perPageProvided, data, total, pageNum, perPage, offset, error_1;
+            var _a, seller, buyer, year, month, date, date_start, date_end, product, name_product, page, per_page, qb, sellers, conds_1, params_1, buyers, conds_2, params_2, productTypesArr, contractEmissionDateAsDate, parseDateToIso, hasDateRange, parsedStartDate, parsedEndDate, parsedDate, y, m, pageProvided, perPageProvided, data, total, pageNum, perPage, offset, error_1;
             var _b, _c;
             return __generator(this, function (_d) {
                 switch (_d.label) {
@@ -189,6 +189,24 @@ var GrainContractController = /** @class */ (function () {
                                 conds_2.push("gc.buyer @> :buyersArray");
                                 params_2.buyersArray = JSON.stringify(buyers);
                                 qb.andWhere("(".concat(conds_2.join(" OR "), ")"), params_2);
+                            }
+                        }
+                        // Filtrar por product_types (array de siglas de produtos)
+                        if (req.query.product_types) {
+                            productTypesArr = [];
+                            if (Array.isArray(req.query.product_types)) {
+                                productTypesArr = req.query.product_types;
+                            }
+                            else if (typeof req.query.product_types === "string") {
+                                productTypesArr = req.query.product_types
+                                    .split(",")
+                                    .map(function (s) { return s.trim(); })
+                                    .filter(Boolean);
+                            }
+                            if (productTypesArr.length > 0) {
+                                qb.andWhere("gc.product IN (:...productTypesArr)", {
+                                    productTypesArr: productTypesArr,
+                                });
                             }
                         }
                         // Filtrar por produto (prefixo) e nome do produto (busca parcial)
@@ -614,6 +632,7 @@ var GrainContractController = /** @class */ (function () {
                             "final_quantity",
                             "payment_date",
                             "charge_date",
+                            "commission_receipt_date",
                             "expected_receipt_date",
                             "internal_communication",
                             "status_received",

@@ -143,7 +143,6 @@ var FocusNfeService = /** @class */ (function () {
         }
         console.log("✅ FocusNfeService inicializado");
         console.log("   API URL: ".concat(this.config.apiUrl));
-        console.log("   Token configurado: ".concat(this.config.apiToken.substring(0, 5), "...").concat(this.config.apiToken.substring(this.config.apiToken.length - 5)));
         // Detectar se está em homologação
         var isHomolog = this.config.apiUrl.includes("homologacao");
         console.log("   Ambiente: ".concat(isHomolog ? "HOMOLOGAÇÃO" : "PRODUÇÃO"));
