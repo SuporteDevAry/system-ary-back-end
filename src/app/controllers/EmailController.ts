@@ -161,21 +161,24 @@ export class EmailController {
         ],
         subject: `Contrato ${number_contract} - ${nameSeller} (X) ${nameBuyer} ${subjectPrefix}`,
         text: `Segue o contrato ${number_contract} em anexo.`,
-        html: ` 
+        html: `
           <div style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;">
-            <p>Prezado ${contractData.seller.name}</p>
-            <p>Segue anexo uma (01) cópia de nossa confirmação, solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve possível.</p>
+            <div style="margin-left: 20px;">
+              <p>Para ${contractData.seller.name}</p>
+              <p>Segue anexo uma (01) cópia de nossa confirmação.<p>
+              <p>Solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve possível.</p>
 
-            <p>Agradecemos e nos colocamos a sua disposição.</p>
+              <p>Agradecemos e nos colocamos à sua disposição.</p>
+              <br/>
+
+              <p style="margin-bottom: 4px;">Saudações,</p>
+            </div>
+            <img src="cid:assinaturaemail" alt="Assinatura" style="max-width: 200px; height: auto; display: block;" />
             <br/>
 
-            <p>Saudações,</p>
-           
-
-            <img src="cid:assinaturaemail" alt="Assinatura" style="max-width: 300px; height: auto;" />
-            <br/>
-
-            <small style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;">Este contrato foi criado e enviado via sistema, pedimos a gentileza que confirme o recebimento.</small>
+            <div style="padding-left: 10px;">
+              <small style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;">Este contrato foi criado e enviado via sistema, pedimos a gentileza que confirme o recebimento.</small>
+            </div>
           </div>`,
         attachments: [
           {
@@ -206,19 +209,22 @@ export class EmailController {
         text: `Segue o contrato ${number_contract} em anexo.`,
         html: `
           <div style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 14px; line-height: 21px;">
-            <p>Prezado ${contractData.buyer.name}</p>
-            <p>Segue anexo uma (01) cópia de nossa confirmação, solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve possível.</p>
+            <div style="margin-left: 20px;">
+              <p>Para ${contractData.buyer.name}</p>
+              <p>Segue anexo uma (01) cópia de nossa confirmação.<p>
+              <p>Solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve possível.</p>
 
-            <p>Agradecemos e nos colocamos a sua disposição.</p>
+              <p>Agradecemos e nos colocamos à sua disposição.</p>
+              <br/>
+
+              <p style="margin-bottom: 4px;">Saudações,</p>
+            </div>
+            <img src="cid:assinaturaemail" alt="Assinatura" style="max-width: 200px; height: auto; display: block;" />
             <br/>
 
-            <p>Saudações,</p>
-            
-
-            <img src="cid:assinaturaemail" alt="Assinatura" style="max-width: 300px; height: auto;" />
-            <br/>
-              
-            <small style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;">Este contrato foi criado e enviado via sistema, pedimos a gentileza que confirme o recebimento.</small>
+            <div style="padding-left: 10px;">
+              <small style="font-family: 'Courier New', Courier, monospace, Arial, sans-serif; font-weight: 400; color: rgb(0, 0, 0); font-size: 12px; line-height: 14px;">Este contrato foi criado e enviado via sistema, pedimos a gentileza que confirme o recebimento.</small>
+            </div>
           </div>`,
         attachments: [
           {
