@@ -1,6 +1,8 @@
 const folhaDeRostoText = `
 
-Segue anexo uma (01) cópia de nossa confirmação, solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve possível.
+Segue anexo uma (01) cópia de nossa confirmação.
+
+Solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve possível.
 
 Agradecemos e nos colocamos à sua disposição.
 
