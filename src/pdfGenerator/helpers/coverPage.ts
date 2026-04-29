@@ -4,7 +4,7 @@ Segue anexo uma (01) cópia de nossa confirmação.
 
 Solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve possível.
 
-Agradecemos e nos colocamos à sua disposição.
+Agradecemos e nos colocamos à disposição.
 
 Saudações,
 
