@@ -168,7 +168,7 @@ export class EmailController {
               <p>Segue anexo uma (01) cópia de nossa confirmação.<p>
               <p>Solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve possível.</p>
 
-              <p>Agradecemos e nos colocamos à sua disposição.</p>
+              <p>Agradecemos e nos colocamos à disposição.</p>
               <br/>
 
               <p style="margin-bottom: 4px;">Saudações,</p>
@@ -214,7 +214,7 @@ export class EmailController {
               <p>Segue anexo uma (01) cópia de nossa confirmação.<p>
               <p>Solicitamos carimbar e assinar a mesma e nos devolver por e-mail o mais breve possível.</p>
 
-              <p>Agradecemos e nos colocamos à sua disposição.</p>
+              <p>Agradecemos e nos colocamos à disposição.</p>
               <br/>
 
               <p style="margin-bottom: 4px;">Saudações,</p>
