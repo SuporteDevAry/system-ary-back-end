@@ -25,6 +25,10 @@ export const InvoiceRepository = {
         return await repo.findOneBy({ nfs_number });
     },
 
+    async findByProtocoloLote(protocolo_lote: string) {
+        return await repo.findOneBy({ protocolo_lote });
+    },
+
     async update(id: string, data: Partial<Invoice>) {
         const invoice = await repo.findOneBy({ id });
         if (!invoice) throw new Error("RPS não encontrada");

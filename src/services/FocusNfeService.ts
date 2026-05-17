@@ -57,13 +57,15 @@ interface FocusNfeRequest {
       codigo_municipio: string;
       uf: string;
       cep: string;
+      codigo_pais?: string;
     };
   };
   servico: {
     discriminacao: string;
     item_lista_servico: string;
     codigo_tributacao_municipio: string;
-    tipo_operacao: number;
+    //codigo_municipio: string;
+    //tipo_operacao: number;
     valor_servicos: number;
     valor_final_cobrado: number;
     base_calculo: number;
@@ -73,7 +75,7 @@ interface FocusNfeRequest {
     codigo_nbs: string;
     codigo_indicador_operacao: string;
     ibs_cbs_classificacao_tributaria: string;
-    //codigo_municipio: string;
+    tipo_tributacao?: "T" | "F" | "C" | "N" | "P";
     //codigo_servico: string;
     //valor_iss?: number;
     //CodigoServico: string;
@@ -96,6 +98,12 @@ interface FocusNfeRequest {
   finalidade_emissao: number;
   consumidor_final: number;
   indicador_destinatario: number;
+}
+
+interface FocusNfeBatchItem {
+  numero_rps: string;
+  referencia: string;
+  request: FocusNfeRequest;
 }
 
 export class FocusNfeService {
@@ -146,23 +154,35 @@ export class FocusNfeService {
    * Envia lote de RPS via API Focus NFe
    * Aceita XML gerado pelo frontend e o processa
    */
-  async enviarLoteRps(xml: string): Promise<any> {
+  async enviarLoteRps(xml: string): Promise<any[]> {
     try {
       console.log("📤 Processando XML para envio Focus NFe...");
 
-      const focusRequest = await this.converterXmlParaFocusNfe(xml);
-      console.log("✅ XML convertido para formato Focus NFe");
-
-      // Gera referência única para o lote
-      const referencia = focusRequest.referencia;
-      const { referencia: _ref, ...body } = focusRequest as any;
-
-      // Envia o parâmetro ref na query string
-      return await this.fazerRequisicaoApi(
-        "POST",
-        `/nfse?ref=${referencia}`,
-        body,
+      const itens = await this.converterXmlParaFocusNfe(xml);
+      console.log(
+        `✅ XML convertido para formato Focus NFe (${itens.length} RPS)`,
       );
+
+      const resultados: any[] = [];
+
+      for (const item of itens) {
+        const { referencia, request, numero_rps } = item;
+        const { referencia: _ref, ...body } = request as any;
+
+        const response = await this.fazerRequisicaoApi(
+          "POST",
+          `/nfse?ref=${referencia}`,
+          body,
+        );
+
+        resultados.push({
+          ...response,
+          ref: response?.ref || referencia,
+          numero_rps,
+        });
+      }
+
+      return resultados;
     } catch (error: any) {
       console.error("❌ Erro ao enviar para Focus NFe:", error);
       throw new Error(`Falha no envio: ${error.message}`);
@@ -189,20 +209,13 @@ export class FocusNfeService {
   /**
    * Cancela NFS-e na Focus NFe
    */
-  async cancelarNfse(numeroNfse: string, motivo: string): Promise<any> {
+  async cancelarNfse(referencia: string, justificativa: string): Promise<any> {
     try {
-      console.log(`❌ Cancelando NFS-e ${numeroNfse} na Focus NFe...`);
+      console.log(`❌ Cancelando NFS-e ${referencia} na Focus NFe...`);
 
-      const payload = {
-        pedido_numero_nfse: numeroNfse,
-        motivo_cancelamento: motivo,
-      };
-
-      return await this.fazerRequisicaoApi(
-        "POST",
-        `/nfse/${numeroNfse}/cancelamento`,
-        payload,
-      );
+      return await this.fazerRequisicaoApi("DELETE", `/nfse/${referencia}`, {
+        justificativa,
+      });
     } catch (error: any) {
       console.error("❌ Erro ao cancelar NFS-e na Focus NFe:", error);
       throw new Error(`Falha no cancelamento: ${error.message}`);
@@ -321,7 +334,7 @@ export class FocusNfeService {
    */
   private async converterXmlParaFocusNfe(
     xml: string,
-  ): Promise<FocusNfeRequest> {
+  ): Promise<FocusNfeBatchItem[]> {
     const fetch = (await import("node-fetch")).default;
     return new Promise((resolve, reject) => {
       parseString(
@@ -343,311 +356,291 @@ export class FocusNfeService {
             const rpsArray = Array.isArray(pedido.RPS)
               ? pedido.RPS
               : [pedido.RPS];
-            const primeiroRps = rpsArray[0];
-
-            // DEBUG: Log completo da estrutura do primeiro RPS
-            console.log("🔍 DEBUG - Estrutura completa do RPS recebida:");
-            console.log(JSON.stringify(primeiroRps, null, 2));
-
-            // InscricaoPrestador está dentro de ChaveRPS no XML
-            const chaveRps = primeiroRps.ChaveRPS || {};
-            const inscricaoPrestador =
-              chaveRps.InscricaoPrestador ||
-              primeiroRps.InscricaoPrestador ||
-              "";
-
-            // Extrai CNPJ/CPF do prestador a partir do Cabecalho (onde o frontend envia)
+            const requests: FocusNfeBatchItem[] = [];
             const cpfCnpjRemetente = cabecalho.CPFCNPJRemetente || {};
-            const cnpjPrestador =
-              cpfCnpjRemetente.CNPJ ||
-              primeiroRps.CNPJRemetente ||
-              primeiroRps.CNPJ ||
-              process.env.CNPJ_PRESTADOR ||
-              "";
-            const cpfPrestador =
-              cpfCnpjRemetente.CPF ||
-              primeiroRps.CPFRemetente ||
-              primeiroRps.CPF ||
-              process.env.CPF_PRESTADOR ||
-              "";
 
-            // Log para debug
-            console.log(`   📋 Extração Prestador:`);
-            console.log(
-              `      IM: ${inscricaoPrestador || "✗ não encontrado"}`,
-            );
-            console.log(
-              `      CNPJ: ${cnpjPrestador ? "✓ fornecido" : "✗ não fornecido"}`,
-            );
-            console.log(
-              `      CPF: ${cpfPrestador ? "✓ fornecido" : "✗ não fornecido"}`,
-            );
+            for (let index = 0; index < rpsArray.length; index++) {
+              const rps = rpsArray[index];
+              if (!rps) continue;
 
-            // Extrai dados do tomador a partir do primeiro RPS
-            const rps = primeiroRps;
-            const cpfCnpjTomador = rps.CPFCNPJTomador || {};
-            const enderecTomador = rps.EnderecoTomador || {};
-            let cnpjTomador = cpfCnpjTomador.CNPJ || "";
-            let cpfTomador = cpfCnpjTomador.CPF || "";
-            const razaoSocialTomador =
-              rps.RazaoSocialTomador || rps.NomeFantasia || "Cliente";
-            const emailTomador = rps.EmailTomador || "";
+              console.log("🔍 DEBUG - Estrutura completa do RPS recebida:");
+              console.log(JSON.stringify(rps, null, 2));
 
-            // Detecta tomador estrangeiro: sem CPF/CNPJ e UF = EX ou país informado
-            const isEstrangeiro =
-              !cnpjTomador &&
-              !cpfTomador &&
-              (enderecTomador.UF === "EX" ||
-                enderecTomador.Pais ||
-                enderecTomador.CodigoPais);
+              const numeroRps = this.extrairNumeroRps(rps, index + 1);
+              const chaveRps = rps.ChaveRPS || {};
+              const inscricaoPrestador =
+                chaveRps.InscricaoPrestador || rps.InscricaoPrestador || "";
 
-            let codigoMunicipioServico = rps.MunicipioPrestacao || "3550308";
-            let codigoMunicipioTomadorOriginal =
-              enderecTomador.Cidade || codigoMunicipioServico;
-            let codigoMunicipioTomadorCorrigido =
-              this.validarECorrigirCodigoMunicipio(
-                codigoMunicipioTomadorOriginal,
-                enderecTomador.UF || "SP",
-                enderecTomador.CEP || "",
+              const cnpjPrestador =
+                cpfCnpjRemetente.CNPJ ||
+                rps.CNPJRemetente ||
+                rps.CNPJ ||
+                process.env.CNPJ_PRESTADOR ||
+                "";
+              const cpfPrestador =
+                cpfCnpjRemetente.CPF ||
+                rps.CPFRemetente ||
+                rps.CPF ||
+                process.env.CPF_PRESTADOR ||
+                "";
+
+              console.log(`   📋 Extração Prestador:`);
+              console.log(
+                `      IM: ${inscricaoPrestador || "✗ não encontrado"}`,
+              );
+              console.log(
+                `      CNPJ: ${cnpjPrestador ? "✓ fornecido" : "✗ não fornecido"}`,
+              );
+              console.log(
+                `      CPF: ${cpfPrestador ? "✓ fornecido" : "✗ não fornecido"}`,
               );
 
-            if (isEstrangeiro) {
-              // Para estrangeiro: remove CPF/CNPJ, define UF=EX, CEP=00000-000, codigo_municipio=9999999
-              cnpjTomador = "";
-              cpfTomador = "";
-              codigoMunicipioTomadorCorrigido = "9999999";
-              enderecTomador.UF = "EX";
-              enderecTomador.CEP = "00000-000";
-              if (!enderecTomador.Bairro) enderecTomador.Bairro = "EXTERIOR";
-              if (!enderecTomador.NumeroEndereco)
-                enderecTomador.NumeroEndereco = "S/N";
-              // Permite informar país
-              if (!enderecTomador.CodigoPais && enderecTomador.Pais) {
-                // Exemplo: Brasil=1058, EUA=249, Argentina=32 (BACEN)
-                enderecTomador.CodigoPais = enderecTomador.Pais;
-              }
-            } else if (enderecTomador.CEP) {
-              const ibgeViaCep = await buscarIbgePorCep(enderecTomador.CEP);
-              if (
-                ibgeViaCep &&
-                ibgeViaCep !== String(codigoMunicipioTomadorCorrigido)
-              ) {
-                console.warn(
-                  `[AUTOMÁTICO] Corrigindo codigo_municipio do tomador de ${codigoMunicipioTomadorCorrigido} para ${ibgeViaCep} com base no CEP ${enderecTomador.CEP}`,
-                );
-                codigoMunicipioTomadorCorrigido = ibgeViaCep;
-              }
-            }
+              const cpfCnpjTomador = rps.CPFCNPJTomador || {};
+              const enderecTomador = { ...(rps.EnderecoTomador || {}) };
+              let cnpjTomador = cpfCnpjTomador.CNPJ || "";
+              let cpfTomador = cpfCnpjTomador.CPF || "";
+              const razaoSocialTomador =
+                rps.RazaoSocialTomador || rps.NomeFantasia || "Cliente";
+              const emailTomador = rps.EmailTomador || "";
 
-            // Validação Focus NFe CNPJ
-            if (cnpjTomador && cnpjTomador.length === 14) {
-              try {
-                const focusToken = process.env.FOCUS_NFE_TOKEN;
-                if (!focusToken) {
-                  reject(
-                    new Error(
-                      "Token da Focus NFe não configurado no backend (.env FOCUS_NFE_TOKEN)",
-                    ),
-                  );
-                  return;
-                }
-                const resp = await fetch(
-                  `https://api.focusnfe.com.br/v2/cnpjs/${cnpjTomador}`,
-                  {
-                    method: "GET",
-                    headers: {
-                      accept: "application/json",
-                      Authorization:
-                        "Basic " +
-                        Buffer.from(focusToken + ":").toString("base64"),
-                    },
-                  },
+              const isEstrangeiro =
+                !cnpjTomador &&
+                !cpfTomador &&
+                (enderecTomador.UF === "EX" ||
+                  enderecTomador.Pais ||
+                  enderecTomador.CodigoPais);
+
+              let codigoMunicipioServico = rps.MunicipioPrestacao || "3550308";
+              let codigoMunicipioTomadorOriginal =
+                enderecTomador.Cidade || codigoMunicipioServico;
+              let codigoMunicipioTomadorCorrigido =
+                this.validarECorrigirCodigoMunicipio(
+                  codigoMunicipioTomadorOriginal,
+                  enderecTomador.UF,
+                  enderecTomador.CEP,
                 );
-                if (!resp.ok) {
-                  reject(
-                    new Error(
-                      `Erro ao consultar CNPJ do tomador na Focus NFe: status ${resp.status}`,
-                    ),
-                  );
-                  return;
+
+              if (isEstrangeiro) {
+                cnpjTomador = "";
+                cpfTomador = "";
+                codigoMunicipioTomadorCorrigido = "9999999";
+                enderecTomador.UF = "EX";
+                enderecTomador.CEP = "00000-000";
+                if (!enderecTomador.Bairro) enderecTomador.Bairro = "EXTERIOR";
+                if (!enderecTomador.NumeroEndereco)
+                  enderecTomador.NumeroEndereco = "S/N";
+                if (!enderecTomador.CodigoPais && enderecTomador.Pais) {
+                  enderecTomador.CodigoPais = enderecTomador.Pais;
                 }
-                const data = await resp.json();
-                if (!data.endereco || !data.endereco.codigo_ibge) {
-                  console.warn(
-                    "[AVISO] Resposta da Focus NFe não contém o campo endereco.codigo_ibge para o tomador. Prosseguindo mesmo assim.",
-                  );
-                } else if (
-                  String(data.endereco.codigo_ibge) !==
-                  String(codigoMunicipioTomadorCorrigido)
+              } else if (enderecTomador.CEP) {
+                const ibgeViaCep = await buscarIbgePorCep(enderecTomador.CEP);
+                if (
+                  ibgeViaCep &&
+                  ibgeViaCep !== String(codigoMunicipioTomadorCorrigido)
                 ) {
                   console.warn(
-                    `[AVISO] O CNPJ do tomador (${cnpjTomador}) está cadastrado na Focus NFe para o município IBGE ${data.endereco.codigo_ibge}, mas o município informado foi ${codigoMunicipioTomadorCorrigido}. Corrija os dados do tomador para prosseguir.`,
+                    `[AUTOMÁTICO] Corrigindo codigo_municipio do tomador de ${codigoMunicipioTomadorCorrigido} para ${ibgeViaCep} com base no CEP ${enderecTomador.CEP}`,
                   );
+                  codigoMunicipioTomadorCorrigido = ibgeViaCep;
                 }
-              } catch (err) {
-                reject(
-                  new Error(
-                    `Erro ao consultar Focus NFe para o CNPJ do tomador: ${err}`,
-                  ),
-                );
-                return;
               }
-            }
 
-            // Define servicoXml para fallback
-            const servicoXml = rps.Servico || {};
+              const servicoXml = rps.Servico || {};
 
-            // Log detalhado do objeto rps
-            console.log(
-              "🔍 DEBUG - Objeto RPS para extração:",
-              JSON.stringify(rps, null, 2),
-            );
-
-            // Busca ValorServicos ignorando case e variações
-            let valorServicos = 0;
-            const valorServicosKeys = [
-              "ValorServicos",
-              "valorservicos",
-              "valor_servicos",
-              "valorServicos",
-            ];
-            for (const key of valorServicosKeys) {
-              if (rps[key] !== undefined) {
-                valorServicos = parseFloat(rps[key]);
-                break;
-              }
-            }
-            if (!valorServicos && servicoXml.ValorServicos) {
-              valorServicos = parseFloat(servicoXml.ValorServicos);
-            }
-            if (!valorServicos && cabecalho.ValorTotalServicos) {
-              valorServicos = parseFloat(cabecalho.ValorTotalServicos);
-            }
-
-            // Busca ValorFinalCobrado ignorando case
-            let valorFinalCobrado = valorServicos;
-            if (rps.ValorFinalCobrado) {
-              valorFinalCobrado = parseFloat(rps.ValorFinalCobrado);
-            } else if (rps.valorfinalcobrado) {
-              valorFinalCobrado = parseFloat(rps.valorfinalcobrado);
-            }
-
-            // Busca BaseCalculo ignorando case
-            let baseCalculo = valorServicos;
-            if (rps.BaseCalculo) {
-              baseCalculo = parseFloat(rps.BaseCalculo);
-            } else if (rps.basecalculo) {
-              baseCalculo = parseFloat(rps.basecalculo);
-            }
-            const codigoServico =
-              rps.CodigoServico || servicoXml.CodigoServico || "06298";
-
-            const discriminacao =
-              rps.Discriminacao ||
-              servicoXml.Discriminacao ||
-              "Serviço não especificado";
-
-            const aliquotaPercentual = parseFloat(
-              rps.aliquota || rps.AliquotaServicos || "5",
-            );
-            const aliquotaFracao = Math.round(aliquotaPercentual / 100);
-            const valorIss = valorServicos * aliquotaFracao;
-            const valorIBS = Math.round(valorServicos * 0.01);
-            const valorCBS = Math.round(valorServicos * 0.09);
-
-            const aliquotaParaEnvio =
-              aliquotaPercentual > 0 ? aliquotaPercentual : 5;
-
-            // Monta a requisição final
-            const prestadorObj: any = {
-              inscricao_municipal: inscricaoPrestador,
-              codigo_municipio: String("3550308"),
-            };
-
-            // Apenas inclui cnpj/cpf se tiverem valores
-            if (cnpjPrestador.trim()) {
-              prestadorObj.cnpj = cnpjPrestador;
-            }
-            if (cpfPrestador.trim()) {
-              prestadorObj.cpf = cpfPrestador;
-            }
-
-            // Validação: precisa de pelo menos um (cnpj ou cpf)
-            if (!prestadorObj.cnpj && !prestadorObj.cpf) {
-              throw new Error(
-                "Prestador sem CNPJ nem CPF. Configure CNPJ_PRESTADOR ou CPF_PRESTADOR em .env",
+              console.log(
+                "🔍 DEBUG - Objeto RPS para extração:",
+                JSON.stringify(rps, null, 2),
               );
-            }
 
-            // Define cTribMun (3 dígitos) via env override quando disponível
-            const codigoTribMun = this.deriveCodigoTributarioMunicipio();
+              let valorServicos = 0;
+              const valorServicosKeys = [
+                "ValorServicos",
+                "valorservicos",
+                "valor_servicos",
+                "valorServicos",
+              ];
+              for (const key of valorServicosKeys) {
+                if (rps[key] !== undefined) {
+                  valorServicos = parseFloat(rps[key]);
+                  break;
+                }
+              }
+              if (!valorServicos && servicoXml.ValorServicos) {
+                valorServicos = parseFloat(servicoXml.ValorServicos);
+              }
+              if (!valorServicos && cabecalho.ValorTotalServicos) {
+                valorServicos = parseFloat(cabecalho.ValorTotalServicos);
+              }
 
-            const focusRequest: FocusNfeRequest = {
-              referencia: `LOTE-${Date.now()}`,
-              data_emissao: this.formatarData(rps.DataEmissao),
-              natureza_operacao: 1,
-              optante_simples_nacional: false,
-              tipo_operacao_governamental: 1,
-              prestador: {
-                ...(cnpjPrestador && { cnpj: cnpjPrestador }),
-                ...(cpfPrestador && { cpf: cpfPrestador }),
+              let valorFinalCobrado = valorServicos;
+              if (rps.ValorFinalCobrado) {
+                valorFinalCobrado = parseFloat(rps.ValorFinalCobrado);
+              } else if (rps.valorfinalcobrado) {
+                valorFinalCobrado = parseFloat(rps.valorfinalcobrado);
+              }
+
+              let baseCalculo = valorServicos;
+              if (rps.BaseCalculo) {
+                baseCalculo = parseFloat(rps.BaseCalculo);
+              } else if (rps.basecalculo) {
+                baseCalculo = parseFloat(rps.basecalculo);
+              }
+              const codigoServico =
+                rps.CodigoServico || servicoXml.CodigoServico || "06298";
+
+              const discriminacao =
+                rps.Discriminacao ||
+                servicoXml.Discriminacao ||
+                "Serviço não especificado";
+
+              const tributacaoRps =
+                rps.TributacaoRPS ||
+                rps.tributacaoRps ||
+                "";
+              const tipoTributacao = tributacaoRps
+                ? this.mapearTributacao(
+                  String(tributacaoRps).trim().toUpperCase(),
+                )
+                : undefined;
+
+              const codigoCidadeIncidencia =
+                tipoTributacao === "P" ? "9999999" : undefined;
+
+              const isExportacao = this.identificarExportacao(
+                rps,
+                servicoXml,
+                isEstrangeiro,
+                tipoTributacao,
+              );
+
+              const aliquotaPercentual = parseFloat(
+                rps.aliquota || rps.AliquotaServicos || "5",
+              );
+              const aliquotaFracao = Math.round(aliquotaPercentual / 100);
+              const valorIss = valorServicos * aliquotaFracao;
+              const valorIBS = Math.round(valorServicos * 0.01);
+              const valorCBS = Math.round(valorServicos * 0.09);
+
+              const aliquotaParaEnvio =
+                aliquotaPercentual > 0 ? aliquotaPercentual : 5;
+
+              const prestadorObj: any = {
                 inscricao_municipal: inscricaoPrestador,
                 codigo_municipio: String("3550308"),
-              },
-              tomador: {
-                ...(cnpjTomador && { cnpj: cnpjTomador }),
-                ...(cpfTomador && { cpf: cpfTomador }),
-                razao_social: razaoSocialTomador,
-                ...(emailTomador && { email: emailTomador }),
-                endereco: {
-                  logradouro: (enderecTomador.Logradouro || "")
-                    .trim()
-                    .substring(0, 50),
-                  numero: enderecTomador.NumeroEndereco || "S/N",
-                  ...(enderecTomador.ComplementoEndereco && {
-                    complemento: enderecTomador.ComplementoEndereco,
-                  }),
-                  bairro: enderecTomador.Bairro || "",
-                  codigo_municipio: String(codigoMunicipioTomadorCorrigido),
-                  uf: enderecTomador.UF || "SP",
-                  cep: this.formatarCEP(enderecTomador.CEP),
-                  ...(isEstrangeiro &&
-                    enderecTomador.CodigoPais && {
+              };
+
+              if (cnpjPrestador.trim()) {
+                prestadorObj.cnpj = cnpjPrestador;
+              }
+              if (cpfPrestador.trim()) {
+                prestadorObj.cpf = cpfPrestador;
+              }
+
+              if (!prestadorObj.cnpj && !prestadorObj.cpf) {
+                throw new Error(
+                  "Prestador sem CNPJ nem CPF. Configure CNPJ_PRESTADOR ou CPF_PRESTADOR em .env",
+                );
+              }
+
+              const codigoTribMun = this.deriveCodigoTributarioMunicipio();
+              const naturezaOperacao =
+                tipoTributacao === "P"
+                  ? 2
+                  : this.extrairNumero(
+                    rps.NaturezaOperacao || servicoXml.NaturezaOperacao,
+                    1,
+                  );
+              const tipoOperacao = this.extrairNumero(
+                rps.TipoOperacao || servicoXml.TipoOperacao,
+                isExportacao ? 2 : 1,
+              );
+              const issRetido = this.extrairBooleano(
+                rps.ISSRetido || servicoXml.ISSRetido,
+                false,
+              );
+
+              const referencia = `LOTE-${Date.now()}-${index + 1}-${numeroRps || "RPS"}`;
+              const focusRequest: FocusNfeRequest = {
+                referencia,
+                data_emissao: this.formatarData(rps.DataEmissao),
+                natureza_operacao: naturezaOperacao,
+                optante_simples_nacional: false,
+                tipo_operacao_governamental: 1,
+                prestador: {
+                  ...(cnpjPrestador && { cnpj: cnpjPrestador }),
+                  ...(cpfPrestador && { cpf: cpfPrestador }),
+                  inscricao_municipal: inscricaoPrestador,
+                  codigo_municipio: String("3550308"),
+                },
+                tomador: {
+                  ...(cnpjTomador && { cnpj: cnpjTomador }),
+                  ...(cpfTomador && { cpf: cpfTomador }),
+                  razao_social: razaoSocialTomador,
+                  ...(emailTomador && { email: emailTomador }),
+                  endereco: {
+                    logradouro: (enderecTomador.Logradouro || "")
+                      .trim()
+                      .substring(0, 50),
+                    numero: enderecTomador.NumeroEndereco || "S/N",
+                    ...(enderecTomador.ComplementoEndereco && {
+                      complemento: enderecTomador.ComplementoEndereco,
+                    }),
+                    bairro: enderecTomador.Bairro || "",
+                    codigo_municipio:
+                      tipoTributacao === "P"
+                        ? ""
+                        : String(codigoMunicipioTomadorCorrigido),
+                    uf: enderecTomador.UF,
+                    cep: this.formatarCEP(enderecTomador.CEP),
+                    ...(isEstrangeiro &&
+                      enderecTomador.CodigoPais && {
                       codigo_pais: enderecTomador.CodigoPais,
                     }),
+                  },
                 },
-              },
-              servico: {
-                discriminacao: discriminacao,
-                item_lista_servico: codigoServico,
-                codigo_tributacao_municipio: codigoServico,
-                tipo_operacao: 1,
-                valor_servicos: valorServicos,
-                valor_final_cobrado: valorFinalCobrado,
-                base_calculo: baseCalculo,
-                aliquota: aliquotaParaEnvio,
-                iss_retido: false,
-                valor_ipi: 0,
-                codigo_nbs: "102010000",
-                codigo_indicador_operacao: "100301",
-                ibs_cbs_classificacao_tributaria: "000001",
-              },
-              exigibilidade_suspensa: 0,
-              pagamento_parcelado_antecipado: 0,
-              finalidade_emissao: 0,
-              consumidor_final: 0,
-              indicador_destinatario: 0,
-            };
+                servico: {
+                  discriminacao: discriminacao,
+                  item_lista_servico: codigoServico,
+                  codigo_tributacao_municipio: codigoTribMun || codigoServico,
+                  ...(codigoCidadeIncidencia && {
+                    codigo_cidade_incidencia: codigoCidadeIncidencia,
+                  }),
+                  valor_servicos: valorServicos,
+                  valor_final_cobrado: valorFinalCobrado,
+                  base_calculo: baseCalculo,
+                  aliquota: aliquotaParaEnvio,
+                  iss_retido: issRetido,
+                  valor_ipi: 0,
+                  codigo_nbs: "102010000",
+                  codigo_indicador_operacao: "100301",
+                  ibs_cbs_classificacao_tributaria: "000001",
+                  ...(tipoTributacao && { tipo_tributacao: tipoTributacao }),
+                },
+                exigibilidade_suspensa: 0,
+                pagamento_parcelado_antecipado: 0,
+                finalidade_emissao: 0,
+                consumidor_final: 0,
+                indicador_destinatario: 0,
+              };
 
-            console.log("✅ Conversão XML → Focus NFe concluída");
+              console.log("✅ Conversão XML → Focus NFe concluída");
+              console.log(
+                "\n🔍 DEBUG - PAYLOAD COMPLETO que será enviado para API:",
+              );
+              console.log(JSON.stringify(focusRequest, null, 2));
 
-            // DEBUG: Log COMPLETO da requisição que será enviada
-            console.log(
-              "\n🔍 DEBUG - PAYLOAD COMPLETO que será enviado para API:",
-            );
-            console.log(JSON.stringify(focusRequest, null, 2));
+              requests.push({
+                numero_rps: numeroRps,
+                referencia,
+                request: focusRequest,
+              });
+            }
 
-            resolve(focusRequest);
+            if (!requests.length) {
+              throw new Error("Nenhum RPS encontrado no XML informado");
+            }
+
+            resolve(requests);
           } catch (error: any) {
             reject(new Error(`Erro ao converter RPS: ${error.message}`));
           }
@@ -709,12 +702,13 @@ export class FocusNfeService {
   /**
    * Mapeia TributacaoRPS para formato Focus NFe
    */
-  private mapearTributacao(tributacao: string): "T" | "F" | "C" | "N" {
-    const mapa: { [key: string]: "T" | "F" | "C" | "N" } = {
+  private mapearTributacao(tributacao: string): "T" | "F" | "C" | "N" | "P" {
+    const mapa: { [key: string]: "T" | "F" | "C" | "N" | "P" } = {
       T: "T", // Tributado
       F: "F", // Não tributável
       C: "C", // Cancelado
       N: "N", // Nenhum
+      P: "P", // ExportaÃ§Ã£o / regime especÃ­fico informado pelo XML
     };
     return mapa[tributacao] || "T";
   }
@@ -722,6 +716,69 @@ export class FocusNfeService {
   /**
    * Extrai competência (ano-mês) da data
    */
+  private identificarExportacao(
+    rps: any,
+    servicoXml: any,
+    isEstrangeiro: boolean,
+    tributacaoIss?: "T" | "F" | "C" | "N" | "P",
+  ): boolean {
+    if (isEstrangeiro) return true;
+
+    const indicadores = [
+      rps.exportacao,
+      rps.Exportacao,
+      rps.ExportacaoServico,
+      servicoXml.exportacao,
+      servicoXml.Exportacao,
+      servicoXml.ExportacaoServico,
+    ];
+
+    if (indicadores.some((valor) => this.extrairBooleano(valor, false))) {
+      return true;
+    }
+
+    return tributacaoIss === "F" || tributacaoIss === "P";
+  }
+
+  private extrairNumero(valor: any, padrao: number): number {
+    if (valor === undefined || valor === null || valor === "") {
+      return padrao;
+    }
+
+    const numero = Number(valor);
+    return Number.isFinite(numero) ? numero : padrao;
+  }
+
+  private extrairBooleano(valor: any, padrao: boolean): boolean {
+    if (valor === undefined || valor === null || valor === "") {
+      return padrao;
+    }
+
+    if (typeof valor === "boolean") return valor;
+    if (typeof valor === "number") return valor !== 0;
+
+    const normalizado = String(valor).trim().toLowerCase();
+    if (["1", "true", "t", "sim", "s", "yes", "y"].includes(normalizado)) {
+      return true;
+    }
+    if (["0", "false", "f", "nao", "não", "n", "no"].includes(normalizado)) {
+      return false;
+    }
+
+    return padrao;
+  }
+
+  private extrairNumeroRps(rps: any, padrao: number): string {
+    const numero =
+      rps?.NumeroRPS ||
+      rps?.numeroRps ||
+      rps?.numero_rps ||
+      rps?.ChaveRPS?.NumeroRPS ||
+      rps?.ChaveRPS?.numeroRps ||
+      padrao;
+    return String(numero).trim();
+  }
+
   private extrairCompetencia(data: string): string {
     const dataFormatada = this.formatarData(data);
     return dataFormatada.substring(0, 7); // YYYY-MM

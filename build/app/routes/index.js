@@ -159,7 +159,7 @@ routes.delete("/api/invoices/:id", InvoicesController_1.InvoiceController.delete
 routes.post("/api/nfse/enviar-lote", NfseController_1.NfseController.enviarLoteRps);
 routes.get("/api/nfse/consultar-lote/:protocolo", NfseController_1.NfseController.consultarLote);
 routes.get("/api/nfse/consultar-rps/:rps_number", NfseController_1.NfseController.consultarRps);
-routes.post("/api/nfse/cancelar", NfseController_1.NfseController.cancelarNfse);
+routes.delete("/api/nfse/:referencia", NfseController_1.NfseController.cancelarNfse);
 routes.get("/api/nfse/testar-conexao", NfseController_1.NfseController.testarConexao);
 // Billing
 routes.post("/api/billings", BillingsController_1.BillingController.createBilling);
