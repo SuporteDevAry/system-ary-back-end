@@ -116,6 +116,25 @@ function extrairReferenciaLote(item, fallback) {
         null;
     return valor ? String(valor).trim() : null;
 }
+function extrairNumeroRpsDaReferencia(referencia) {
+    if (!referencia)
+        return null;
+    var valor = String(referencia).trim();
+    var partes = valor.split("-");
+    if (partes.length < 4)
+        return null;
+    var candidato = partes[partes.length - 1].trim();
+    return candidato ? candidato : null;
+}
+function extrairNumeroRpsRetorno(item) {
+    var valor = (item === null || item === void 0 ? void 0 : item.numero_rps) ||
+        (item === null || item === void 0 ? void 0 : item.numeroRps) ||
+        (item === null || item === void 0 ? void 0 : item.rps_number) ||
+        (item === null || item === void 0 ? void 0 : item.numero) ||
+        extrairNumeroRpsDaReferencia(extrairReferenciaLote(item, null)) ||
+        null;
+    return valor ? String(valor).trim() : null;
+}
 function extrairNumerosRpsDoXml(xml) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -157,21 +176,21 @@ exports.NfseController = {
      */
     enviarLoteRps: function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var xml, result, numerosRpsXml, resultados, index, item, numeroRps, invoice, numeroNfse, referenciaLote, protocolo, error_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var xml, result, numerosRpsXml, resultados, index, item, referenciaLote, numeroRpsXml, numeroRpsRetorno, numeroRps, invoice, _a, _b, numeroNfse, protocolo, error_1;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
-                        _a.trys.push([0, 9, , 10]);
+                        _c.trys.push([0, 12, , 13]);
                         xml = req.body.xml;
                         if (!xml || typeof xml !== "string") {
                             throw new api_errors_1.BadRequestError("XML do lote não informado");
                         }
                         return [4 /*yield*/, focusNfeService.enviarLoteRps(xml)];
                     case 1:
-                        result = _a.sent();
+                        result = _c.sent();
                         return [4 /*yield*/, extrairNumerosRpsDoXml(xml)];
                     case 2:
-                        numerosRpsXml = _a.sent();
+                        numerosRpsXml = _c.sent();
                         resultados = Array.isArray(result)
                             ? result
                             : Array.isArray(result === null || result === void 0 ? void 0 : result.resultado)
@@ -183,37 +202,58 @@ exports.NfseController = {
                             console.log("[NFSe] XML cont\u00E9m ".concat(numerosRpsXml.length, " RPS e a resposta retornou ").concat(resultados.length, " itens"));
                         }
                         index = 0;
-                        _a.label = 3;
+                        _c.label = 3;
                     case 3:
-                        if (!(index < resultados.length)) return [3 /*break*/, 8];
+                        if (!(index < resultados.length)) return [3 /*break*/, 11];
                         item = resultados[index] || {};
-                        numeroRps = String(item.numero_rps ||
-                            item.numeroRps ||
-                            item.rps_number ||
-                            item.numero ||
-                            numerosRpsXml[index] ||
-                            "").trim();
+                        referenciaLote = extrairReferenciaLote(item, (result === null || result === void 0 ? void 0 : result.ref) || null);
+                        numeroRpsXml = numerosRpsXml[index] || null;
+                        numeroRpsRetorno = extrairNumeroRpsRetorno(item) || "";
+                        numeroRps = extrairNumeroRpsDaReferencia(referenciaLote) ||
+                            numeroRpsRetorno ||
+                            numeroRpsXml ||
+                            "";
                         if (!numeroRps) {
                             console.warn("[NFSe] Resultado sem n\u00FAmero de RPS identific\u00E1vel no \u00EDndice ".concat(index));
-                            return [3 /*break*/, 7];
+                            return [3 /*break*/, 10];
                         }
-                        return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.findByRps_number(numeroRps)];
+                        if (numeroRpsXml && numeroRpsXml !== numeroRps) {
+                            console.warn("[NFSe] Diverg\u00EAncia de mapeamento no \u00EDndice ".concat(index, ": XML=").concat(numeroRpsXml, " retorno=").concat(numeroRps));
+                        }
+                        if (numeroRpsRetorno && numeroRpsRetorno !== numeroRps) {
+                            console.warn("[NFSe] Retorno da API indicou RPS ".concat(numeroRpsRetorno, ", mas a refer\u00EAncia aponta para RPS ").concat(numeroRps));
+                        }
+                        if (numeroRpsXml && numeroRpsXml !== numeroRpsRetorno && numeroRpsRetorno) {
+                            console.warn("[NFSe] Retorno da API trouxe RPS ".concat(numeroRpsRetorno, ", que n\u00E3o foi localizado no XML enviado"));
+                        }
+                        _b = referenciaLote;
+                        if (!_b) return [3 /*break*/, 5];
+                        return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.findByProtocoloLote(referenciaLote)];
                     case 4:
-                        invoice = _a.sent();
-                        if (!invoice) return [3 /*break*/, 6];
-                        numeroNfse = extrairNumeroNfse(item);
-                        referenciaLote = extrairReferenciaLote(item, (result === null || result === void 0 ? void 0 : result.ref) || null);
-                        return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.update(invoice.id, __assign(__assign(__assign({ status: item.status ? mapStatus(item.status) : null }, (numeroNfse && { nfs_number: numeroNfse })), (referenciaLote && { protocolo_lote: referenciaLote })), { xml_nfse: xml }))];
+                        _b = (_c.sent());
+                        _c.label = 5;
                     case 5:
-                        _a.sent();
-                        return [3 /*break*/, 7];
+                        _a = (_b);
+                        if (_a) return [3 /*break*/, 7];
+                        return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.findByRps_number(numeroRps)];
                     case 6:
-                        console.warn("[DB] RPS n\u00E3o encontrada: ".concat(numeroRps));
-                        _a.label = 7;
+                        _a = (_c.sent());
+                        _c.label = 7;
                     case 7:
+                        invoice = _a;
+                        if (!invoice) return [3 /*break*/, 9];
+                        numeroNfse = extrairNumeroNfse(item);
+                        return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.update(invoice.id, __assign(__assign(__assign({ status: item.status ? mapStatus(item.status) : null }, (numeroNfse && { nfs_number: numeroNfse })), (referenciaLote && { protocolo_lote: referenciaLote })), { xml_nfse: xml }))];
+                    case 8:
+                        _c.sent();
+                        return [3 /*break*/, 10];
+                    case 9:
+                        console.warn("[DB] RPS n\u00E3o encontrada: ".concat(numeroRps));
+                        _c.label = 10;
+                    case 10:
                         index++;
                         return [3 /*break*/, 3];
-                    case 8:
+                    case 11:
                         protocolo = extrairReferenciaLote(Array.isArray(result) ? result[0] : result) ||
                             extrairReferenciaLote(resultados[0]) ||
                             null;
@@ -222,14 +262,14 @@ exports.NfseController = {
                                 protocolo: protocolo,
                                 resultado: result,
                             })];
-                    case 9:
-                        error_1 = _a.sent();
+                    case 12:
+                        error_1 = _c.sent();
                         console.error("Erro ao enviar lote RPS:", error_1);
                         return [2 /*return*/, res.status(500).json({
                                 message: "Erro ao enviar lote RPS",
                                 error: error_1.message,
                             })];
-                    case 10: return [2 /*return*/];
+                    case 13: return [2 /*return*/];
                 }
             });
         });

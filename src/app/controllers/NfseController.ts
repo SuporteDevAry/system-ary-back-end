@@ -81,6 +81,17 @@ function extrairNumeroRpsDaReferencia(referencia?: string | null): string | null
   return candidato ? candidato : null;
 }
 
+function extrairNumeroRpsRetorno(item: any): string | null {
+  const valor =
+    item?.numero_rps ||
+    item?.numeroRps ||
+    item?.rps_number ||
+    item?.numero ||
+    extrairNumeroRpsDaReferencia(extrairReferenciaLote(item, null)) ||
+    null;
+  return valor ? String(valor).trim() : null;
+}
+
 async function extrairNumerosRpsDoXml(xml: string): Promise<string[]> {
   return new Promise((resolve, reject) => {
     parseString(xml, { explicitArray: false }, (err: any, result: any) => {
@@ -140,52 +151,22 @@ export const NfseController = {
             ? [result]
             : [];
 
-      const resultadosPorNumeroRps = new Map<string, any>();
-      const resultadosPorReferencia = new Map<string, any>();
-
-      for (const item of resultados) {
-        const numeroRpsResultado = String(
-          item?.numero_rps ||
-            item?.numeroRps ||
-            item?.rps_number ||
-            item?.numero ||
-            extrairNumeroRpsDaReferencia(
-              extrairReferenciaLote(item, null),
-            ) ||
-            "",
-        ).trim();
-        const referenciaResultado = extrairReferenciaLote(item, null);
-
-        if (numeroRpsResultado) {
-          resultadosPorNumeroRps.set(numeroRpsResultado, item);
-        }
-        if (referenciaResultado) {
-          resultadosPorReferencia.set(referenciaResultado, item);
-        }
-      }
-
       if (resultados.length > 1 && numerosRpsXml.length > 0) {
         console.log(
           `[NFSe] XML contém ${numerosRpsXml.length} RPS e a resposta retornou ${resultados.length} itens`,
         );
       }
 
-      for (let index = 0; index < numerosRpsXml.length; index++) {
-        const numeroRpsXml = numerosRpsXml[index];
-        const item =
-          resultadosPorNumeroRps.get(numeroRpsXml) ||
-          resultadosPorReferencia.get(numeroRpsXml) ||
-          resultados[index] ||
-          {};
-        const numeroRps = String(
-          item.numero_rps ||
-            item.numeroRps ||
-            item.rps_number ||
-            item.numero ||
-            numeroRpsXml ||
-            extrairNumeroRpsDaReferencia(extrairReferenciaLote(item, null)) ||
-            "",
-        ).trim();
+      for (let index = 0; index < resultados.length; index++) {
+        const item = resultados[index] || {};
+        const referenciaLote = extrairReferenciaLote(item, result?.ref || null);
+        const numeroRpsXml = numerosRpsXml[index] || null;
+        const numeroRpsRetorno = extrairNumeroRpsRetorno(item) || "";
+        const numeroRps =
+          extrairNumeroRpsDaReferencia(referenciaLote) ||
+          numeroRpsRetorno ||
+          numeroRpsXml ||
+          "";
 
         if (!numeroRps) {
           console.warn(
@@ -194,13 +175,30 @@ export const NfseController = {
           continue;
         }
 
-        const invoice = await InvoiceRepository.findByRps_number(numeroRps);
+        if (numeroRpsXml && numeroRpsXml !== numeroRps) {
+          console.warn(
+            `[NFSe] Divergência de mapeamento no índice ${index}: XML=${numeroRpsXml} retorno=${numeroRps}`,
+          );
+        }
+
+        if (numeroRpsRetorno && numeroRpsRetorno !== numeroRps) {
+          console.warn(
+            `[NFSe] Retorno da API indicou RPS ${numeroRpsRetorno}, mas a referência aponta para RPS ${numeroRps}`,
+          );
+        }
+
+        if (numeroRpsXml && numeroRpsXml !== numeroRpsRetorno && numeroRpsRetorno) {
+          console.warn(
+            `[NFSe] Retorno da API trouxe RPS ${numeroRpsRetorno}, que não foi localizado no XML enviado`,
+          );
+        }
+
+        const invoice =
+          (referenciaLote &&
+            (await InvoiceRepository.findByProtocoloLote(referenciaLote))) ||
+          (await InvoiceRepository.findByRps_number(numeroRps));
         if (invoice) {
           const numeroNfse = extrairNumeroNfse(item);
-          const referenciaLote = extrairReferenciaLote(
-            item,
-            result?.ref || null,
-          );
           await InvoiceRepository.update(invoice.id, {
             status: item.status ? mapStatus(item.status) : null,
             ...(numeroNfse && { nfs_number: numeroNfse }),
