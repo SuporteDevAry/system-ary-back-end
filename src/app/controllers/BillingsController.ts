@@ -2,15 +2,20 @@ import { Request, Response } from "express";
 
 import { BillingRepository } from "../repositories/BillingsRepository";
 import { updateContractPaymentDate } from "../repositories/updateContractPaymentDate";
+import { updateContractCommissionReceiptDate } from "../repositories/updateContractCommissionReceiptDate";
 
 export const BillingController = {
   async createBilling(req: Request, res: Response) {
     const billing = await BillingRepository.create(req.body);
-    // Atualiza a data de pagamento do contrato para a data do novo recebimento
-    if (billing && billing.number_contract && billing.receipt_date) {
-      await updateContractPaymentDate(
+    // Atualiza a data de recebimento da comissão do contrato, se houver
+    if (
+      billing &&
+      billing.number_contract &&
+      req.body.commission_receipt_date
+    ) {
+      await updateContractCommissionReceiptDate(
         billing.number_contract,
-        billing.receipt_date,
+        req.body.commission_receipt_date,
       );
     }
     return res.status(201).json(billing);
@@ -76,12 +81,17 @@ export const BillingController = {
 
   async updateBilling(req: Request, res: Response) {
     const { id } = req.params;
+
     const updated = await BillingRepository.update(id, req.body);
-    // Atualiza a data de pagamento do contrato para a data do recebimento editado
-    if (updated && updated.number_contract && updated.receipt_date) {
-      await updateContractPaymentDate(
+    // Atualiza a data de recebimento da comissão do contrato, se houver
+    if (
+      updated &&
+      updated.number_contract &&
+      req.body.commission_receipt_date
+    ) {
+      await updateContractCommissionReceiptDate(
         updated.number_contract,
-        updated.receipt_date,
+        req.body.commission_receipt_date,
       );
     }
     return res.json(updated);
