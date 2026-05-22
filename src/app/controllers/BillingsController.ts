@@ -1,9 +1,18 @@
 import { Request, Response } from "express";
+
 import { BillingRepository } from "../repositories/BillingsRepository";
+import { updateContractPaymentDate } from "../repositories/updateContractPaymentDate";
 
 export const BillingController = {
   async createBilling(req: Request, res: Response) {
     const billing = await BillingRepository.create(req.body);
+    // Atualiza a data de pagamento do contrato para a data do novo recebimento
+    if (billing && billing.number_contract && billing.receipt_date) {
+      await updateContractPaymentDate(
+        billing.number_contract,
+        billing.receipt_date,
+      );
+    }
     return res.status(201).json(billing);
   },
 
@@ -23,9 +32,8 @@ export const BillingController = {
   async findBillingByNumberContract(req: Request, res: Response) {
     const { number_contract } = req.params;
 
-    const billings = await BillingRepository.findByNumberContract(
-      number_contract
-    );
+    const billings =
+      await BillingRepository.findByNumberContract(number_contract);
     if (!billings || billings.length === 0)
       return res.status(404).json({
         message: "Nenhum recebimento encontrado para o contrato informado",
@@ -61,15 +69,21 @@ export const BillingController = {
         .status(400)
         .json({ message: "Parâmetro 'number_contract' é obrigatório no body" });
 
-    const billings = await BillingRepository.findByNumberContract(
-      number_contract
-    );
+    const billings =
+      await BillingRepository.findByNumberContract(number_contract);
     return res.json(billings);
   },
 
   async updateBilling(req: Request, res: Response) {
     const { id } = req.params;
     const updated = await BillingRepository.update(id, req.body);
+    // Atualiza a data de pagamento do contrato para a data do recebimento editado
+    if (updated && updated.number_contract && updated.receipt_date) {
+      await updateContractPaymentDate(
+        updated.number_contract,
+        updated.receipt_date,
+      );
+    }
     return res.json(updated);
   },
 

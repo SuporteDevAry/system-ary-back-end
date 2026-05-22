@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BillingController = void 0;
 var BillingsRepository_1 = require("../repositories/BillingsRepository");
+var updateContractPaymentDate_1 = require("../repositories/updateContractPaymentDate");
 exports.BillingController = {
     createBilling: function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
@@ -47,7 +48,12 @@ exports.BillingController = {
                     case 0: return [4 /*yield*/, BillingsRepository_1.BillingRepository.create(req.body)];
                     case 1:
                         billing = _a.sent();
-                        return [2 /*return*/, res.status(201).json(billing)];
+                        if (!(billing && billing.number_contract && billing.receipt_date)) return [3 /*break*/, 3];
+                        return [4 /*yield*/, (0, updateContractPaymentDate_1.updateContractPaymentDate)(billing.number_contract, billing.receipt_date)];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3: return [2 /*return*/, res.status(201).json(billing)];
                 }
             });
         });
@@ -168,7 +174,12 @@ exports.BillingController = {
                         return [4 /*yield*/, BillingsRepository_1.BillingRepository.update(id, req.body)];
                     case 1:
                         updated = _a.sent();
-                        return [2 /*return*/, res.json(updated)];
+                        if (!(updated && updated.number_contract && updated.receipt_date)) return [3 /*break*/, 3];
+                        return [4 /*yield*/, (0, updateContractPaymentDate_1.updateContractPaymentDate)(updated.number_contract, updated.receipt_date)];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3: return [2 /*return*/, res.json(updated)];
                 }
             });
         });
