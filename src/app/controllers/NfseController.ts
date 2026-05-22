@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { parseString } from "xml2js";
 import { InvoiceRepository } from "../repositories/InvoiceRepository";
 import { FocusNfeService } from "../../services/FocusNfeService";
 import { BadRequestError } from "../helpers/api-errors";
@@ -11,6 +12,117 @@ function mapStatus(status?: string) {
   if (s.includes("process")) return "processando_autorizacao";
   if (s.includes("autoriza") || s.includes("autoriz")) return "autorizada";
   return s;
+}
+
+function extrairStatusRespostaFocusNfe(result: any): string {
+  const candidatos = [
+    result?.status,
+    result?.Status,
+    result?.situacao,
+    result?.Situacao,
+    result?.message,
+    result?.mensagem,
+    result?.resultado?.status,
+    result?.resultado?.Status,
+    result?.resultado?.situacao,
+    result?.resultado?.Situacao,
+    result?.resultado?.message,
+    result?.resultado?.mensagem,
+    result?.data?.status,
+    result?.data?.Status,
+    result?.data?.situacao,
+    result?.data?.Situacao,
+    result?.data?.message,
+    result?.data?.mensagem,
+  ];
+
+  for (const candidato of candidatos) {
+    const mapped = mapStatus(
+      typeof candidato === "string" ? candidato : candidato ? String(candidato) : "",
+    );
+    if (mapped) return mapped;
+  }
+
+  return "";
+}
+
+function extrairNumeroNfse(item: any): string | null {
+  const valor =
+    item?.numero_nfse ||
+    item?.numeroNfse ||
+    item?.numero ||
+    item?.nfs_number ||
+    item?.numero_nota ||
+    item?.numeroNota ||
+    null;
+  return valor ? String(valor).trim() : null;
+}
+
+function extrairReferenciaLote(item: any, fallback?: string | null): string | null {
+  const valor =
+    item?.ref ||
+    item?.referencia ||
+    item?.protocolo_lote ||
+    item?.numero_lote ||
+    item?.protocolo ||
+    fallback ||
+    null;
+  return valor ? String(valor).trim() : null;
+}
+
+function extrairNumeroRpsDaReferencia(referencia?: string | null): string | null {
+  if (!referencia) return null;
+
+  const valor = String(referencia).trim();
+  const partes = valor.split("-");
+  if (partes.length < 4) return null;
+
+  const candidato = partes[partes.length - 1].trim();
+  return candidato ? candidato : null;
+}
+
+function extrairNumeroRpsRetorno(item: any): string | null {
+  const valor =
+    item?.numero_rps ||
+    item?.numeroRps ||
+    item?.rps_number ||
+    item?.numero ||
+    extrairNumeroRpsDaReferencia(extrairReferenciaLote(item, null)) ||
+    null;
+  return valor ? String(valor).trim() : null;
+}
+
+async function extrairNumerosRpsDoXml(xml: string): Promise<string[]> {
+  return new Promise((resolve, reject) => {
+    parseString(xml, { explicitArray: false }, (err: any, result: any) => {
+      if (err) {
+        reject(new Error(`Erro ao parsear XML do lote: ${err.message}`));
+        return;
+      }
+
+      const pedido = result?.PedidoEnvioLoteRPS;
+      const rpsArray = pedido?.RPS
+        ? Array.isArray(pedido.RPS)
+          ? pedido.RPS
+          : [pedido.RPS]
+        : [];
+
+      const numeros = rpsArray
+        .map((rps: any) =>
+          String(
+            rps?.NumeroRPS ||
+              rps?.numeroRps ||
+              rps?.numero_rps ||
+              rps?.ChaveRPS?.NumeroRPS ||
+              rps?.ChaveRPS?.numeroRps ||
+              "",
+          ).trim(),
+        )
+        .filter(Boolean);
+
+      resolve(numeros);
+    });
+  });
 }
 
 const focusNfeService = new FocusNfeService();
@@ -29,45 +141,83 @@ export const NfseController = {
         throw new BadRequestError("XML do lote não informado");
       }
 
-      const result = await focusNfeService.enviarLoteRps(xml);
+      const result: any = await focusNfeService.enviarLoteRps(xml);
+      const numerosRpsXml = await extrairNumerosRpsDoXml(xml);
+      const resultados: any[] = Array.isArray(result)
+        ? result
+        : Array.isArray(result?.resultado)
+          ? result.resultado
+          : result
+            ? [result]
+            : [];
 
-      if (result) {
-        if (Array.isArray(result)) {
-          for (const rps of result) {
-            if (rps.numero_rps) {
-              const invoice = await InvoiceRepository.findByRps_number(
-                rps.numero_rps,
-              );
-              if (invoice) {
-                await InvoiceRepository.update(invoice.id, {
-                  status: rps.status ? mapStatus(rps.status) : null,
-                  protocolo_lote: rps.ref || null,
-                  xml_nfse: xml,
-                });
-              } else {
-                console.warn(`[DB] RPS não encontrada: ${rps.numero_rps}`);
-              }
-            }
-          }
-        } else if (result.numero_rps) {
-          const invoice = await InvoiceRepository.findByRps_number(
-            result.numero_rps,
+      if (resultados.length > 1 && numerosRpsXml.length > 0) {
+        console.log(
+          `[NFSe] XML contém ${numerosRpsXml.length} RPS e a resposta retornou ${resultados.length} itens`,
+        );
+      }
+
+      for (let index = 0; index < resultados.length; index++) {
+        const item = resultados[index] || {};
+        const referenciaLote = extrairReferenciaLote(item, result?.ref || null);
+        const numeroRpsXml = numerosRpsXml[index] || null;
+        const numeroRpsRetorno = extrairNumeroRpsRetorno(item) || "";
+        const numeroRps =
+          extrairNumeroRpsDaReferencia(referenciaLote) ||
+          numeroRpsRetorno ||
+          numeroRpsXml ||
+          "";
+
+        if (!numeroRps) {
+          console.warn(
+            `[NFSe] Resultado sem número de RPS identificável no índice ${index}`,
           );
-          if (invoice) {
-            await InvoiceRepository.update(invoice.id, {
-              status: result.status ? mapStatus(result.status) : null,
-              protocolo_lote: result.ref || null,
-              xml_nfse: xml,
-            });
-          } else {
-            console.warn(`[DB] RPS não encontrada: ${result.numero_rps}`);
-          }
+          continue;
+        }
+
+        if (numeroRpsXml && numeroRpsXml !== numeroRps) {
+          console.warn(
+            `[NFSe] Divergência de mapeamento no índice ${index}: XML=${numeroRpsXml} retorno=${numeroRps}`,
+          );
+        }
+
+        if (numeroRpsRetorno && numeroRpsRetorno !== numeroRps) {
+          console.warn(
+            `[NFSe] Retorno da API indicou RPS ${numeroRpsRetorno}, mas a referência aponta para RPS ${numeroRps}`,
+          );
+        }
+
+        if (numeroRpsXml && numeroRpsXml !== numeroRpsRetorno && numeroRpsRetorno) {
+          console.warn(
+            `[NFSe] Retorno da API trouxe RPS ${numeroRpsRetorno}, que não foi localizado no XML enviado`,
+          );
+        }
+
+        const invoice =
+          (referenciaLote &&
+            (await InvoiceRepository.findByProtocoloLote(referenciaLote))) ||
+          (await InvoiceRepository.findByRps_number(numeroRps));
+        if (invoice) {
+          const numeroNfse = extrairNumeroNfse(item);
+          await InvoiceRepository.update(invoice.id, {
+            status: item.status ? mapStatus(item.status) : null,
+            ...(numeroNfse && { nfs_number: numeroNfse }),
+            ...(referenciaLote && { protocolo_lote: referenciaLote }),
+            xml_nfse: xml,
+          });
+        } else {
+          console.warn(`[DB] RPS não encontrada: ${numeroRps}`);
         }
       }
 
+      const protocolo =
+        extrairReferenciaLote(Array.isArray(result) ? result[0] : result) ||
+        extrairReferenciaLote(resultados[0]) ||
+        null;
+
       return res.status(200).json({
         message: "Lote enviado com sucesso",
-        protocolo: result.ref,
+        protocolo,
         resultado: result,
       });
     } catch (error: any) {
@@ -195,27 +345,71 @@ export const NfseController = {
 
   /**
    * Cancela uma NFS-e
-   * POST /api/nfse/cancelar
-   * Body: { nfseNumber: string, motivo: string }
+   * DELETE /api/nfse/:referencia
+   * Body: { referencia: string, justificativa: string }
    */
   async cancelarNfse(req: Request, res: Response) {
     try {
-      const { nfseNumber, motivo } = req.body;
+      const referencia =
+        req.params.referencia ||
+        req.body.referencia ||
+        req.body.nfseNumber ||
+        req.body.numeroNfse ||
+        req.body.protocolo;
+      const justificativa =
+        req.body.justificativa ||
+        req.body.motivo ||
+        req.body.motivo_cancelamento;
 
-      if (!nfseNumber || !motivo) {
-        throw new BadRequestError("Número da NFS-e e motivo são obrigatórios");
+      if (!referencia) {
+        throw new BadRequestError("Referência da NFSe não informada");
       }
 
-      const result = await focusNfeService.cancelarNfse(nfseNumber, motivo);
+      if (!justificativa) {
+        throw new BadRequestError("Justificativa do cancelamento não informada");
+      }
+
+      const justificativaFormatada = String(justificativa).trim();
+      if (
+        justificativaFormatada.length < 15 ||
+        justificativaFormatada.length > 255
+      ) {
+        throw new BadRequestError(
+          "Justificativa deve ter entre 15 e 255 caracteres",
+        );
+      }
+
+      const invoice =
+        (await InvoiceRepository.findByNfs_number(String(referencia).trim())) ||
+        (await InvoiceRepository.findByRps_number(String(referencia).trim())) ||
+        (await InvoiceRepository.findByProtocoloLote(
+          String(referencia).trim(),
+        ));
+
+      const referenciaCancelamento =
+        invoice?.protocolo_lote || String(referencia).trim();
+
+      const result = await focusNfeService.cancelarNfse(
+        referenciaCancelamento,
+        justificativaFormatada,
+      );
+
+      const retornoStatus = extrairStatusRespostaFocusNfe(result);
+
+      if (invoice && retornoStatus) {
+        await InvoiceRepository.update(invoice.id, {
+          status: retornoStatus,
+        });
+      }
 
       return res.status(200).json({
-        message: "NFS-e cancelada com sucesso",
+        message: "NFSe cancelada com sucesso",
         resultado: result,
       });
     } catch (error: any) {
-      console.error("Erro ao cancelar NFS-e:", error);
+      console.error("Erro ao cancelar NFSe:", error);
       return res.status(500).json({
-        message: "Erro ao cancelar NFS-e",
+        message: "Erro ao cancelar NFSe",
         error: error.message,
       });
     }

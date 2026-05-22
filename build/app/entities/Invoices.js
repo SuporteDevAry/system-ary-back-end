@@ -138,6 +138,30 @@ var Invoice = /** @class */ (function () {
         __metadata("design:type", String)
     ], Invoice.prototype, "irrf_value", void 0);
     __decorate([
+        (0, typeorm_1.Column)("decimal", { nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "pis_value", void 0);
+    __decorate([
+        (0, typeorm_1.Column)("decimal", { nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "cofins_value", void 0);
+    __decorate([
+        (0, typeorm_1.Column)("decimal", { nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "csll_value", void 0);
+    __decorate([
+        (0, typeorm_1.Column)("decimal", { nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "iss_value", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "number_contract", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "exportacao", void 0);
+    __decorate([
         (0, typeorm_1.Column)("decimal"),
         __metadata("design:type", String)
     ], Invoice.prototype, "service_liquid_value", void 0);

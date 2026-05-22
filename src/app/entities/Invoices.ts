@@ -96,6 +96,24 @@ export class Invoice {
   @Column("decimal")
   irrf_value: string;
 
+  @Column("decimal", { nullable: true })
+  pis_value: string;
+
+  @Column("decimal", { nullable: true })
+  cofins_value: string;
+
+  @Column("decimal", { nullable: true })
+  csll_value: string;
+
+  @Column("decimal", { nullable: true })
+  iss_value: string;
+
+  @Column({ type: "varchar", nullable: true })
+  number_contract: string;
+
+  @Column({ type: "varchar", nullable: true })
+  exportacao: string;
+
   @Column("decimal")
   service_liquid_value: string;
 
