@@ -24,6 +24,7 @@ var _1769793476444_AddFieldsToInvoices_1 = require("./1769793476444-AddFieldsToI
 var _1769793476445_AddXmlFieldToInvoices_1 = require("./1769793476445-AddXmlFieldToInvoices");
 var _1775849143332_AddCommissionReceitpDate_1 = require("./1775849143332-AddCommissionReceitpDate");
 var _1778624659540_AddTaxAndContractFieldsToInvoices_1 = require("./1778624659540-AddTaxAndContractFieldsToInvoices");
+var _1780968445477_AddReformaTributariaFieldsToInvoices_1 = require("./1780968445477-AddReformaTributariaFieldsToInvoices");
 exports.migrationDir = {
     CreatePermissions: _1697084968105_permissions_1.Permissions1697084968105,
     CreateUsers: _1694720577496_createUsers_1.CreateUsers1694720577496,
@@ -48,5 +49,6 @@ exports.migrationDir = {
     AddContractEmissionDatetime: _1756778999999_AddContractEmissionDatetime_1.AddContractEmissionDatetime1756778999999,
     AddCommissionReceiptDate: _1775849143332_AddCommissionReceitpDate_1.AddCommissionReceitpDate1775849143332,
     AddTaxAndContractFieldsToInvoices: _1778624659540_AddTaxAndContractFieldsToInvoices_1.AddTaxAndContractFieldsToInvoices1778624659540,
+    AddReformaTributariaFieldsToInvoices: _1780968445477_AddReformaTributariaFieldsToInvoices_1.AddReformaTributariaFieldsToInvoices1780968445477
 };
 //# sourceMappingURL=index.js.map

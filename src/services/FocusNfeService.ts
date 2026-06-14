@@ -75,23 +75,23 @@ interface FocusNfeRequest {
     codigo_nbs: string;
     codigo_indicador_operacao: string;
     ibs_cbs_classificacao_tributaria: string;
+    valor_iss?: number;
+    tributacao_iss?: string;
+    ibs_cbs_situacao_tributaria?: string;
+    ibs_cbs_base_calculo?: number;
+    ibs_uf_aliquota?: number;
+    ibs_uf_valor?: number;
+    ibs_mun_aliquota?: number;
+    ibs_mun_valor?: number;
+    cbs_aliquota?: number;
+    cbs_valor?: number;
     tipo_tributacao?: "T" | "F" | "C" | "N" | "P";
     //codigo_servico: string;
-    //valor_iss?: number;
     //CodigoServico: string;
     //valor_deducoes?: number;
     //desconto_incondicionado?: number;
     //desconto_condicionado?: number;
     //codigo_cnae?: string;
-    //tributacao_iss: string;
-    //ibs_cbs_situacao_tributaria: string;
-    //ibs_cbs_base_calculo: number;
-    //ibs_uf_aliquota: string;
-    //ibs_uf_valor: number;
-    //ibs_mun_aliquota: string;
-    //ibs_mun_valor: number;
-    //cbs_aliquota: string;
-    //cbs_valor: number;
   };
   exigibilidade_suspensa: number;
   pagamento_parcelado_antecipado: number;
@@ -104,6 +104,21 @@ interface FocusNfeBatchItem {
   numero_rps: string;
   referencia: string;
   request: FocusNfeRequest;
+  invoice_data?: {
+    pis_value?: number | null;
+    cofins_value?: number | null;
+    csll_value?: number | null;
+    irrf_value?: number | null;
+    iss_value?: number | null;
+    ibs_value?: number | null;
+    cbs_value?: number | null;
+    ins_est?: string | null;
+    owner_record?: string | null;
+    owner_send?: string | null;
+    liquidada?: string | null;
+    receipt_date?: string | null;
+    recibo_date?: string | null;
+  };
 }
 
 export class FocusNfeService {
@@ -126,8 +141,7 @@ export class FocusNfeService {
 
   constructor() {
     // Sempre usa endpoint oficial FocusNFE até /v2
-    let apiUrl =
-      process.env.FOCUS_NFE_API_URL || "https://api.focusnfe.com.br/v2";
+    let apiUrl = process.env.FOCUS_NFE_API_URL;
     // Remove qualquer /nfse no final
     apiUrl = apiUrl.replace(/\/nfse$/, "");
     this.config = {
@@ -213,7 +227,7 @@ export class FocusNfeService {
     try {
       console.log(`❌ Cancelando NFS-e ${referencia} na Focus NFe...`);
 
-      return await this.fazerRequisicaoApi("DELETE", `/nfse/${referencia}`, {
+      return await this.fazerRequisicaoApi("DELETE", `/nfse/${encodeURIComponent(referencia)}`, {
         justificativa,
       });
     } catch (error: any) {
@@ -516,10 +530,194 @@ export class FocusNfeService {
               const aliquotaPercentual = parseFloat(
                 rps.aliquota || rps.AliquotaServicos || "5",
               );
-              const aliquotaFracao = Math.round(aliquotaPercentual / 100);
-              const valorIss = valorServicos * aliquotaFracao;
-              const valorIBS = Math.round(valorServicos * 0.01);
-              const valorCBS = Math.round(valorServicos * 0.09);
+              const valorIss = Math.round(
+                valorServicos * (aliquotaPercentual / 100) * 100,
+              ) / 100;
+              const valorIBS = Math.round(valorServicos * 0.01 * 100) / 100;
+              const valorCBS = Math.round(valorServicos * 0.09 * 100) / 100;
+              const valorIssXml = this.extrairNumeroOpcional(
+                rps.ValorIss,
+                rps.ValorISS,
+                rps.valor_iss,
+                servicoXml.ValorIss,
+                servicoXml.ValorISS,
+                servicoXml.valor_iss,
+              );
+              const tributacaoIssXml = this.extrairTextoOpcional(
+                rps.TributacaoIss,
+                rps.TributacaoISS,
+                rps.tributacao_iss,
+                servicoXml.TributacaoIss,
+                servicoXml.TributacaoISS,
+                servicoXml.tributacao_iss,
+              );
+              const ibsCbsSituacaoTributariaXml = this.extrairTextoOpcional(
+                rps.IBSCBSSituacaoTributaria,
+                rps.ibs_cbs_situacao_tributaria,
+                servicoXml.IBSCBSSituacaoTributaria,
+                servicoXml.ibs_cbs_situacao_tributaria,
+              );
+              const ibsCbsBaseCalculoXml = this.extrairNumeroOpcional(
+                rps.IBSCBSBaseCalculo,
+                rps.ibs_cbs_base_calculo,
+                servicoXml.IBSCBSBaseCalculo,
+                servicoXml.ibs_cbs_base_calculo,
+              );
+              const ibsUfAliquotaXml = this.extrairNumeroOpcional(
+                rps.IBSUFAliquota,
+                rps.ibs_uf_aliquota,
+                servicoXml.IBSUFAliquota,
+                servicoXml.ibs_uf_aliquota,
+              );
+              const ibsUfValorXml = this.extrairNumeroOpcional(
+                rps.IBSUFValor,
+                rps.ibs_uf_valor,
+                servicoXml.IBSUFValor,
+                servicoXml.ibs_uf_valor,
+              );
+              const ibsMunAliquotaXml = this.extrairNumeroOpcional(
+                rps.IBSMunAliquota,
+                rps.ibs_mun_aliquota,
+                servicoXml.IBSMunAliquota,
+                servicoXml.ibs_mun_aliquota,
+              );
+              const ibsMunValorXml = this.extrairNumeroOpcional(
+                rps.IBSMunValor,
+                rps.ibs_mun_valor,
+                servicoXml.IBSMunValor,
+                servicoXml.ibs_mun_valor,
+              );
+              const cbsAliquotaXml = this.extrairNumeroOpcional(
+                rps.CBSAliquota,
+                rps.cbs_aliquota,
+                servicoXml.CBSAliquota,
+                servicoXml.cbs_aliquota,
+              );
+              const cbsValorXml = this.extrairNumeroOpcional(
+                rps.CBSValor,
+                rps.cbs_valor,
+                servicoXml.CBSValor,
+                servicoXml.cbs_valor,
+              );
+              const ibsValorXml = this.extrairNumeroOpcional(
+                this.buscarCampoRecursivo(rps, [
+                  "IBS",
+                  "ValorIBS",
+                  "ValorIbs",
+                  "ibs_value",
+                ]),
+                this.buscarCampoRecursivo(servicoXml, [
+                  "IBS",
+                  "ValorIBS",
+                  "ValorIbs",
+                  "ibs_value",
+                ]),
+              );
+              const ibsValueFallback =
+                (ibsUfValorXml ?? 0) + (ibsMunValorXml ?? 0) || valorIBS;
+              const pisValue = this.extrairNumeroOpcional(
+                this.buscarCampoRecursivo(rps, [
+                  "PIS",
+                  "ValorPIS",
+                  "ValorPis",
+                  "valor_pis",
+                ]),
+                this.buscarCampoRecursivo(servicoXml, [
+                  "PIS",
+                  "ValorPIS",
+                  "ValorPis",
+                  "valor_pis",
+                ]),
+              );
+              const cofinsValue = this.extrairNumeroOpcional(
+                this.buscarCampoRecursivo(rps, [
+                  "COFINS",
+                  "ValorCOFINS",
+                  "ValorCofins",
+                  "valor_cofins",
+                ]),
+                this.buscarCampoRecursivo(servicoXml, [
+                  "COFINS",
+                  "ValorCOFINS",
+                  "ValorCofins",
+                  "valor_cofins",
+                ]),
+              );
+              const csllValue = this.extrairNumeroOpcional(
+                this.buscarCampoRecursivo(rps, [
+                  "CSLL",
+                  "ValorCSLL",
+                  "ValorCsll",
+                  "valor_csll",
+                ]),
+                this.buscarCampoRecursivo(servicoXml, [
+                  "CSLL",
+                  "ValorCSLL",
+                  "ValorCsll",
+                  "valor_csll",
+                ]),
+              );
+              const irrfValue = this.extrairNumeroOpcional(
+                this.buscarCampoRecursivo(rps, [
+                  "IRRF",
+                  "ValorIRRF",
+                  "ValorIrrf",
+                  "valor_irrf",
+                ]),
+                this.buscarCampoRecursivo(servicoXml, [
+                  "IRRF",
+                  "ValorIRRF",
+                  "ValorIrrf",
+                  "valor_irrf",
+                ]),
+              );
+              const insEst = this.extrairTextoOpcional(
+                this.buscarCampoRecursivo(rps, [
+                  "InscricaoEstadual",
+                  "InsEst",
+                  "ins_est",
+                ]),
+                this.buscarCampoRecursivo(servicoXml, [
+                  "InscricaoEstadual",
+                  "InsEst",
+                  "ins_est",
+                ]),
+              );
+              const ownerRecord = this.extrairTextoOpcional(
+                this.buscarCampoRecursivo(rps, ["OwnerRecord", "owner_record"]),
+                this.buscarCampoRecursivo(servicoXml, [
+                  "OwnerRecord",
+                  "owner_record",
+                ]),
+              );
+              const ownerSend = this.extrairTextoOpcional(
+                this.buscarCampoRecursivo(rps, ["OwnerSend", "owner_send"]),
+                this.buscarCampoRecursivo(servicoXml, [
+                  "OwnerSend",
+                  "owner_send",
+                ]),
+              );
+              const liquidada = this.extrairTextoOpcional(
+                this.buscarCampoRecursivo(rps, ["Liquidada", "liquidada"]),
+                this.buscarCampoRecursivo(servicoXml, [
+                  "Liquidada",
+                  "liquidada",
+                ]),
+              );
+              const receiptDate = this.extrairTextoOpcional(
+                this.buscarCampoRecursivo(rps, ["ReceiptDate", "receipt_date"]),
+                this.buscarCampoRecursivo(servicoXml, [
+                  "ReceiptDate",
+                  "receipt_date",
+                ]),
+              );
+              const reciboDate = this.extrairTextoOpcional(
+                this.buscarCampoRecursivo(rps, ["ReciboDate", "recibo_date"]),
+                this.buscarCampoRecursivo(servicoXml, [
+                  "ReciboDate",
+                  "recibo_date",
+                ]),
+              );
 
               const aliquotaParaEnvio =
                 aliquotaPercentual > 0 ? aliquotaPercentual : 5;
@@ -614,6 +812,18 @@ export class FocusNfeService {
                   codigo_nbs: "102010000",
                   codigo_indicador_operacao: "100301",
                   ibs_cbs_classificacao_tributaria: "000001",
+                  valor_iss: valorIssXml ?? valorIss,
+                  ...(tributacaoIssXml && { tributacao_iss: tributacaoIssXml }),
+                  ...(ibsCbsSituacaoTributariaXml && {
+                    ibs_cbs_situacao_tributaria: ibsCbsSituacaoTributariaXml,
+                  }),
+                  ibs_cbs_base_calculo: ibsCbsBaseCalculoXml ?? baseCalculo,
+                  ibs_uf_aliquota: ibsUfAliquotaXml ?? 1,
+                  ibs_uf_valor: ibsUfValorXml ?? valorIBS,
+                  ibs_mun_aliquota: ibsMunAliquotaXml ?? 0,
+                  ibs_mun_valor: ibsMunValorXml ?? 0,
+                  cbs_aliquota: cbsAliquotaXml ?? 9,
+                  cbs_valor: cbsValorXml ?? valorCBS,
                   ...(tipoTributacao && { tipo_tributacao: tipoTributacao }),
                 },
                 exigibilidade_suspensa: 0,
@@ -633,6 +843,21 @@ export class FocusNfeService {
                 numero_rps: numeroRps,
                 referencia,
                 request: focusRequest,
+                invoice_data: {
+                  pis_value: pisValue ?? null,
+                  cofins_value: cofinsValue ?? null,
+                  csll_value: csllValue ?? null,
+                  irrf_value: irrfValue ?? null,
+                  iss_value: valorIssXml ?? valorIss,
+                  ibs_value: ibsValorXml ?? ibsValueFallback,
+                  cbs_value: cbsValorXml ?? valorCBS,
+                  ins_est: insEst ?? null,
+                  owner_record: ownerRecord ?? null,
+                  owner_send: ownerSend ?? null,
+                  liquidada: liquidada ?? null,
+                  receipt_date: receiptDate ?? null,
+                  recibo_date: reciboDate ?? null,
+                },
               });
             }
 
@@ -766,6 +991,72 @@ export class FocusNfeService {
     }
 
     return padrao;
+  }
+
+  private extrairTextoOpcional(...valores: any[]): string | undefined {
+    for (const valor of valores) {
+      if (valor === undefined || valor === null) continue;
+      const texto = String(valor).trim();
+      if (texto) return texto;
+    }
+    return undefined;
+  }
+
+  private extrairNumeroOpcional(...valores: any[]): number | undefined {
+    for (const valor of valores) {
+      if (valor === undefined || valor === null || valor === "") continue;
+      const texto = String(valor).trim();
+      const normalizado = texto.includes(",")
+        ? texto.replace(/\./g, "").replace(",", ".")
+        : texto;
+      const numero = Number(normalizado);
+      if (Number.isFinite(numero)) return numero;
+    }
+    return undefined;
+  }
+
+  private normalizarChaveCampo(valor: string): string {
+    return String(valor || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+  }
+
+  private buscarCampoRecursivo(
+    alvo: any,
+    nomes: string[],
+  ): any | undefined {
+    if (alvo === undefined || alvo === null) return undefined;
+
+    const nomesNormalizados = nomes.map((nome) => this.normalizarChaveCampo(nome));
+
+    const procurar = (valor: any): any | undefined => {
+      if (valor === undefined || valor === null) return undefined;
+
+      if (Array.isArray(valor)) {
+        for (const item of valor) {
+          const encontrado = procurar(item);
+          if (encontrado !== undefined) return encontrado;
+        }
+        return undefined;
+      }
+
+      if (typeof valor !== "object") return undefined;
+
+      for (const [chave, conteudo] of Object.entries(valor)) {
+        if (nomesNormalizados.includes(this.normalizarChaveCampo(chave))) {
+          return conteudo;
+        }
+      }
+
+      for (const conteudo of Object.values(valor)) {
+        const encontrado = procurar(conteudo);
+        if (encontrado !== undefined) return encontrado;
+      }
+
+      return undefined;
+    };
+
+    return procurar(alvo);
   }
 
   private extrairNumeroRps(rps: any, padrao: number): string {

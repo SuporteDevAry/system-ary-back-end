@@ -166,6 +166,46 @@ var Invoice = /** @class */ (function () {
         __metadata("design:type", String)
     ], Invoice.prototype, "service_liquid_value", void 0);
     __decorate([
+        (0, typeorm_1.Column)("numeric", { nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "ibs_value", void 0);
+    __decorate([
+        (0, typeorm_1.Column)("numeric", { nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "cbs_value", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "cod_pais", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "ins_est", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "owner_record", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "owner_send", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "code_verif", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "liquidada", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "receipt_date", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+        __metadata("design:type", String)
+    ], Invoice.prototype, "recibo_date", void 0);
+    __decorate([
         (0, typeorm_1.CreateDateColumn)(),
         __metadata("design:type", Date)
     ], Invoice.prototype, "created_at", void 0);
