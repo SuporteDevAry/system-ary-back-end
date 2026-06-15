@@ -130,7 +130,7 @@ var xml2js_1 = require("xml2js");
 var FocusNfeService = /** @class */ (function () {
     function FocusNfeService() {
         // Sempre usa endpoint oficial FocusNFE até /v2
-        var apiUrl = process.env.FOCUS_NFE_API_URL || "https://api.focusnfe.com.br/v2";
+        var apiUrl = process.env.FOCUS_NFE_API_URL;
         // Remove qualquer /nfse no final
         apiUrl = apiUrl.replace(/\/nfse$/, "");
         this.config = {
@@ -246,7 +246,7 @@ var FocusNfeService = /** @class */ (function () {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
                         console.log("\u274C Cancelando NFS-e ".concat(referencia, " na Focus NFe..."));
-                        return [4 /*yield*/, this.fazerRequisicaoApi("DELETE", "/nfse/".concat(referencia), {
+                        return [4 /*yield*/, this.fazerRequisicaoApi("DELETE", "/nfse/".concat(encodeURIComponent(referencia)), {
                                 justificativa: justificativa,
                             })];
                     case 1: return [2 /*return*/, _a.sent()];
@@ -351,7 +351,7 @@ var FocusNfeService = /** @class */ (function () {
                         fetch = (_a.sent()).default;
                         return [2 /*return*/, new Promise(function (resolve, reject) {
                                 (0, xml2js_1.parseString)(xml, { explicitArray: false }, function (err, result) { return __awaiter(_this, void 0, void 0, function () {
-                                    var pedido, cabecalho, rpsArray, requests, cpfCnpjRemetente, index, rps, numeroRps, chaveRps, inscricaoPrestador, cnpjPrestador, cpfPrestador, cpfCnpjTomador, enderecTomador, cnpjTomador, cpfTomador, razaoSocialTomador, emailTomador, isEstrangeiro, codigoMunicipioServico, codigoMunicipioTomadorOriginal, codigoMunicipioTomadorCorrigido, ibgeViaCep, servicoXml, valorServicos, valorServicosKeys, _i, valorServicosKeys_1, key, valorFinalCobrado, baseCalculo, codigoServico, discriminacao, tributacaoRps, tipoTributacao, codigoCidadeIncidencia, isExportacao, aliquotaPercentual, aliquotaFracao, valorIss, valorIBS, valorCBS, aliquotaParaEnvio, prestadorObj, codigoTribMun, naturezaOperacao, tipoOperacao, issRetido, referencia, focusRequest, error_5;
+                                    var pedido, cabecalho, rpsArray, requests, cpfCnpjRemetente, index, rps, numeroRps, chaveRps, inscricaoPrestador, cnpjPrestador, cpfPrestador, cpfCnpjTomador, enderecTomador, cnpjTomador, cpfTomador, razaoSocialTomador, emailTomador, isEstrangeiro, codigoMunicipioServico, codigoMunicipioTomadorOriginal, codigoMunicipioTomadorCorrigido, ibgeViaCep, servicoXml, valorServicos, valorServicosKeys, _i, valorServicosKeys_1, key, valorFinalCobrado, baseCalculo, codigoServico, discriminacao, tributacaoRps, tipoTributacao, codigoCidadeIncidencia, isExportacao, aliquotaPercentual, valorIss, valorIBS, valorCBS, valorIssXml, tributacaoIssXml, ibsCbsSituacaoTributariaXml, ibsCbsBaseCalculoXml, ibsUfAliquotaXml, ibsUfValorXml, ibsMunAliquotaXml, ibsMunValorXml, cbsAliquotaXml, cbsValorXml, ibsValorXml, ibsValueFallback, pisValue, cofinsValue, csllValue, irrfValue, insEst, ownerRecord, ownerSend, liquidada, receiptDate, reciboDate, aliquotaParaEnvio, prestadorObj, codigoTribMun, naturezaOperacao, tipoOperacao, issRetido, referencia, focusRequest, error_5;
                                     return __generator(this, function (_a) {
                                         switch (_a.label) {
                                             case 0:
@@ -485,10 +485,104 @@ var FocusNfeService = /** @class */ (function () {
                                                 codigoCidadeIncidencia = tipoTributacao === "P" ? "9999999" : undefined;
                                                 isExportacao = this.identificarExportacao(rps, servicoXml, isEstrangeiro, tipoTributacao);
                                                 aliquotaPercentual = parseFloat(rps.aliquota || rps.AliquotaServicos || "5");
-                                                aliquotaFracao = Math.round(aliquotaPercentual / 100);
-                                                valorIss = valorServicos * aliquotaFracao;
-                                                valorIBS = Math.round(valorServicos * 0.01);
-                                                valorCBS = Math.round(valorServicos * 0.09);
+                                                valorIss = Math.round(valorServicos * (aliquotaPercentual / 100) * 100) / 100;
+                                                valorIBS = Math.round(valorServicos * 0.01 * 100) / 100;
+                                                valorCBS = Math.round(valorServicos * 0.09 * 100) / 100;
+                                                valorIssXml = this.extrairNumeroOpcional(rps.ValorIss, rps.ValorISS, rps.valor_iss, servicoXml.ValorIss, servicoXml.ValorISS, servicoXml.valor_iss);
+                                                tributacaoIssXml = this.extrairTextoOpcional(rps.TributacaoIss, rps.TributacaoISS, rps.tributacao_iss, servicoXml.TributacaoIss, servicoXml.TributacaoISS, servicoXml.tributacao_iss);
+                                                ibsCbsSituacaoTributariaXml = this.extrairTextoOpcional(rps.IBSCBSSituacaoTributaria, rps.ibs_cbs_situacao_tributaria, servicoXml.IBSCBSSituacaoTributaria, servicoXml.ibs_cbs_situacao_tributaria);
+                                                ibsCbsBaseCalculoXml = this.extrairNumeroOpcional(rps.IBSCBSBaseCalculo, rps.ibs_cbs_base_calculo, servicoXml.IBSCBSBaseCalculo, servicoXml.ibs_cbs_base_calculo);
+                                                ibsUfAliquotaXml = this.extrairNumeroOpcional(rps.IBSUFAliquota, rps.ibs_uf_aliquota, servicoXml.IBSUFAliquota, servicoXml.ibs_uf_aliquota);
+                                                ibsUfValorXml = this.extrairNumeroOpcional(rps.IBSUFValor, rps.ibs_uf_valor, servicoXml.IBSUFValor, servicoXml.ibs_uf_valor);
+                                                ibsMunAliquotaXml = this.extrairNumeroOpcional(rps.IBSMunAliquota, rps.ibs_mun_aliquota, servicoXml.IBSMunAliquota, servicoXml.ibs_mun_aliquota);
+                                                ibsMunValorXml = this.extrairNumeroOpcional(rps.IBSMunValor, rps.ibs_mun_valor, servicoXml.IBSMunValor, servicoXml.ibs_mun_valor);
+                                                cbsAliquotaXml = this.extrairNumeroOpcional(rps.CBSAliquota, rps.cbs_aliquota, servicoXml.CBSAliquota, servicoXml.cbs_aliquota);
+                                                cbsValorXml = this.extrairNumeroOpcional(rps.CBSValor, rps.cbs_valor, servicoXml.CBSValor, servicoXml.cbs_valor);
+                                                ibsValorXml = this.extrairNumeroOpcional(this.buscarCampoRecursivo(rps, [
+                                                    "IBS",
+                                                    "ValorIBS",
+                                                    "ValorIbs",
+                                                    "ibs_value",
+                                                ]), this.buscarCampoRecursivo(servicoXml, [
+                                                    "IBS",
+                                                    "ValorIBS",
+                                                    "ValorIbs",
+                                                    "ibs_value",
+                                                ]));
+                                                ibsValueFallback = (ibsUfValorXml !== null && ibsUfValorXml !== void 0 ? ibsUfValorXml : 0) + (ibsMunValorXml !== null && ibsMunValorXml !== void 0 ? ibsMunValorXml : 0) || valorIBS;
+                                                pisValue = this.extrairNumeroOpcional(this.buscarCampoRecursivo(rps, [
+                                                    "PIS",
+                                                    "ValorPIS",
+                                                    "ValorPis",
+                                                    "valor_pis",
+                                                ]), this.buscarCampoRecursivo(servicoXml, [
+                                                    "PIS",
+                                                    "ValorPIS",
+                                                    "ValorPis",
+                                                    "valor_pis",
+                                                ]));
+                                                cofinsValue = this.extrairNumeroOpcional(this.buscarCampoRecursivo(rps, [
+                                                    "COFINS",
+                                                    "ValorCOFINS",
+                                                    "ValorCofins",
+                                                    "valor_cofins",
+                                                ]), this.buscarCampoRecursivo(servicoXml, [
+                                                    "COFINS",
+                                                    "ValorCOFINS",
+                                                    "ValorCofins",
+                                                    "valor_cofins",
+                                                ]));
+                                                csllValue = this.extrairNumeroOpcional(this.buscarCampoRecursivo(rps, [
+                                                    "CSLL",
+                                                    "ValorCSLL",
+                                                    "ValorCsll",
+                                                    "valor_csll",
+                                                ]), this.buscarCampoRecursivo(servicoXml, [
+                                                    "CSLL",
+                                                    "ValorCSLL",
+                                                    "ValorCsll",
+                                                    "valor_csll",
+                                                ]));
+                                                irrfValue = this.extrairNumeroOpcional(this.buscarCampoRecursivo(rps, [
+                                                    "IRRF",
+                                                    "ValorIRRF",
+                                                    "ValorIrrf",
+                                                    "valor_irrf",
+                                                ]), this.buscarCampoRecursivo(servicoXml, [
+                                                    "IRRF",
+                                                    "ValorIRRF",
+                                                    "ValorIrrf",
+                                                    "valor_irrf",
+                                                ]));
+                                                insEst = this.extrairTextoOpcional(this.buscarCampoRecursivo(rps, [
+                                                    "InscricaoEstadual",
+                                                    "InsEst",
+                                                    "ins_est",
+                                                ]), this.buscarCampoRecursivo(servicoXml, [
+                                                    "InscricaoEstadual",
+                                                    "InsEst",
+                                                    "ins_est",
+                                                ]));
+                                                ownerRecord = this.extrairTextoOpcional(this.buscarCampoRecursivo(rps, ["OwnerRecord", "owner_record"]), this.buscarCampoRecursivo(servicoXml, [
+                                                    "OwnerRecord",
+                                                    "owner_record",
+                                                ]));
+                                                ownerSend = this.extrairTextoOpcional(this.buscarCampoRecursivo(rps, ["OwnerSend", "owner_send"]), this.buscarCampoRecursivo(servicoXml, [
+                                                    "OwnerSend",
+                                                    "owner_send",
+                                                ]));
+                                                liquidada = this.extrairTextoOpcional(this.buscarCampoRecursivo(rps, ["Liquidada", "liquidada"]), this.buscarCampoRecursivo(servicoXml, [
+                                                    "Liquidada",
+                                                    "liquidada",
+                                                ]));
+                                                receiptDate = this.extrairTextoOpcional(this.buscarCampoRecursivo(rps, ["ReceiptDate", "receipt_date"]), this.buscarCampoRecursivo(servicoXml, [
+                                                    "ReceiptDate",
+                                                    "receipt_date",
+                                                ]));
+                                                reciboDate = this.extrairTextoOpcional(this.buscarCampoRecursivo(rps, ["ReciboDate", "recibo_date"]), this.buscarCampoRecursivo(servicoXml, [
+                                                    "ReciboDate",
+                                                    "recibo_date",
+                                                ]));
                                                 aliquotaParaEnvio = aliquotaPercentual > 0 ? aliquotaPercentual : 5;
                                                 prestadorObj = {
                                                     inscricao_municipal: inscricaoPrestador,
@@ -527,9 +621,11 @@ var FocusNfeService = /** @class */ (function () {
                                                             enderecTomador.CodigoPais && {
                                                             codigo_pais: enderecTomador.CodigoPais,
                                                         })) }),
-                                                    servico: __assign(__assign(__assign({ discriminacao: discriminacao, item_lista_servico: codigoServico, codigo_tributacao_municipio: codigoTribMun || codigoServico }, (codigoCidadeIncidencia && {
+                                                    servico: __assign(__assign(__assign(__assign(__assign(__assign({ discriminacao: discriminacao, item_lista_servico: codigoServico, codigo_tributacao_municipio: codigoTribMun || codigoServico }, (codigoCidadeIncidencia && {
                                                         codigo_cidade_incidencia: codigoCidadeIncidencia,
-                                                    })), { valor_servicos: valorServicos, valor_final_cobrado: valorFinalCobrado, base_calculo: baseCalculo, aliquota: aliquotaParaEnvio, iss_retido: issRetido, valor_ipi: 0, codigo_nbs: "102010000", codigo_indicador_operacao: "100301", ibs_cbs_classificacao_tributaria: "000001" }), (tipoTributacao && { tipo_tributacao: tipoTributacao })),
+                                                    })), { valor_servicos: valorServicos, valor_final_cobrado: valorFinalCobrado, base_calculo: baseCalculo, aliquota: aliquotaParaEnvio, iss_retido: issRetido, valor_ipi: 0, codigo_nbs: "102010000", codigo_indicador_operacao: "100301", ibs_cbs_classificacao_tributaria: "000001", valor_iss: valorIssXml !== null && valorIssXml !== void 0 ? valorIssXml : valorIss }), (tributacaoIssXml && { tributacao_iss: tributacaoIssXml })), (ibsCbsSituacaoTributariaXml && {
+                                                        ibs_cbs_situacao_tributaria: ibsCbsSituacaoTributariaXml,
+                                                    })), { ibs_cbs_base_calculo: ibsCbsBaseCalculoXml !== null && ibsCbsBaseCalculoXml !== void 0 ? ibsCbsBaseCalculoXml : baseCalculo, ibs_uf_aliquota: ibsUfAliquotaXml !== null && ibsUfAliquotaXml !== void 0 ? ibsUfAliquotaXml : 1, ibs_uf_valor: ibsUfValorXml !== null && ibsUfValorXml !== void 0 ? ibsUfValorXml : valorIBS, ibs_mun_aliquota: ibsMunAliquotaXml !== null && ibsMunAliquotaXml !== void 0 ? ibsMunAliquotaXml : 0, ibs_mun_valor: ibsMunValorXml !== null && ibsMunValorXml !== void 0 ? ibsMunValorXml : 0, cbs_aliquota: cbsAliquotaXml !== null && cbsAliquotaXml !== void 0 ? cbsAliquotaXml : 9, cbs_valor: cbsValorXml !== null && cbsValorXml !== void 0 ? cbsValorXml : valorCBS }), (tipoTributacao && { tipo_tributacao: tipoTributacao })),
                                                     exigibilidade_suspensa: 0,
                                                     pagamento_parcelado_antecipado: 0,
                                                     finalidade_emissao: 0,
@@ -543,6 +639,21 @@ var FocusNfeService = /** @class */ (function () {
                                                     numero_rps: numeroRps,
                                                     referencia: referencia,
                                                     request: focusRequest,
+                                                    invoice_data: {
+                                                        pis_value: pisValue !== null && pisValue !== void 0 ? pisValue : null,
+                                                        cofins_value: cofinsValue !== null && cofinsValue !== void 0 ? cofinsValue : null,
+                                                        csll_value: csllValue !== null && csllValue !== void 0 ? csllValue : null,
+                                                        irrf_value: irrfValue !== null && irrfValue !== void 0 ? irrfValue : null,
+                                                        iss_value: valorIssXml !== null && valorIssXml !== void 0 ? valorIssXml : valorIss,
+                                                        ibs_value: ibsValorXml !== null && ibsValorXml !== void 0 ? ibsValorXml : ibsValueFallback,
+                                                        cbs_value: cbsValorXml !== null && cbsValorXml !== void 0 ? cbsValorXml : valorCBS,
+                                                        ins_est: insEst !== null && insEst !== void 0 ? insEst : null,
+                                                        owner_record: ownerRecord !== null && ownerRecord !== void 0 ? ownerRecord : null,
+                                                        owner_send: ownerSend !== null && ownerSend !== void 0 ? ownerSend : null,
+                                                        liquidada: liquidada !== null && liquidada !== void 0 ? liquidada : null,
+                                                        receipt_date: receiptDate !== null && receiptDate !== void 0 ? receiptDate : null,
+                                                        recibo_date: reciboDate !== null && reciboDate !== void 0 ? reciboDate : null,
+                                                    },
                                                 });
                                                 _a.label = 6;
                                             case 6:
@@ -658,6 +769,80 @@ var FocusNfeService = /** @class */ (function () {
             return false;
         }
         return padrao;
+    };
+    FocusNfeService.prototype.extrairTextoOpcional = function () {
+        var valores = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            valores[_i] = arguments[_i];
+        }
+        for (var _a = 0, valores_1 = valores; _a < valores_1.length; _a++) {
+            var valor = valores_1[_a];
+            if (valor === undefined || valor === null)
+                continue;
+            var texto = String(valor).trim();
+            if (texto)
+                return texto;
+        }
+        return undefined;
+    };
+    FocusNfeService.prototype.extrairNumeroOpcional = function () {
+        var valores = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            valores[_i] = arguments[_i];
+        }
+        for (var _a = 0, valores_2 = valores; _a < valores_2.length; _a++) {
+            var valor = valores_2[_a];
+            if (valor === undefined || valor === null || valor === "")
+                continue;
+            var texto = String(valor).trim();
+            var normalizado = texto.includes(",")
+                ? texto.replace(/\./g, "").replace(",", ".")
+                : texto;
+            var numero = Number(normalizado);
+            if (Number.isFinite(numero))
+                return numero;
+        }
+        return undefined;
+    };
+    FocusNfeService.prototype.normalizarChaveCampo = function (valor) {
+        return String(valor || "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "");
+    };
+    FocusNfeService.prototype.buscarCampoRecursivo = function (alvo, nomes) {
+        var _this = this;
+        if (alvo === undefined || alvo === null)
+            return undefined;
+        var nomesNormalizados = nomes.map(function (nome) { return _this.normalizarChaveCampo(nome); });
+        var procurar = function (valor) {
+            if (valor === undefined || valor === null)
+                return undefined;
+            if (Array.isArray(valor)) {
+                for (var _i = 0, valor_1 = valor; _i < valor_1.length; _i++) {
+                    var item = valor_1[_i];
+                    var encontrado = procurar(item);
+                    if (encontrado !== undefined)
+                        return encontrado;
+                }
+                return undefined;
+            }
+            if (typeof valor !== "object")
+                return undefined;
+            for (var _a = 0, _b = Object.entries(valor); _a < _b.length; _a++) {
+                var _c = _b[_a], chave = _c[0], conteudo = _c[1];
+                if (nomesNormalizados.includes(_this.normalizarChaveCampo(chave))) {
+                    return conteudo;
+                }
+            }
+            for (var _d = 0, _e = Object.values(valor); _d < _e.length; _d++) {
+                var conteudo = _e[_d];
+                var encontrado = procurar(conteudo);
+                if (encontrado !== undefined)
+                    return encontrado;
+            }
+            return undefined;
+        };
+        return procurar(alvo);
     };
     FocusNfeService.prototype.extrairNumeroRps = function (rps, padrao) {
         var _a, _b;

@@ -21,6 +21,7 @@ import { AddFieldsToInvoices1769793476444 as AddFieldsToInvoices } from "./17697
 import { AddXmlFieldToInvoices1769793476445 as AddXmlFieldToInvoices } from "./1769793476445-AddXmlFieldToInvoices";
 import { AddCommissionReceitpDate1775849143332 as AddCommissionReceiptDate } from "./1775849143332-AddCommissionReceitpDate";
 import { AddTaxAndContractFieldsToInvoices1778624659540 as AddTaxAndContractFieldsToInvoices } from "./1778624659540-AddTaxAndContractFieldsToInvoices"
+import { AddReformaTributariaFieldsToInvoices1780968445477 as AddReformaTributariaFieldsToInvoices } from "./1780968445477-AddReformaTributariaFieldsToInvoices"
 
 export const migrationDir = {
   CreatePermissions,
@@ -46,4 +47,5 @@ export const migrationDir = {
   AddContractEmissionDatetime,
   AddCommissionReceiptDate,
   AddTaxAndContractFieldsToInvoices,
+  AddReformaTributariaFieldsToInvoices
 };
