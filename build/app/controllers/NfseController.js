@@ -106,6 +106,54 @@ function extrairNumeroNfse(item) {
         null;
     return valor ? String(valor).trim() : null;
 }
+function extrairCodigoVerificacao(item) {
+    var _a, _b, _c, _d;
+    var candidatos = [
+        item === null || item === void 0 ? void 0 : item.codigo_verificacao,
+        item === null || item === void 0 ? void 0 : item.codigoVerificacao,
+        item === null || item === void 0 ? void 0 : item.codigo_verif,
+        item === null || item === void 0 ? void 0 : item.code_verif,
+        (_a = item === null || item === void 0 ? void 0 : item.resultado) === null || _a === void 0 ? void 0 : _a.codigo_verificacao,
+        (_b = item === null || item === void 0 ? void 0 : item.resultado) === null || _b === void 0 ? void 0 : _b.codigoVerificacao,
+        (_c = item === null || item === void 0 ? void 0 : item.data) === null || _c === void 0 ? void 0 : _c.codigo_verificacao,
+        (_d = item === null || item === void 0 ? void 0 : item.data) === null || _d === void 0 ? void 0 : _d.codigoVerificacao,
+    ];
+    for (var _i = 0, candidatos_2 = candidatos; _i < candidatos_2.length; _i++) {
+        var candidato = candidatos_2[_i];
+        if (candidato === undefined || candidato === null)
+            continue;
+        var valor = String(candidato).trim();
+        if (valor)
+            return valor;
+    }
+    return null;
+}
+function extrairUrlDanfse(item) {
+    var _a, _b, _c, _d, _e, _f, _g, _h;
+    var candidatos = [
+        item === null || item === void 0 ? void 0 : item.url_danfse,
+        item === null || item === void 0 ? void 0 : item.urlDanfse,
+        item === null || item === void 0 ? void 0 : item.danfse_url,
+        item === null || item === void 0 ? void 0 : item.danfe_url,
+        (_a = item === null || item === void 0 ? void 0 : item.resultado) === null || _a === void 0 ? void 0 : _a.url_danfse,
+        (_b = item === null || item === void 0 ? void 0 : item.resultado) === null || _b === void 0 ? void 0 : _b.urlDanfse,
+        (_c = item === null || item === void 0 ? void 0 : item.resultado) === null || _c === void 0 ? void 0 : _c.danfse_url,
+        (_d = item === null || item === void 0 ? void 0 : item.resultado) === null || _d === void 0 ? void 0 : _d.danfe_url,
+        (_e = item === null || item === void 0 ? void 0 : item.data) === null || _e === void 0 ? void 0 : _e.url_danfse,
+        (_f = item === null || item === void 0 ? void 0 : item.data) === null || _f === void 0 ? void 0 : _f.urlDanfse,
+        (_g = item === null || item === void 0 ? void 0 : item.data) === null || _g === void 0 ? void 0 : _g.danfse_url,
+        (_h = item === null || item === void 0 ? void 0 : item.data) === null || _h === void 0 ? void 0 : _h.danfe_url,
+    ];
+    for (var _i = 0, candidatos_3 = candidatos; _i < candidatos_3.length; _i++) {
+        var candidato = candidatos_3[_i];
+        if (candidato === undefined || candidato === null)
+            continue;
+        var valor = String(candidato).trim();
+        if (valor)
+            return valor;
+    }
+    return null;
+}
 function extrairReferenciaLote(item, fallback) {
     var valor = (item === null || item === void 0 ? void 0 : item.ref) ||
         (item === null || item === void 0 ? void 0 : item.referencia) ||
@@ -176,7 +224,7 @@ exports.NfseController = {
      */
     enviarLoteRps: function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var xml, result, numerosRpsXml, resultados, index, item, referenciaLote, numeroRpsXml, numeroRpsRetorno, numeroRps, invoice, _a, _b, numeroNfse, protocolo, error_1;
+            var xml, result, numerosRpsXml, resultados, index, item, referenciaLote, numeroRpsXml, numeroRpsRetorno, invoiceData, codigoVerificacao, numeroRps, invoice, _a, _b, numeroNfse, updates, camposTributarios, _i, camposTributarios_1, campo, valor, protocolo, error_1;
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0:
@@ -209,6 +257,8 @@ exports.NfseController = {
                         referenciaLote = extrairReferenciaLote(item, (result === null || result === void 0 ? void 0 : result.ref) || null);
                         numeroRpsXml = numerosRpsXml[index] || null;
                         numeroRpsRetorno = extrairNumeroRpsRetorno(item) || "";
+                        invoiceData = item.invoice_data || {};
+                        codigoVerificacao = extrairCodigoVerificacao(item);
                         numeroRps = extrairNumeroRpsDaReferencia(referenciaLote) ||
                             numeroRpsRetorno ||
                             numeroRpsXml ||
@@ -243,7 +293,33 @@ exports.NfseController = {
                         invoice = _a;
                         if (!invoice) return [3 /*break*/, 9];
                         numeroNfse = extrairNumeroNfse(item);
-                        return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.update(invoice.id, __assign(__assign(__assign({ status: item.status ? mapStatus(item.status) : null }, (numeroNfse && { nfs_number: numeroNfse })), (referenciaLote && { protocolo_lote: referenciaLote })), { xml_nfse: xml }))];
+                        updates = __assign(__assign(__assign({ status: item.status ? mapStatus(item.status) : null }, (numeroNfse && { nfs_number: numeroNfse })), (referenciaLote && { protocolo_lote: referenciaLote })), { xml_nfse: xml });
+                        camposTributarios = [
+                            "pis_value",
+                            "cofins_value",
+                            "csll_value",
+                            "irrf_value",
+                            "iss_value",
+                            "ibs_value",
+                            "cbs_value",
+                            "ins_est",
+                            "owner_record",
+                            "owner_send",
+                            "liquidada",
+                            "receipt_date",
+                            "recibo_date",
+                        ];
+                        for (_i = 0, camposTributarios_1 = camposTributarios; _i < camposTributarios_1.length; _i++) {
+                            campo = camposTributarios_1[_i];
+                            valor = invoiceData === null || invoiceData === void 0 ? void 0 : invoiceData[campo];
+                            if (valor !== undefined && valor !== null && valor !== "") {
+                                updates[campo] = valor;
+                            }
+                        }
+                        if (codigoVerificacao) {
+                            updates.code_verif = codigoVerificacao;
+                        }
+                        return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.update(invoice.id, updates)];
                     case 8:
                         _c.sent();
                         return [3 /*break*/, 10];
@@ -280,7 +356,7 @@ exports.NfseController = {
      */
     consultarRps: function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var rps_number, invoice, result, remoteStatus, mapped, updates, error_2, error_3;
+            var rps_number, invoice, result, remoteStatus, mapped, codigoVerificacao, urlDanfse, updates, error_2, error_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -294,7 +370,7 @@ exports.NfseController = {
                         invoice = _a.sent();
                         if (!invoice || !invoice.protocolo_lote) {
                             return [2 /*return*/, res.status(404).json({
-                                    message: "RPS não encontrada ou sem protocolo_lote para consulta na FocusNFE",
+                                    message: "RPS não encontrada ou sem protocolo_lote para consulta.",
                                 })];
                         }
                         result = void 0;
@@ -306,11 +382,15 @@ exports.NfseController = {
                         result = _a.sent();
                         remoteStatus = (result && (result.status || result.Status)) || null;
                         mapped = mapStatus(remoteStatus);
+                        codigoVerificacao = extrairCodigoVerificacao(result);
+                        urlDanfse = extrairUrlDanfse(result);
                         updates = {};
                         if (mapped && mapped !== invoice.status)
                             updates.status = mapped;
-                        if ((result === null || result === void 0 ? void 0 : result.url_danfse) && result.url_danfse !== invoice.url_danfse)
-                            updates.url_danfse = result.url_danfse;
+                        if (urlDanfse && urlDanfse !== invoice.url_danfse)
+                            updates.url_danfse = urlDanfse;
+                        if (codigoVerificacao)
+                            updates.code_verif = codigoVerificacao;
                         if (!(Object.keys(updates).length > 0)) return [3 /*break*/, 5];
                         return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.update(invoice.id, updates)];
                     case 4:
@@ -321,7 +401,7 @@ exports.NfseController = {
                         error_2 = _a.sent();
                         if (error_2.message && error_2.message.includes("API Error 404")) {
                             return [2 /*return*/, res.status(404).json({
-                                    message: "Lote não encontrado ou ainda não processado na FocusNFE. Aguarde alguns minutos e tente novamente.",
+                                    message: "Lote não encontrado ou ainda não processado. Aguarde alguns minutos e tente novamente.",
                                     error: error_2.message,
                                 })];
                         }
@@ -365,7 +445,7 @@ exports.NfseController = {
                     case 2:
                         _a.trys.push([2, 10, , 11]);
                         handleSingle = function (obj) { return __awaiter(_this, void 0, void 0, function () {
-                            var rpsNum, invoice, mapped, updates;
+                            var rpsNum, invoice, mapped, urlDanfse, updates, codigoVerificacao;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0:
@@ -378,11 +458,15 @@ exports.NfseController = {
                                         if (!invoice)
                                             return [2 /*return*/];
                                         mapped = mapStatus(obj.status || obj.Status || null);
+                                        urlDanfse = extrairUrlDanfse(obj);
                                         updates = {};
                                         if (mapped && mapped !== invoice.status)
                                             updates.status = mapped;
-                                        if ((obj === null || obj === void 0 ? void 0 : obj.url_danfse) && obj.url_danfse !== invoice.url_danfse)
-                                            updates.url_danfse = obj.url_danfse;
+                                        if (urlDanfse && urlDanfse !== invoice.url_danfse)
+                                            updates.url_danfse = urlDanfse;
+                                        codigoVerificacao = extrairCodigoVerificacao(obj);
+                                        if (codigoVerificacao)
+                                            updates.code_verif = codigoVerificacao;
                                         if (!(Object.keys(updates).length > 0)) return [3 /*break*/, 3];
                                         return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.update(invoice.id, updates)];
                                     case 2:
@@ -435,7 +519,7 @@ exports.NfseController = {
      */
     cancelarNfse: function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var referencia, justificativa, justificativaFormatada, invoice, _a, _b, referenciaCancelamento, result, retornoStatus, error_5;
+            var referencia, justificativa, justificativaFormatada, invoice, _a, _b, referenciaCancelamento, statusNormalizado, result, retornoStatus, codigoVerificacao, error_5, apiErrorMatch, apiStatus;
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0:
@@ -477,14 +561,27 @@ exports.NfseController = {
                     case 5:
                         invoice = _a;
                         referenciaCancelamento = (invoice === null || invoice === void 0 ? void 0 : invoice.protocolo_lote) || String(referencia).trim();
+                        if (invoice) {
+                            statusNormalizado = String(invoice.status || "").toLowerCase();
+                            if (statusNormalizado && statusNormalizado !== "autorizada") {
+                                return [2 /*return*/, res.status(400).json({
+                                        message: "Somente NFS-e autorizadas podem ser canceladas na FocusNFe.",
+                                        statusAtual: invoice.status,
+                                    })];
+                            }
+                            if (!invoice.protocolo_lote && invoice.protocolo_lote !== referenciaCancelamento) {
+                                return [2 /*return*/, res.status(400).json({
+                                        message: "Não foi encontrada a referência da NFSe necessária para cancelar esta nota.",
+                                    })];
+                            }
+                        }
                         return [4 /*yield*/, focusNfeService.cancelarNfse(referenciaCancelamento, justificativaFormatada)];
                     case 6:
                         result = _c.sent();
                         retornoStatus = extrairStatusRespostaFocusNfe(result);
-                        if (!(invoice && retornoStatus)) return [3 /*break*/, 8];
-                        return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.update(invoice.id, {
-                                status: retornoStatus,
-                            })];
+                        codigoVerificacao = extrairCodigoVerificacao(result);
+                        if (!(invoice && (retornoStatus || codigoVerificacao))) return [3 /*break*/, 8];
+                        return [4 /*yield*/, InvoiceRepository_1.InvoiceRepository.update(invoice.id, __assign(__assign({}, (retornoStatus && { status: retornoStatus })), (codigoVerificacao && { code_verif: codigoVerificacao })))];
                     case 7:
                         _c.sent();
                         _c.label = 8;
@@ -494,6 +591,15 @@ exports.NfseController = {
                         })];
                     case 9:
                         error_5 = _c.sent();
+                        apiErrorMatch = String((error_5 === null || error_5 === void 0 ? void 0 : error_5.message) || "").match(/API Error (\d+):/i);
+                        if (apiErrorMatch) {
+                            apiStatus = Number(apiErrorMatch[1]);
+                            if (apiStatus === 400 || apiStatus === 404) {
+                                return [2 /*return*/, res.status(apiStatus).json({
+                                        message: error_5.message,
+                                    })];
+                            }
+                        }
                         console.error("Erro ao cancelar NFSe:", error_5);
                         return [2 /*return*/, res.status(500).json({
                                 message: "Erro ao cancelar NFSe",

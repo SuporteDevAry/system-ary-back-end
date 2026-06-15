@@ -117,6 +117,36 @@ export class Invoice {
   @Column("decimal")
   service_liquid_value: string;
 
+  @Column("numeric", { nullable: true })
+  ibs_value: string;
+
+  @Column("numeric", { nullable: true })
+  cbs_value: string;
+
+  @Column({ type: "varchar", nullable: true })
+  cod_pais: string;
+
+  @Column({ type: "varchar", nullable: true })
+  ins_est: string;
+
+  @Column({ type: "varchar", nullable: true })
+  owner_record: string;
+
+  @Column({ type: "varchar", nullable: true })
+  owner_send: string;
+
+  @Column({ type: "varchar", nullable: true })
+  code_verif: string;
+
+  @Column({ type: "varchar", nullable: true })
+  liquidada: string;
+
+  @Column({ type: "varchar", nullable: true })
+  receipt_date: string;
+
+  @Column({ type: "varchar", nullable: true })
+  recibo_date: string;
+
   @CreateDateColumn()
   created_at: Date;
 
