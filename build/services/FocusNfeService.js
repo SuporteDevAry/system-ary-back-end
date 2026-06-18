@@ -544,11 +544,15 @@ var FocusNfeService = /** @class */ (function () {
                                                     "valor_csll",
                                                 ]));
                                                 irrfValue = this.extrairNumeroOpcional(this.buscarCampoRecursivo(rps, [
+                                                    "valorIR",
+                                                    "ValorIR",
                                                     "IRRF",
                                                     "ValorIRRF",
                                                     "ValorIrrf",
                                                     "valor_irrf",
                                                 ]), this.buscarCampoRecursivo(servicoXml, [
+                                                    "valorIR",
+                                                    "ValorIR",
                                                     "IRRF",
                                                     "ValorIRRF",
                                                     "ValorIrrf",
@@ -623,7 +627,7 @@ var FocusNfeService = /** @class */ (function () {
                                                         })) }),
                                                     servico: __assign(__assign(__assign(__assign(__assign(__assign({ discriminacao: discriminacao, item_lista_servico: codigoServico, codigo_tributacao_municipio: codigoTribMun || codigoServico }, (codigoCidadeIncidencia && {
                                                         codigo_cidade_incidencia: codigoCidadeIncidencia,
-                                                    })), { valor_servicos: valorServicos, valor_final_cobrado: valorFinalCobrado, base_calculo: baseCalculo, aliquota: aliquotaParaEnvio, iss_retido: issRetido, valor_ipi: 0, codigo_nbs: "102010000", codigo_indicador_operacao: "100301", ibs_cbs_classificacao_tributaria: "000001", valor_iss: valorIssXml !== null && valorIssXml !== void 0 ? valorIssXml : valorIss }), (tributacaoIssXml && { tributacao_iss: tributacaoIssXml })), (ibsCbsSituacaoTributariaXml && {
+                                                    })), { valor_servicos: valorServicos, valor_final_cobrado: valorFinalCobrado, base_calculo: baseCalculo, aliquota: aliquotaParaEnvio, iss_retido: issRetido, valor_ipi: 0, codigo_nbs: "102010000", codigo_indicador_operacao: "100301", ibs_cbs_classificacao_tributaria: "000001", valor_ir: irrfValue, valor_iss: valorIssXml !== null && valorIssXml !== void 0 ? valorIssXml : valorIss }), (tributacaoIssXml && { tributacao_iss: tributacaoIssXml })), (ibsCbsSituacaoTributariaXml && {
                                                         ibs_cbs_situacao_tributaria: ibsCbsSituacaoTributariaXml,
                                                     })), { ibs_cbs_base_calculo: ibsCbsBaseCalculoXml !== null && ibsCbsBaseCalculoXml !== void 0 ? ibsCbsBaseCalculoXml : baseCalculo, ibs_uf_aliquota: ibsUfAliquotaXml !== null && ibsUfAliquotaXml !== void 0 ? ibsUfAliquotaXml : 1, ibs_uf_valor: ibsUfValorXml !== null && ibsUfValorXml !== void 0 ? ibsUfValorXml : valorIBS, ibs_mun_aliquota: ibsMunAliquotaXml !== null && ibsMunAliquotaXml !== void 0 ? ibsMunAliquotaXml : 0, ibs_mun_valor: ibsMunValorXml !== null && ibsMunValorXml !== void 0 ? ibsMunValorXml : 0, cbs_aliquota: cbsAliquotaXml !== null && cbsAliquotaXml !== void 0 ? cbsAliquotaXml : 9, cbs_valor: cbsValorXml !== null && cbsValorXml !== void 0 ? cbsValorXml : valorCBS }), (tipoTributacao && { tipo_tributacao: tipoTributacao })),
                                                     exigibilidade_suspensa: 0,
