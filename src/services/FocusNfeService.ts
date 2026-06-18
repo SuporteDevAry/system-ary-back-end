@@ -723,6 +723,13 @@ export class FocusNfeService {
                   "recibo_date",
                 ]),
               );
+              const ibsCbsClassificacaoTributaria = this.extrairTextoOpcional(
+                this.buscarCampoRecursivo(rps, ["cClassTrib", "cclasstrib"]),
+                this.buscarCampoRecursivo(servicoXml, [
+                  "cClassTrib",
+                  "cclasstrib",
+                ]),
+              );
 
               const aliquotaParaEnvio =
                 aliquotaPercentual > 0 ? aliquotaPercentual : 5;
@@ -816,7 +823,8 @@ export class FocusNfeService {
                   valor_ipi: 0,
                   codigo_nbs: "102010000",
                   codigo_indicador_operacao: "100301",
-                  ibs_cbs_classificacao_tributaria: "000001",
+                  ibs_cbs_classificacao_tributaria:
+                    ibsCbsClassificacaoTributaria || "",
                   valor_ir: irrfValue,
                   valor_iss: valorIssXml ?? valorIss,
                   ...(tributacaoIssXml && { tributacao_iss: tributacaoIssXml }),
