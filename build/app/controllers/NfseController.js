@@ -63,8 +63,26 @@ function mapStatus(status) {
     if (s.includes("process"))
         return "processando_autorizacao";
     if (s.includes("autoriza") || s.includes("autoriz"))
-        return "autorizada";
+        return "emitida";
     return s;
+}
+function normalizarStatusFocusNfe(valor) {
+    if (Array.isArray(valor)) {
+        return valor.map(function (item) { return normalizarStatusFocusNfe(item); });
+    }
+    if (valor && typeof valor === "object") {
+        var resultado = {};
+        for (var _i = 0, _a = Object.entries(valor); _i < _a.length; _i++) {
+            var _b = _a[_i], chave = _b[0], conteudo = _b[1];
+            if (chave === "status" || chave === "Status") {
+                resultado[chave] = mapStatus(typeof conteudo === "string" ? conteudo : conteudo ? String(conteudo) : "");
+                continue;
+            }
+            resultado[chave] = normalizarStatusFocusNfe(conteudo);
+        }
+        return resultado;
+    }
+    return valor;
 }
 function extrairStatusRespostaFocusNfe(result) {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
@@ -409,7 +427,9 @@ exports.NfseController = {
                                 message: "Erro ao consultar RPS",
                                 error: error_2.message,
                             })];
-                    case 7: return [2 /*return*/, res.status(200).json({ resultado: result })];
+                    case 7: return [2 /*return*/, res.status(200).json({
+                            resultado: normalizarStatusFocusNfe(result),
+                        })];
                     case 8:
                         error_3 = _a.sent();
                         console.error("Erro ao consultar RPS:", error_3);
@@ -499,7 +519,9 @@ exports.NfseController = {
                         errUpdate_1 = _a.sent();
                         console.warn("Falha ao atualizar invoice após consulta de lote:", errUpdate_1);
                         return [3 /*break*/, 11];
-                    case 11: return [2 /*return*/, res.status(200).json({ resultado: result })];
+                    case 11: return [2 /*return*/, res.status(200).json({
+                            resultado: normalizarStatusFocusNfe(result),
+                        })];
                     case 12:
                         error_4 = _a.sent();
                         console.error("Erro ao consultar lote:", error_4);
@@ -563,9 +585,9 @@ exports.NfseController = {
                         referenciaCancelamento = (invoice === null || invoice === void 0 ? void 0 : invoice.protocolo_lote) || String(referencia).trim();
                         if (invoice) {
                             statusNormalizado = String(invoice.status || "").toLowerCase();
-                            if (statusNormalizado && statusNormalizado !== "autorizada") {
+                            if (statusNormalizado && !["autorizada", "emitida"].includes(statusNormalizado)) {
                                 return [2 /*return*/, res.status(400).json({
-                                        message: "Somente NFS-e autorizadas podem ser canceladas na FocusNFe.",
+                                        message: "Somente NFS-e autorizadas ou emitidas podem ser canceladas na FocusNFe.",
                                         statusAtual: invoice.status,
                                     })];
                             }
