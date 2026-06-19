@@ -10,8 +10,30 @@ function mapStatus(status?: string) {
   if (s.includes("erro")) return "erro_autorizacao";
   if (s.includes("cancel")) return "cancelada";
   if (s.includes("process")) return "processando_autorizacao";
-  if (s.includes("autoriza") || s.includes("autoriz")) return "autorizada";
+  if (s.includes("autoriza") || s.includes("autoriz")) return "emitida";
   return s;
+}
+
+function normalizarStatusFocusNfe(valor: any): any {
+  if (Array.isArray(valor)) {
+    return valor.map((item) => normalizarStatusFocusNfe(item));
+  }
+
+  if (valor && typeof valor === "object") {
+    const resultado: any = {};
+    for (const [chave, conteudo] of Object.entries(valor)) {
+      if (chave === "status" || chave === "Status") {
+        resultado[chave] = mapStatus(
+          typeof conteudo === "string" ? conteudo : conteudo ? String(conteudo) : "",
+        );
+        continue;
+      }
+      resultado[chave] = normalizarStatusFocusNfe(conteudo);
+    }
+    return resultado;
+  }
+
+  return valor;
 }
 
 function extrairStatusRespostaFocusNfe(result: any): string {
@@ -357,7 +379,9 @@ export const NfseController = {
         });
       }
 
-      return res.status(200).json({ resultado: result });
+      return res.status(200).json({
+        resultado: normalizarStatusFocusNfe(result),
+      });
     } catch (error: any) {
       console.error("Erro ao consultar RPS:", error);
       return res.status(500).json({
@@ -416,7 +440,9 @@ export const NfseController = {
         );
       }
 
-      return res.status(200).json({ resultado: result });
+      return res.status(200).json({
+        resultado: normalizarStatusFocusNfe(result),
+      });
     } catch (error: any) {
       console.error("Erro ao consultar lote:", error);
       return res.status(500).json({
@@ -474,10 +500,10 @@ export const NfseController = {
 
       if (invoice) {
         const statusNormalizado = String(invoice.status || "").toLowerCase();
-        if (statusNormalizado && statusNormalizado !== "autorizada") {
+        if (statusNormalizado && !["autorizada", "emitida"].includes(statusNormalizado)) {
           return res.status(400).json({
             message:
-              "Somente NFS-e autorizadas podem ser canceladas na FocusNFe.",
+              "Somente NFS-e autorizadas ou emitidas podem ser canceladas na FocusNFe.",
             statusAtual: invoice.status,
           });
         }

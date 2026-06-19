@@ -75,6 +75,7 @@ interface FocusNfeRequest {
     codigo_nbs: string;
     codigo_indicador_operacao: string;
     ibs_cbs_classificacao_tributaria: string;
+    valor_ir?: number;
     valor_iss?: number;
     tributacao_iss?: string;
     ibs_cbs_situacao_tributaria?: string;
@@ -659,12 +660,16 @@ export class FocusNfeService {
               );
               const irrfValue = this.extrairNumeroOpcional(
                 this.buscarCampoRecursivo(rps, [
+                  "valorIR",
+                  "ValorIR",
                   "IRRF",
                   "ValorIRRF",
                   "ValorIrrf",
                   "valor_irrf",
                 ]),
                 this.buscarCampoRecursivo(servicoXml, [
+                  "valorIR",
+                  "ValorIR",
                   "IRRF",
                   "ValorIRRF",
                   "ValorIrrf",
@@ -716,6 +721,13 @@ export class FocusNfeService {
                 this.buscarCampoRecursivo(servicoXml, [
                   "ReciboDate",
                   "recibo_date",
+                ]),
+              );
+              const ibsCbsClassificacaoTributaria = this.extrairTextoOpcional(
+                this.buscarCampoRecursivo(rps, ["cClassTrib", "cclasstrib"]),
+                this.buscarCampoRecursivo(servicoXml, [
+                  "cClassTrib",
+                  "cclasstrib",
                 ]),
               );
 
@@ -811,7 +823,9 @@ export class FocusNfeService {
                   valor_ipi: 0,
                   codigo_nbs: "102010000",
                   codigo_indicador_operacao: "100301",
-                  ibs_cbs_classificacao_tributaria: "000001",
+                  ibs_cbs_classificacao_tributaria:
+                    ibsCbsClassificacaoTributaria || "",
+                  valor_ir: irrfValue,
                   valor_iss: valorIssXml ?? valorIss,
                   ...(tributacaoIssXml && { tributacao_iss: tributacaoIssXml }),
                   ...(ibsCbsSituacaoTributariaXml && {
