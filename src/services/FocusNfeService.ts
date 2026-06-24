@@ -37,6 +37,7 @@ interface FocusNfeRequest {
   natureza_operacao: number;
   optante_simples_nacional: boolean;
   tipo_operacao_governamental: number;
+  tributacao_rps?: "T" | "F" | "C" | "N" | "P";
   prestador: {
     cnpj?: string;
     cpf?: string;
@@ -86,7 +87,6 @@ interface FocusNfeRequest {
     ibs_mun_valor?: number;
     cbs_aliquota?: number;
     cbs_valor?: number;
-    tipo_tributacao?: "T" | "F" | "C" | "N" | "P";
     //codigo_servico: string;
     //CodigoServico: string;
     //valor_deducoes?: number;
@@ -776,6 +776,7 @@ export class FocusNfeService {
                 natureza_operacao: naturezaOperacao,
                 optante_simples_nacional: false,
                 tipo_operacao_governamental: 1,
+                ...(tipoTributacao && { tributacao_rps: tipoTributacao }),
                 prestador: {
                   ...(cnpjPrestador && { cnpj: cnpjPrestador }),
                   ...(cpfPrestador && { cpf: cpfPrestador }),
@@ -838,7 +839,6 @@ export class FocusNfeService {
                   ibs_mun_valor: ibsMunValorXml ?? 0,
                   cbs_aliquota: cbsAliquotaXml ?? 9,
                   cbs_valor: cbsValorXml ?? valorCBS,
-                  ...(tipoTributacao && { tipo_tributacao: tipoTributacao }),
                 },
                 exigibilidade_suspensa: 0,
                 pagamento_parcelado_antecipado: 0,
