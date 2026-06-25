@@ -612,14 +612,7 @@ var FocusNfeService = /** @class */ (function () {
                                                 tipoOperacao = this.extrairNumero(rps.TipoOperacao || servicoXml.TipoOperacao, isExportacao ? 2 : 1);
                                                 issRetido = this.extrairBooleano(rps.ISSRetido || servicoXml.ISSRetido, false);
                                                 referencia = "LOTE-".concat(Date.now(), "-").concat(index + 1, "-").concat(numeroRps || "RPS");
-                                                focusRequest = {
-                                                    referencia: referencia,
-                                                    data_emissao: this.formatarData(rps.DataEmissao),
-                                                    natureza_operacao: naturezaOperacao,
-                                                    optante_simples_nacional: false,
-                                                    tipo_operacao_governamental: 1,
-                                                    prestador: __assign(__assign(__assign({}, (cnpjPrestador && { cnpj: cnpjPrestador })), (cpfPrestador && { cpf: cpfPrestador })), { inscricao_municipal: inscricaoPrestador, codigo_municipio: String("3550308") }),
-                                                    tomador: __assign(__assign(__assign(__assign(__assign({}, (cnpjTomador && { cnpj: cnpjTomador })), (cpfTomador && { cpf: cpfTomador })), { razao_social: razaoSocialTomador }), (emailTomador && { email: emailTomador })), { endereco: __assign(__assign(__assign({ logradouro: (enderecTomador.Logradouro || "")
+                                                focusRequest = __assign(__assign({ referencia: referencia, data_emissao: this.formatarData(rps.DataEmissao), natureza_operacao: naturezaOperacao, optante_simples_nacional: false, tipo_operacao_governamental: 1 }, (tipoTributacao && { tributacao_rps: tipoTributacao })), { prestador: __assign(__assign(__assign({}, (cnpjPrestador && { cnpj: cnpjPrestador })), (cpfPrestador && { cpf: cpfPrestador })), { inscricao_municipal: inscricaoPrestador, codigo_municipio: String("3550308") }), tomador: __assign(__assign(__assign(__assign(__assign({}, (cnpjTomador && { cnpj: cnpjTomador })), (cpfTomador && { cpf: cpfTomador })), { razao_social: razaoSocialTomador }), (emailTomador && { email: emailTomador })), { endereco: __assign(__assign(__assign({ logradouro: (enderecTomador.Logradouro || "")
                                                                 .trim()
                                                                 .substring(0, 50), numero: enderecTomador.NumeroEndereco || "S/N" }, (enderecTomador.ComplementoEndereco && {
                                                             complemento: enderecTomador.ComplementoEndereco,
@@ -628,18 +621,11 @@ var FocusNfeService = /** @class */ (function () {
                                                                 : String(codigoMunicipioTomadorCorrigido), uf: enderecTomador.UF, cep: this.formatarCEP(enderecTomador.CEP) }), (isEstrangeiro &&
                                                             enderecTomador.CodigoPais && {
                                                             codigo_pais: enderecTomador.CodigoPais,
-                                                        })) }),
-                                                    servico: __assign(__assign(__assign(__assign(__assign(__assign({ discriminacao: discriminacao, item_lista_servico: codigoServico, codigo_tributacao_municipio: codigoTribMun || codigoServico }, (codigoCidadeIncidencia && {
+                                                        })) }), servico: __assign(__assign(__assign(__assign(__assign({ discriminacao: discriminacao, item_lista_servico: codigoServico, codigo_tributacao_municipio: codigoTribMun || codigoServico }, (codigoCidadeIncidencia && {
                                                         codigo_cidade_incidencia: codigoCidadeIncidencia,
                                                     })), { valor_servicos: valorServicos, valor_final_cobrado: valorFinalCobrado, base_calculo: baseCalculo, aliquota: aliquotaParaEnvio, iss_retido: issRetido, valor_ipi: 0, codigo_nbs: "102010000", codigo_indicador_operacao: "100301", ibs_cbs_classificacao_tributaria: ibsCbsClassificacaoTributaria || "", valor_ir: irrfValue, valor_iss: valorIssXml !== null && valorIssXml !== void 0 ? valorIssXml : valorIss }), (tributacaoIssXml && { tributacao_iss: tributacaoIssXml })), (ibsCbsSituacaoTributariaXml && {
                                                         ibs_cbs_situacao_tributaria: ibsCbsSituacaoTributariaXml,
-                                                    })), { ibs_cbs_base_calculo: ibsCbsBaseCalculoXml !== null && ibsCbsBaseCalculoXml !== void 0 ? ibsCbsBaseCalculoXml : baseCalculo, ibs_uf_aliquota: ibsUfAliquotaXml !== null && ibsUfAliquotaXml !== void 0 ? ibsUfAliquotaXml : 1, ibs_uf_valor: ibsUfValorXml !== null && ibsUfValorXml !== void 0 ? ibsUfValorXml : valorIBS, ibs_mun_aliquota: ibsMunAliquotaXml !== null && ibsMunAliquotaXml !== void 0 ? ibsMunAliquotaXml : 0, ibs_mun_valor: ibsMunValorXml !== null && ibsMunValorXml !== void 0 ? ibsMunValorXml : 0, cbs_aliquota: cbsAliquotaXml !== null && cbsAliquotaXml !== void 0 ? cbsAliquotaXml : 9, cbs_valor: cbsValorXml !== null && cbsValorXml !== void 0 ? cbsValorXml : valorCBS }), (tipoTributacao && { tipo_tributacao: tipoTributacao })),
-                                                    exigibilidade_suspensa: 0,
-                                                    pagamento_parcelado_antecipado: 0,
-                                                    finalidade_emissao: 0,
-                                                    consumidor_final: 0,
-                                                    indicador_destinatario: 0,
-                                                };
+                                                    })), { ibs_cbs_base_calculo: ibsCbsBaseCalculoXml !== null && ibsCbsBaseCalculoXml !== void 0 ? ibsCbsBaseCalculoXml : baseCalculo, ibs_uf_aliquota: ibsUfAliquotaXml !== null && ibsUfAliquotaXml !== void 0 ? ibsUfAliquotaXml : 1, ibs_uf_valor: ibsUfValorXml !== null && ibsUfValorXml !== void 0 ? ibsUfValorXml : valorIBS, ibs_mun_aliquota: ibsMunAliquotaXml !== null && ibsMunAliquotaXml !== void 0 ? ibsMunAliquotaXml : 0, ibs_mun_valor: ibsMunValorXml !== null && ibsMunValorXml !== void 0 ? ibsMunValorXml : 0, cbs_aliquota: cbsAliquotaXml !== null && cbsAliquotaXml !== void 0 ? cbsAliquotaXml : 9, cbs_valor: cbsValorXml !== null && cbsValorXml !== void 0 ? cbsValorXml : valorCBS }), exigibilidade_suspensa: 0, pagamento_parcelado_antecipado: 0, finalidade_emissao: 0, consumidor_final: 0, indicador_destinatario: 0 });
                                                 console.log("✅ Conversão XML → Focus NFe concluída");
                                                 console.log("\n🔍 DEBUG - PAYLOAD COMPLETO que será enviado para API:");
                                                 console.log(JSON.stringify(focusRequest, null, 2));
