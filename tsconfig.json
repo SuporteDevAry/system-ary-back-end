@@ -1,37 +1,28 @@
 {
-   "compilerOptions": {
-      "jsx": "react",
-      "target": "es5",
-      "module": "commonjs",
-      "lib": [
-         "es6"
-      ],
-      "allowJs": true,
-      "strict": false,
-      "noImplicitAny": true,
-      "strictPropertyInitialization": false,
-      "esModuleInterop": true,
-      "resolveJsonModule": true,
-      "moduleResolution": "node",
-      "outDir": "./build",
-      "rootDir": "src",
-      "emitDecoratorMetadata": true,
-      "experimentalDecorators": true,
-      "skipLibCheck": true,
-      "forceConsistentCasingInFileNames": true,
-      "sourceMap": true,
-      "typeRoots": [
-         "./src/@types",
-         "./custom_typings",
-         "./node_modules/@types"
-       ]
-       
-   },
-   "include": [
-      "src/**/**/*",
-   ],
-	"exclude": ["node_modules", "build"],
-	"ts-node": {
-		"files": true
-	}
+  "compilerOptions": {
+    "jsx": "react",
+    "target": "ES2017",
+    "module": "node16",
+    "lib": ["ES2017"],
+    "allowJs": true,
+    "strict": false,
+    "noImplicitAny": true,
+    "strictPropertyInitialization": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node16",
+    "outDir": "./build",
+    "rootDir": "src",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "sourceMap": true,
+    "typeRoots": ["./src/@types", "./custom_typings", "./node_modules/@types"]
+  },
+  "include": ["src/**/**/*"],
+  "exclude": ["node_modules", "build"],
+  "ts-node": {
+    "files": true
+  }
 }
