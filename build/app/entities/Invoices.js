@@ -10,224 +10,223 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Invoice = void 0;
-var typeorm_1 = require("typeorm");
-var uuid_1 = require("uuid");
-var Invoice = /** @class */ (function () {
-    function Invoice() {
+const typeorm_1 = require("typeorm");
+const uuid_1 = require("uuid");
+let Invoice = class Invoice {
+    updateTimestamp() {
+        this.updated_at = new Date();
+    }
+    constructor() {
         if (!this.id) {
             this.id = (0, uuid_1.v4)();
         }
     }
-    Invoice.prototype.updateTimestamp = function () {
-        this.updated_at = new Date();
-    };
-    __decorate([
-        (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "id", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "rps_number", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "rps_emission_date", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "nfs_number", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "nfs_emission_date", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "service_code", void 0);
-    __decorate([
-        (0, typeorm_1.Column)("decimal"),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "aliquot", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "cpf_cnpj", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "name", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "address", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "number", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "complement", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "district", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "city", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "state", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "zip_code", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "email", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "status", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "protocolo_lote", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text", nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "url_danfse", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text", nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "xml_nfse", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "service_discrim", void 0);
-    __decorate([
-        (0, typeorm_1.Column)("decimal"),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "service_value", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "name_adjust1", void 0);
-    __decorate([
-        (0, typeorm_1.Column)("decimal"),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "value_adjust1", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "name_adjust2", void 0);
-    __decorate([
-        (0, typeorm_1.Column)("decimal"),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "value_adjust2", void 0);
-    __decorate([
-        (0, typeorm_1.Column)("decimal"),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "deduction_value", void 0);
-    __decorate([
-        (0, typeorm_1.Column)("decimal"),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "irrf_value", void 0);
-    __decorate([
-        (0, typeorm_1.Column)("decimal", { nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "pis_value", void 0);
-    __decorate([
-        (0, typeorm_1.Column)("decimal", { nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "cofins_value", void 0);
-    __decorate([
-        (0, typeorm_1.Column)("decimal", { nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "csll_value", void 0);
-    __decorate([
-        (0, typeorm_1.Column)("decimal", { nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "iss_value", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "number_contract", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "exportacao", void 0);
-    __decorate([
-        (0, typeorm_1.Column)("decimal"),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "service_liquid_value", void 0);
-    __decorate([
-        (0, typeorm_1.Column)("numeric", { nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "ibs_value", void 0);
-    __decorate([
-        (0, typeorm_1.Column)("numeric", { nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "cbs_value", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "cod_pais", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "ins_est", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "owner_record", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "owner_send", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "code_verif", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "liquidada", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "receipt_date", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
-        __metadata("design:type", String)
-    ], Invoice.prototype, "recibo_date", void 0);
-    __decorate([
-        (0, typeorm_1.CreateDateColumn)(),
-        __metadata("design:type", Date)
-    ], Invoice.prototype, "created_at", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({
-            type: "timestamp",
-            default: function () { return "CURRENT_TIMESTAMP"; },
-            onUpdate: "CURRENT_TIMESTAMP",
-        }),
-        __metadata("design:type", Date)
-    ], Invoice.prototype, "updated_at", void 0);
-    __decorate([
-        (0, typeorm_1.BeforeUpdate)(),
-        __metadata("design:type", Function),
-        __metadata("design:paramtypes", []),
-        __metadata("design:returntype", void 0)
-    ], Invoice.prototype, "updateTimestamp", null);
-    Invoice = __decorate([
-        (0, typeorm_1.Entity)("invoices"),
-        __metadata("design:paramtypes", [])
-    ], Invoice);
-    return Invoice;
-}());
+};
 exports.Invoice = Invoice;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
+    __metadata("design:type", String)
+], Invoice.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Invoice.prototype, "rps_number", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Invoice.prototype, "rps_emission_date", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Invoice.prototype, "nfs_number", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Invoice.prototype, "nfs_emission_date", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Invoice.prototype, "service_code", void 0);
+__decorate([
+    (0, typeorm_1.Column)("decimal"),
+    __metadata("design:type", String)
+], Invoice.prototype, "aliquot", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Invoice.prototype, "cpf_cnpj", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Invoice.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Invoice.prototype, "address", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Invoice.prototype, "number", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Invoice.prototype, "complement", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Invoice.prototype, "district", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Invoice.prototype, "city", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Invoice.prototype, "state", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Invoice.prototype, "zip_code", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Invoice.prototype, "email", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "protocolo_lote", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text", nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "url_danfse", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text", nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "xml_nfse", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Invoice.prototype, "service_discrim", void 0);
+__decorate([
+    (0, typeorm_1.Column)("decimal"),
+    __metadata("design:type", String)
+], Invoice.prototype, "service_value", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Invoice.prototype, "name_adjust1", void 0);
+__decorate([
+    (0, typeorm_1.Column)("decimal"),
+    __metadata("design:type", String)
+], Invoice.prototype, "value_adjust1", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Invoice.prototype, "name_adjust2", void 0);
+__decorate([
+    (0, typeorm_1.Column)("decimal"),
+    __metadata("design:type", String)
+], Invoice.prototype, "value_adjust2", void 0);
+__decorate([
+    (0, typeorm_1.Column)("decimal"),
+    __metadata("design:type", String)
+], Invoice.prototype, "deduction_value", void 0);
+__decorate([
+    (0, typeorm_1.Column)("decimal"),
+    __metadata("design:type", String)
+], Invoice.prototype, "irrf_value", void 0);
+__decorate([
+    (0, typeorm_1.Column)("decimal", { nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "pis_value", void 0);
+__decorate([
+    (0, typeorm_1.Column)("decimal", { nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "cofins_value", void 0);
+__decorate([
+    (0, typeorm_1.Column)("decimal", { nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "csll_value", void 0);
+__decorate([
+    (0, typeorm_1.Column)("decimal", { nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "iss_value", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "number_contract", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "exportacao", void 0);
+__decorate([
+    (0, typeorm_1.Column)("decimal"),
+    __metadata("design:type", String)
+], Invoice.prototype, "service_liquid_value", void 0);
+__decorate([
+    (0, typeorm_1.Column)("numeric", { nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "ibs_value", void 0);
+__decorate([
+    (0, typeorm_1.Column)("numeric", { nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "cbs_value", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "cod_pais", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "ins_est", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "owner_record", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "owner_send", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "code_verif", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "liquidada", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "receipt_date", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], Invoice.prototype, "recibo_date", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", Date)
+], Invoice.prototype, "created_at", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: "timestamp",
+        default: () => "CURRENT_TIMESTAMP",
+        onUpdate: "CURRENT_TIMESTAMP",
+    }),
+    __metadata("design:type", Date)
+], Invoice.prototype, "updated_at", void 0);
+__decorate([
+    (0, typeorm_1.BeforeUpdate)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], Invoice.prototype, "updateTimestamp", null);
+exports.Invoice = Invoice = __decorate([
+    (0, typeorm_1.Entity)("invoices"),
+    __metadata("design:paramtypes", [])
+], Invoice);
 //# sourceMappingURL=Invoices.js.map

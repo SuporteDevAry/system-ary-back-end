@@ -1,16 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Extenso = void 0;
-function Extenso(vlr, genero) {
-    if (genero === void 0) { genero = "M"; }
+function Extenso(vlr, genero = "M") {
     // suporta número ou string (com pontos e vírgulas)
-    var numStr = String(vlr).trim();
+    let numStr = String(vlr).trim();
     // remover separador de milhares e normalizar decimal para ponto
     numStr = numStr.replace(/\./g, "").replace(/,/g, ".");
-    var num = Math.floor(Number(numStr) || 0);
+    const num = Math.floor(Number(numStr) || 0);
     if (num === 0)
         return "zero";
-    var unidadesM = [
+    const unidadesM = [
         "",
         "um",
         "dois",
@@ -22,7 +21,7 @@ function Extenso(vlr, genero) {
         "oito",
         "nove",
     ];
-    var unidadesF = [
+    const unidadesF = [
         "",
         "uma",
         "duas",
@@ -34,7 +33,7 @@ function Extenso(vlr, genero) {
         "oito",
         "nove",
     ];
-    var especiais = [
+    const especiais = [
         "dez",
         "onze",
         "doze",
@@ -46,7 +45,7 @@ function Extenso(vlr, genero) {
         "dezoito",
         "dezenove",
     ];
-    var dezenas = [
+    const dezenas = [
         "",
         "",
         "vinte",
@@ -58,7 +57,7 @@ function Extenso(vlr, genero) {
         "oitenta",
         "noventa",
     ];
-    var centenasM = [
+    const centenasM = [
         "",
         "cento",
         "duzentos",
@@ -70,7 +69,7 @@ function Extenso(vlr, genero) {
         "oitocentos",
         "novecentos",
     ];
-    var centenasF = [
+    const centenasF = [
         "",
         "cento",
         "duzentas",
@@ -82,17 +81,17 @@ function Extenso(vlr, genero) {
         "oitocentas",
         "novecentas",
     ];
-    var unidades = genero === "F" ? unidadesF : unidadesM;
-    var centenas = genero === "F" ? centenasF : centenasM;
+    const unidades = genero === "F" ? unidadesF : unidadesM;
+    const centenas = genero === "F" ? centenasF : centenasM;
     function extensoAte999(n) {
         if (n === 0)
             return "";
         if (n === 100)
             return "cem";
-        var c = Math.floor(n / 100);
-        var d = Math.floor((n % 100) / 10);
-        var u = n % 10;
-        var str = "";
+        const c = Math.floor(n / 100);
+        const d = Math.floor((n % 100) / 10);
+        const u = n % 10;
+        let str = "";
         if (c > 0)
             str += centenas[c];
         if (d > 0 || u > 0) {
@@ -113,10 +112,10 @@ function Extenso(vlr, genero) {
         }
         return str;
     }
-    var extenso = "";
-    var milhoes = Math.floor(num / 1000000);
-    var milhar = Math.floor((num % 1000000) / 1000);
-    var resto = num % 1000;
+    let extenso = "";
+    const milhoes = Math.floor(num / 1000000);
+    const milhar = Math.floor((num % 1000000) / 1000);
+    const resto = num % 1000;
     if (milhoes > 0) {
         if (milhoes === 1) {
             extenso += "um milhão";

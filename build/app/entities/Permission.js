@@ -10,48 +10,47 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Permission = void 0;
-var typeorm_1 = require("typeorm");
-var uuid_1 = require("uuid");
-var Permission = /** @class */ (function () {
-    function Permission() {
+const typeorm_1 = require("typeorm");
+const uuid_1 = require("uuid");
+let Permission = class Permission {
+    updateTimestamp() {
+        this.updated_at = new Date();
+    }
+    constructor() {
         if (!this.id) {
             this.id = (0, uuid_1.v4)();
         }
     }
-    Permission.prototype.updateTimestamp = function () {
-        this.updated_at = new Date();
-    };
-    __decorate([
-        (0, typeorm_1.PrimaryColumn)(),
-        __metadata("design:type", String)
-    ], Permission.prototype, "id", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "jsonb", nullable: true, default: [] }),
-        __metadata("design:type", Array)
-    ], Permission.prototype, "rules", void 0);
-    __decorate([
-        (0, typeorm_1.CreateDateColumn)(),
-        __metadata("design:type", Date)
-    ], Permission.prototype, "created_at", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({
-            type: "timestamp",
-            default: function () { return "CURRENT_TIMESTAMP"; },
-            onUpdate: "CURRENT_TIMESTAMP",
-        }),
-        __metadata("design:type", Date)
-    ], Permission.prototype, "updated_at", void 0);
-    __decorate([
-        (0, typeorm_1.BeforeUpdate)(),
-        __metadata("design:type", Function),
-        __metadata("design:paramtypes", []),
-        __metadata("design:returntype", void 0)
-    ], Permission.prototype, "updateTimestamp", null);
-    Permission = __decorate([
-        (0, typeorm_1.Entity)("permissions"),
-        __metadata("design:paramtypes", [])
-    ], Permission);
-    return Permission;
-}());
+};
 exports.Permission = Permission;
+__decorate([
+    (0, typeorm_1.PrimaryColumn)(),
+    __metadata("design:type", String)
+], Permission.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "jsonb", nullable: true, default: [] }),
+    __metadata("design:type", Array)
+], Permission.prototype, "rules", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", Date)
+], Permission.prototype, "created_at", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: "timestamp",
+        default: () => "CURRENT_TIMESTAMP",
+        onUpdate: "CURRENT_TIMESTAMP",
+    }),
+    __metadata("design:type", Date)
+], Permission.prototype, "updated_at", void 0);
+__decorate([
+    (0, typeorm_1.BeforeUpdate)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], Permission.prototype, "updateTimestamp", null);
+exports.Permission = Permission = __decorate([
+    (0, typeorm_1.Entity)("permissions"),
+    __metadata("design:paramtypes", [])
+], Permission);
 //# sourceMappingURL=Permission.js.map

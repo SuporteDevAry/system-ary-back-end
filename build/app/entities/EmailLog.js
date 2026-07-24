@@ -10,30 +10,27 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmailLog = void 0;
-var typeorm_1 = require("typeorm");
-var EmailLog = /** @class */ (function () {
-    function EmailLog() {
-    }
-    __decorate([
-        (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
-        __metadata("design:type", String)
-    ], EmailLog.prototype, "id", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], EmailLog.prototype, "email_sender", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], EmailLog.prototype, "number_contract", void 0);
-    __decorate([
-        (0, typeorm_1.CreateDateColumn)(),
-        __metadata("design:type", Date)
-    ], EmailLog.prototype, "sent_at", void 0);
-    EmailLog = __decorate([
-        (0, typeorm_1.Entity)("email_logs")
-    ], EmailLog);
-    return EmailLog;
-}());
+const typeorm_1 = require("typeorm");
+let EmailLog = class EmailLog {
+};
 exports.EmailLog = EmailLog;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
+    __metadata("design:type", String)
+], EmailLog.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], EmailLog.prototype, "email_sender", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], EmailLog.prototype, "number_contract", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", Date)
+], EmailLog.prototype, "sent_at", void 0);
+exports.EmailLog = EmailLog = __decorate([
+    (0, typeorm_1.Entity)("email_logs")
+], EmailLog);
 //# sourceMappingURL=EmailLog.js.map
