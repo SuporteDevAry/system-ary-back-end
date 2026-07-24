@@ -32,6 +32,8 @@ interface FocusNfeConfig {
 }
 
 interface FocusNfeRequest {
+  serie_rps?: string;
+  numero_rps?: string;
   referencia: string;
   data_emissao: string;
   natureza_operacao: number;
@@ -771,6 +773,8 @@ export class FocusNfeService {
 
               const referencia = `LOTE-${Date.now()}-${index + 1}-${numeroRps || "RPS"}`;
               const focusRequest: FocusNfeRequest = {
+                serie_rps: "1",
+                numero_rps: numeroRps,
                 referencia,
                 data_emissao: this.formatarData(rps.DataEmissao),
                 natureza_operacao: naturezaOperacao,

@@ -4,31 +4,30 @@ exports.calcCommissionBySack = void 0;
 /**
  * Normaliza número formatado removendo separadores de milhar e convertendo vírgula em ponto
  */
-function normalizeNumber(value, preferDecimalDot, options) {
-    if (preferDecimalDot === void 0) { preferDecimalDot = true; }
+function normalizeNumber(value, preferDecimalDot = true, options) {
     if (typeof value === "number") {
         return Number.isFinite(value) ? value : Number.NaN;
     }
-    var raw = String(value).trim();
+    const raw = String(value).trim();
     if (!raw)
         return Number.NaN;
-    var isToneladaMetrica = function (type) {
+    const isToneladaMetrica = (type) => {
         if (!type)
             return false;
-        var quantityType = normalizeQuantityType(type);
+        const quantityType = normalizeQuantityType(type);
         return (quantityType === "tm" ||
             quantityType === "toneladas" ||
             quantityType === "tonelada" ||
             quantityType === "toneladas metricas");
     };
     if ((options === null || options === void 0 ? void 0 : options.isQuantity) && isToneladaMetrica(options.typeQuantity)) {
-        var hasComma = raw.includes(",");
-        var hasDot = raw.includes(".");
+        const hasComma = raw.includes(",");
+        const hasDot = raw.includes(".");
         if (hasComma && !hasDot) {
             return Number(raw.replace(/\./g, "").replace(",", "."));
         }
         if (hasDot && !hasComma) {
-            var parts = raw.split(".");
+            const parts = raw.split(".");
             // Mais de um ponto segue o formato brasileiro com separador de milhar.
             if (parts.length > 2) {
                 return Number(raw.replace(/\./g, ""));
@@ -70,23 +69,23 @@ function normalizeQuantityType(type) {
  * @returns Valor total da comissão calculada
  */
 function calcCommissionBySack(quantity, typeQuantity, commissionValue, typeCommission, typeCurrency, exchangeRate, totalContractValue) {
-    var quantityNum = normalizeNumber(quantity, false, {
+    const quantityNum = normalizeNumber(quantity, false, {
         isQuantity: true,
-        typeQuantity: typeQuantity,
+        typeQuantity,
     });
-    var commissionNum = normalizeNumber(commissionValue, true); // comissão: dot = decimal
+    const commissionNum = normalizeNumber(commissionValue, true); // comissão: dot = decimal
     // Normaliza exchange rate se fornecido
-    var normalizedExchangeRate = exchangeRate
+    const normalizedExchangeRate = exchangeRate
         ? normalizeNumber(exchangeRate, true) // exchange rate: dot = decimal
         : 1;
     // Normaliza total do contrato se fornecido
-    var normalizedTotalContract = totalContractValue
+    const normalizedTotalContract = totalContractValue
         ? normalizeNumber(totalContractValue, true)
         : 0;
-    var isDollar = typeCurrency === "USD" ||
+    const isDollar = typeCurrency === "USD" ||
         typeCurrency === "US$" ||
         typeCurrency === "Dólar";
-    var quantityType = normalizeQuantityType(typeQuantity || "KG");
+    const quantityType = normalizeQuantityType(typeQuantity || "KG");
     // REGRA 1: Fixo em Dólar - comissão_valor × exchange_rate
     // Ex.: 1,25 × 5,000 = 6,25
     if (typeCommission === "Fixo" && isDollar) {
@@ -103,7 +102,7 @@ function calcCommissionBySack(quantity, typeQuantity, commissionValue, typeCommi
     }
     // REGRA 4 e 5: Por Saca
     if (typeCommission === "Por Saca") {
-        var sacas = 0;
+        let sacas = 0;
         // Calcula quantidade em sacas baseado no tipo de quantidade
         if (quantityType === "kg" ||
             quantityType === "quilos" ||
@@ -128,13 +127,13 @@ function calcCommissionBySack(quantity, typeQuantity, commissionValue, typeCommi
     }
     // REGRA 6 e 7: Por TM (tonelada metrica)
     if (typeCommission === "Por TM") {
-        var isQuantityInKg = quantityType === "kg" ||
+        const isQuantityInKg = quantityType === "kg" ||
             quantityType === "quilos" ||
             quantityType === "quilo";
         // Se a quantidade vier em KG, converte para TM; caso contrario assume TM.
-        var toneladasMetricas = isQuantityInKg ? quantityNum / 1000 : quantityNum;
+        const toneladasMetricas = isQuantityInKg ? quantityNum / 1000 : quantityNum;
         // Regra explicita: quantidade x (valor da comissao x cambio da comissao)
-        var commissionPerTm = isDollar
+        const commissionPerTm = isDollar
             ? commissionNum * normalizedExchangeRate
             : commissionNum;
         return toneladasMetricas * commissionPerTm;

@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.convertPrice = void 0;
 function convertPrice(price, typeCurrency, dayExchangeRate) {
-    var priceNumber = Number(price);
+    const priceNumber = Number(price);
     if (typeCurrency === "Dólar" && dayExchangeRate) {
-        var normalizeRate = function (value) {
-            var raw = String(value).trim();
+        const normalizeRate = (value) => {
+            const raw = String(value).trim();
             if (!raw) {
                 return Number.NaN;
             }
@@ -17,7 +17,7 @@ function convertPrice(price, typeCurrency, dayExchangeRate) {
             }
             return Number(raw);
         };
-        var rateNumber = normalizeRate(dayExchangeRate);
+        const rateNumber = normalizeRate(dayExchangeRate);
         return priceNumber * rateNumber;
     }
     return priceNumber;

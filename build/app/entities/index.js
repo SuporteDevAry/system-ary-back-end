@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.entitiesDir = void 0;
-var User_1 = require("./User");
-var Permission_1 = require("./Permission");
-var Client_1 = require("./Client");
-var Contact_1 = require("./Contact");
-var Notifications_1 = require("./Notifications");
-var GrainContracts_1 = require("./GrainContracts");
-var EmailLog_1 = require("./EmailLog");
-var Products_1 = require("./Products");
-var ProductsTable_1 = require("./ProductsTable");
-var Taxes_1 = require("./Taxes");
-var Invoices_1 = require("./Invoices");
-var Billings_1 = require("./Billings");
+const User_1 = require("./User");
+const Permission_1 = require("./Permission");
+const Client_1 = require("./Client");
+const Contact_1 = require("./Contact");
+const Notifications_1 = require("./Notifications");
+const GrainContracts_1 = require("./GrainContracts");
+const EmailLog_1 = require("./EmailLog");
+const Products_1 = require("./Products");
+const ProductsTable_1 = require("./ProductsTable");
+const Taxes_1 = require("./Taxes");
+const Invoices_1 = require("./Invoices");
+const Billings_1 = require("./Billings");
 exports.entitiesDir = {
     User: User_1.User,
     Permission: Permission_1.Permission,
