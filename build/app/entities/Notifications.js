@@ -10,60 +10,59 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Notifications = void 0;
-var typeorm_1 = require("typeorm");
-var uuid_1 = require("uuid");
-var Notifications = /** @class */ (function () {
-    function Notifications() {
+const typeorm_1 = require("typeorm");
+const uuid_1 = require("uuid");
+let Notifications = class Notifications {
+    updateTimestamp() {
+        this.updated_at = new Date();
+    }
+    constructor() {
         if (!this.id) {
             this.id = (0, uuid_1.v4)();
         }
     }
-    Notifications.prototype.updateTimestamp = function () {
-        this.updated_at = new Date();
-    };
-    __decorate([
-        (0, typeorm_1.PrimaryColumn)(),
-        __metadata("design:type", String)
-    ], Notifications.prototype, "id", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], Notifications.prototype, "user", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "boolean" }),
-        __metadata("design:type", Boolean)
-    ], Notifications.prototype, "read", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], Notifications.prototype, "content", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], Notifications.prototype, "type", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "boolean" }),
-        __metadata("design:type", Boolean)
-    ], Notifications.prototype, "isLoading", void 0);
-    __decorate([
-        (0, typeorm_1.CreateDateColumn)(),
-        __metadata("design:type", Date)
-    ], Notifications.prototype, "created_at", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "timestamp", default: function () { return "CURRENT_TIMESTAMP"; }, onUpdate: "CURRENT_TIMESTAMP" }),
-        __metadata("design:type", Date)
-    ], Notifications.prototype, "updated_at", void 0);
-    __decorate([
-        (0, typeorm_1.BeforeUpdate)(),
-        __metadata("design:type", Function),
-        __metadata("design:paramtypes", []),
-        __metadata("design:returntype", void 0)
-    ], Notifications.prototype, "updateTimestamp", null);
-    Notifications = __decorate([
-        (0, typeorm_1.Entity)("notifications"),
-        __metadata("design:paramtypes", [])
-    ], Notifications);
-    return Notifications;
-}());
+};
 exports.Notifications = Notifications;
+__decorate([
+    (0, typeorm_1.PrimaryColumn)(),
+    __metadata("design:type", String)
+], Notifications.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Notifications.prototype, "user", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "boolean" }),
+    __metadata("design:type", Boolean)
+], Notifications.prototype, "read", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Notifications.prototype, "content", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Notifications.prototype, "type", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "boolean" }),
+    __metadata("design:type", Boolean)
+], Notifications.prototype, "isLoading", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", Date)
+], Notifications.prototype, "created_at", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "timestamp", default: () => "CURRENT_TIMESTAMP", onUpdate: "CURRENT_TIMESTAMP" }),
+    __metadata("design:type", Date)
+], Notifications.prototype, "updated_at", void 0);
+__decorate([
+    (0, typeorm_1.BeforeUpdate)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], Notifications.prototype, "updateTimestamp", null);
+exports.Notifications = Notifications = __decorate([
+    (0, typeorm_1.Entity)("notifications"),
+    __metadata("design:paramtypes", [])
+], Notifications);
 //# sourceMappingURL=Notifications.js.map

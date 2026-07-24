@@ -10,62 +10,61 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
-var typeorm_1 = require("typeorm");
-var uuid_1 = require("uuid");
-var Permission_1 = require("./Permission");
-var User = /** @class */ (function () {
-    function User() {
+const typeorm_1 = require("typeorm");
+const uuid_1 = require("uuid");
+const Permission_1 = require("./Permission");
+let User = class User {
+    updateTimestamp() {
+        this.updated_at = new Date();
+    }
+    constructor() {
         if (!this.id) {
             this.id = (0, uuid_1.v4)();
         }
     }
-    User.prototype.updateTimestamp = function () {
-        this.updated_at = new Date();
-    };
-    __decorate([
-        (0, typeorm_1.PrimaryColumn)(),
-        __metadata("design:type", String)
-    ], User.prototype, "id", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], User.prototype, "name", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text", unique: true }),
-        __metadata("design:type", String)
-    ], User.prototype, "email", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "text" }),
-        __metadata("design:type", String)
-    ], User.prototype, "password", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "uuid" }),
-        __metadata("design:type", String)
-    ], User.prototype, "permissions_id", void 0);
-    __decorate([
-        (0, typeorm_1.OneToOne)(function () { return Permission_1.Permission; }),
-        (0, typeorm_1.JoinColumn)({ name: "permissions_id" }),
-        __metadata("design:type", Permission_1.Permission)
-    ], User.prototype, "permissions", void 0);
-    __decorate([
-        (0, typeorm_1.CreateDateColumn)(),
-        __metadata("design:type", Date)
-    ], User.prototype, "created_at", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: "timestamp", default: function () { return "CURRENT_TIMESTAMP"; }, onUpdate: "CURRENT_TIMESTAMP" }),
-        __metadata("design:type", Date)
-    ], User.prototype, "updated_at", void 0);
-    __decorate([
-        (0, typeorm_1.BeforeUpdate)(),
-        __metadata("design:type", Function),
-        __metadata("design:paramtypes", []),
-        __metadata("design:returntype", void 0)
-    ], User.prototype, "updateTimestamp", null);
-    User = __decorate([
-        (0, typeorm_1.Entity)("users"),
-        __metadata("design:paramtypes", [])
-    ], User);
-    return User;
-}());
+};
 exports.User = User;
+__decorate([
+    (0, typeorm_1.PrimaryColumn)(),
+    __metadata("design:type", String)
+], User.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], User.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text", unique: true }),
+    __metadata("design:type", String)
+], User.prototype, "email", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], User.prototype, "password", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "uuid" }),
+    __metadata("design:type", String)
+], User.prototype, "permissions_id", void 0);
+__decorate([
+    (0, typeorm_1.OneToOne)(() => Permission_1.Permission),
+    (0, typeorm_1.JoinColumn)({ name: "permissions_id" }),
+    __metadata("design:type", Permission_1.Permission)
+], User.prototype, "permissions", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", Date)
+], User.prototype, "created_at", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "timestamp", default: () => "CURRENT_TIMESTAMP", onUpdate: "CURRENT_TIMESTAMP" }),
+    __metadata("design:type", Date)
+], User.prototype, "updated_at", void 0);
+__decorate([
+    (0, typeorm_1.BeforeUpdate)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], User.prototype, "updateTimestamp", null);
+exports.User = User = __decorate([
+    (0, typeorm_1.Entity)("users"),
+    __metadata("design:paramtypes", [])
+], User);
 //# sourceMappingURL=User.js.map
