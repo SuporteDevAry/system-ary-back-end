@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { DataSource } from "typeorm";
 import { migrationDir } from "./migrations";
 import { entitiesDir } from "../app/entities";
+import { AuditSubscriber } from "../app/subscribers/AuditSubscriber";
 
 dotenv.config({ path: ".env" });
 
@@ -20,7 +21,7 @@ export const AppDataSource = new DataSource({
   logging: false,
   entities: entitiesDir,
   migrations: migrationDir,
-  subscribers: [],
+  subscribers: [AuditSubscriber],
   ssl: SSL_VALUE,
   // Configurações para melhor resiliência
   connectTimeoutMS: 30000,

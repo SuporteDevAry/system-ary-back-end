@@ -4,6 +4,8 @@ import { BadRequestError } from "../helpers/api-errors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { permissionRepository } from "../repositories/PermissionRepository";
+import { loginHistoryRepository } from "../repositories/LoginHistoryRepository";
+import { activeSessionRepository } from "../repositories/ActiveSessionRepository";
 
 export class SessionController {
   async login(req: Request, res: Response) {
@@ -40,6 +42,18 @@ export class SessionController {
 
     const userLogin = { id: user.id, email: user.email, name: user.name };
 
+    try {
+      const newLogin = loginHistoryRepository.create({
+        user_id: user.id,
+        email: user.email,
+        name: user.name,
+        ip_address: req.ip ?? null,
+      });
+      await loginHistoryRepository.save(newLogin);
+    } catch (error) {
+      console.error("Falha ao gravar login_history:", error);
+    }
+
     return res.status(200).json({
       user: userLogin,
       token,
@@ -69,5 +83,24 @@ export class SessionController {
     await userRepository.save(user);
 
     return res.status(200).json({ message: "Senha redefinida com sucesso!" });
+  }
+
+  async heartbeat(req: Request, res: Response) {
+    const { id, email, name } = req.user;
+
+    await activeSessionRepository.upsert(
+      { user_id: id, email, name, last_seen_at: new Date() },
+      ["user_id"]
+    );
+
+    return res.status(204).send();
+  }
+
+  async endSession(req: Request, res: Response) {
+    const { id } = req.user;
+
+    await activeSessionRepository.delete({ user_id: id });
+
+    return res.status(204).send();
   }
 }
