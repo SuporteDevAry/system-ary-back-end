@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { UnauthorizedError } from "../helpers/api-errors";
 import { userRepository } from "../repositories/UserRepository";
+import { runWithUserContext } from "../helpers/requestContext";
 import jwt from "jsonwebtoken";
 
 type JwtPayload = {
@@ -32,5 +33,8 @@ export const authMiddleware = async (
 
   req.user = loggedUser;
 
-  next();
+  runWithUserContext(
+    { id: user.id, email: user.email, name: user.name },
+    next
+  );
 };

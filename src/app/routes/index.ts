@@ -15,6 +15,8 @@ import { NfseController } from "../controllers/NfseController";
 
 import fetch from "node-fetch";
 import { BillingController } from "../controllers/BillingsController";
+import { DevPanelController } from "../controllers/DevPanelController";
+import { devPanelMiddleware } from "../middlewares/devPanelMiddleware";
 
 const routes = Router();
 
@@ -47,6 +49,8 @@ routes.get("/api-cnpj/cnpj/:cnpj", async (req, res) => {
 routes.use(authMiddleware); // comentar ao usar local
 routes.get("/api/profile", new UserController().getProfile);
 routes.post("/api/reset-password", new SessionController().resetPassword);
+routes.post("/api/heartbeat", new SessionController().heartbeat);
+routes.delete("/api/heartbeat", new SessionController().endSession);
 
 // CRUD USERS
 routes.post("/api/user", new UserController().create);
@@ -195,5 +199,21 @@ routes.get(
 );
 routes.patch("/api/billings/:id", BillingController.updateBilling);
 routes.delete("/api/billings/:id", BillingController.deleteBilling);
+
+// Dev Panel (login history, métricas de acesso, auditoria) - restrito por e-mail
+routes.use("/api/dev-panel", devPanelMiddleware);
+routes.get(
+  "/api/dev-panel/login-history",
+  new DevPanelController().getLoginHistory
+);
+routes.get(
+  "/api/dev-panel/user-metrics",
+  new DevPanelController().getUserMetrics
+);
+routes.get("/api/dev-panel/audit-log", new DevPanelController().getAuditLog);
+routes.get(
+  "/api/dev-panel/online-users",
+  new DevPanelController().getOnlineUsers
+);
 
 export default routes;
