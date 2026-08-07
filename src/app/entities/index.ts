@@ -10,6 +10,7 @@ import { ProductTable } from "./ProductsTable";
 import { Tax } from "./Taxes";
 import { Invoice } from "./Invoices";
 import { Billing } from "./Billings";
+import { GrainContractFixationItem } from "./GrainContractFixationItem";
 
 export const entitiesDir = {
   User,
@@ -24,4 +25,5 @@ export const entitiesDir = {
   Tax,
   Invoice,
   Billing,
+  GrainContractFixationItem,
 };

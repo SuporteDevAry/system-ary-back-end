@@ -28,7 +28,9 @@ const fixContractNumbers = async () => {
   const grainContractRepository = AppDataSource.getRepository(GrainContract);
 
   // Buscar todos os contratos ordenados por grupo de produtos e data
+  // (só "MI" — contratos "a fixar" têm numeração própria, com marcador "F")
   const contracts = await grainContractRepository.find({
+    where: { type_contract: "MI" },
     order: { created_at: "ASC" }, // Ordena pela data para manter o sequencial
   });
 

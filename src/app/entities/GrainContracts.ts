@@ -51,10 +51,15 @@ export class GrainContract {
   @Column("decimal")
   quantity_bag: number;
 
-  @Column()
+  // "MI" (mercado interno, fluxo original) ou "A Fixar" (preço definido depois,
+  // via fixações de mercado). Todo contrato existente antes desta coluna é "MI".
+  @Column({ default: "MI" })
+  type_contract: string;
+
+  @Column({ nullable: true })
   type_currency: string;
 
-  @Column("decimal")
+  @Column("decimal", { nullable: true })
   price: number;
 
   @Column()
@@ -93,14 +98,24 @@ export class GrainContract {
   @Column()
   owner_contract: string;
 
-  @Column()
+  @Column({ nullable: true })
   type_commission_seller: string;
 
-  @Column()
+  @Column({ nullable: true })
   type_commission_buyer: string;
 
-  @Column("decimal")
+  @Column("decimal", { nullable: true })
   total_contract_value: number;
+
+  // Só usados por contratos "AF" — ver GrainFixationContractController.
+  @Column({ nullable: true })
+  fixation_status: string;
+
+  @Column("decimal", { nullable: true })
+  fixed_quantity: number;
+
+  @Column("decimal", { nullable: true })
+  average_fixed_price: number;
 
   @Column("jsonb", { nullable: true })
   status: {

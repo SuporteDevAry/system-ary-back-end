@@ -22,6 +22,12 @@ import { AddXmlFieldToInvoices1769793476445 as AddXmlFieldToInvoices } from "./1
 import { AddCommissionReceitpDate1775849143332 as AddCommissionReceiptDate } from "./1775849143332-AddCommissionReceitpDate";
 import { AddTaxAndContractFieldsToInvoices1778624659540 as AddTaxAndContractFieldsToInvoices } from "./1778624659540-AddTaxAndContractFieldsToInvoices"
 import { AddReformaTributariaFieldsToInvoices1780968445477 as AddReformaTributariaFieldsToInvoices } from "./1780968445477-AddReformaTributariaFieldsToInvoices"
+import { CreateGrainFixationContracts1785526225471 as CreateGrainFixationContracts } from "./1785526225471-CreateGrainFixationContracts";
+import { AddNumberContractToFixationItems1785532036916 as AddNumberContractToFixationItems } from "./1785532036916-AddNumberContractToFixationItems";
+import { AddPdfMetadataToFixationItems1785533408739 as AddPdfMetadataToFixationItems } from "./1785533408739-AddPdfMetadataToFixationItems";
+import { MergeFixationContractsIntoGrainContracts1785542112697 as MergeFixationContractsIntoGrainContracts } from "./1785542112697-MergeFixationContractsIntoGrainContracts";
+import { AddCbotFieldsToFixationItems1785885079646 as AddCbotFieldsToFixationItems } from "./1785885079646-AddCbotFieldsToFixationItems";
+import { AddEmailSentToFixationItems1785900000000 as AddEmailSentToFixationItems } from "./1785900000000-AddEmailSentToFixationItems";
 
 export const migrationDir = {
   CreatePermissions,
@@ -47,5 +53,11 @@ export const migrationDir = {
   AddContractEmissionDatetime,
   AddCommissionReceiptDate,
   AddTaxAndContractFieldsToInvoices,
-  AddReformaTributariaFieldsToInvoices
+  AddReformaTributariaFieldsToInvoices,
+  CreateGrainFixationContracts,
+  AddNumberContractToFixationItems,
+  AddPdfMetadataToFixationItems,
+  MergeFixationContractsIntoGrainContracts,
+  AddCbotFieldsToFixationItems,
+  AddEmailSentToFixationItems,
 };

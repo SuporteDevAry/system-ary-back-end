@@ -34,7 +34,9 @@ export const generateNumberContract = async (
   const validProducts = listProducts.includes(product);
   const siglaProduct = validProducts ? "O" : product;
 
-  // Query para pegar o último número do contrato baseado no grupo
+  // Query para pegar o último número do contrato baseado no grupo. Contratos
+  // "AF" (a fixar) compartilham a MESMA sequência dos "MI" — só as fixações
+  // (itens filhos) recebem um marcador "F" próprio, não o contrato em si.
   const query = `
       SELECT number_contract
       FROM grain_contracts

@@ -7,6 +7,7 @@ import { ClientController } from "../controllers/ClientController";
 import { ContactController } from "../controllers/ContactController";
 import { NotificationController } from "../controllers/NotificationsController";
 import { GrainContractController } from "../controllers/GrainContractController";
+import { GrainFixationContractController } from "../controllers/GrainFixationContractController";
 import { EmailController } from "../controllers/EmailController";
 import { ProductController } from "../controllers/ProductController";
 import { ProductTablesController } from "../controllers/ProductTablesController";
@@ -130,6 +131,48 @@ routes.delete(
 routes.patch(
   "/api/grain-contracts/update-contract-adjustments/:id",
   new GrainContractController().updateContractAdjustments,
+);
+
+// Contratos a Fixar (preço definido posteriormente, em lotes de fixação) — fluxo isolado do grain-contracts
+routes.get(
+  "/api/grain-fixation-contracts",
+  new GrainFixationContractController().getFixationContracts,
+);
+routes.get(
+  "/api/grain-fixation-contracts/:id",
+  new GrainFixationContractController().getFixationContractById,
+);
+routes.post(
+  "/api/grain-fixation-contracts",
+  new GrainFixationContractController().createFixationContract,
+);
+routes.patch(
+  "/api/grain-fixation-contracts/:id",
+  new GrainFixationContractController().updateFixationContract,
+);
+routes.delete(
+  "/api/grain-fixation-contracts/:id",
+  new GrainFixationContractController().deleteFixationContract,
+);
+routes.post(
+  "/api/grain-fixation-contracts/:id/fixation-items",
+  new GrainFixationContractController().addFixationItem,
+);
+routes.get(
+  "/api/grain-fixation-contracts/:id/fixation-items",
+  new GrainFixationContractController().listFixationItems,
+);
+routes.patch(
+  "/api/grain-fixation-contracts/:id/fixation-items/:itemId",
+  new GrainFixationContractController().updateFixationItemPdfMetadata,
+);
+routes.post(
+  "/api/grain-fixation-contracts/:id/fixation-items/:itemId/send-email",
+  new GrainFixationContractController().sendFixationEmail,
+);
+routes.get(
+  "/api/grain-fixation-contracts/fixation-items/pending",
+  new GrainFixationContractController().listPendingFixationItems,
 );
 
 // Send Emails

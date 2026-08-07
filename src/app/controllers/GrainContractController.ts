@@ -171,6 +171,10 @@ export class GrainContractController {
 
       const qb = grainContractRepository.createQueryBuilder("gc");
 
+      // grain_contracts agora também guarda contratos "a fixar" (mesma tabela,
+      // discriminados por type_contract) — este endpoint é só do fluxo MI.
+      qb.andWhere("gc.type_contract = :typeContract", { typeContract: "MI" });
+
       // Filtrar por seller — suporta objeto com campo `name` ou arrays; aceita valores separados por vírgula
       if (seller) {
         const sellers = String(seller)
@@ -400,7 +404,9 @@ export class GrainContractController {
     res: Response,
   ): Promise<Response> => {
     try {
-      const grainContracts = await grainContractRepository.find();
+      const grainContracts = await grainContractRepository.find({
+        where: { type_contract: "MI" },
+      });
       return res.json(
         grainContracts.map((contract) =>
           enrichContractFinancialFields(contract),
@@ -565,6 +571,7 @@ export class GrainContractController {
         number_contract: numberContract,
         final_quantity: initialFinalQuantity,
         status_received: "Não",
+        type_contract: "MI",
         commission_contract: finalCommissionContract,
         commission_seller_contract_value: commissionSellerContract,
         commission_buyer_contract_value: commissionBuyerContract,
