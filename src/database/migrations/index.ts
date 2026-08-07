@@ -20,8 +20,11 @@ import { AddCommissionCurrencyFields1769793476443 as AddCommissionCurrencyFields
 import { AddFieldsToInvoices1769793476444 as AddFieldsToInvoices } from "./1769793476444-AddFieldsToInvoices";
 import { AddXmlFieldToInvoices1769793476445 as AddXmlFieldToInvoices } from "./1769793476445-AddXmlFieldToInvoices";
 import { AddCommissionReceitpDate1775849143332 as AddCommissionReceiptDate } from "./1775849143332-AddCommissionReceitpDate";
-import { AddTaxAndContractFieldsToInvoices1778624659540 as AddTaxAndContractFieldsToInvoices } from "./1778624659540-AddTaxAndContractFieldsToInvoices"
-import { AddReformaTributariaFieldsToInvoices1780968445477 as AddReformaTributariaFieldsToInvoices } from "./1780968445477-AddReformaTributariaFieldsToInvoices"
+import { AddTaxAndContractFieldsToInvoices1778624659540 as AddTaxAndContractFieldsToInvoices } from "./1778624659540-AddTaxAndContractFieldsToInvoices";
+import { AddReformaTributariaFieldsToInvoices1780968445477 as AddReformaTributariaFieldsToInvoices } from "./1780968445477-AddReformaTributariaFieldsToInvoices";
+import { CreateAuditLog1786139484074 as CreateAuditLog } from "./1786139484074-CreateAuditLog";
+import { CreateLoginHistory1786139484075 as CreateLoginHistory } from "./1786139484075-CreateLoginHistory";
+import { CreateActiveSession1786142899084 as CreateActiveSession } from "./1786142899084-CreateActiveSession";
 
 export const migrationDir = {
   CreatePermissions,
@@ -47,5 +50,8 @@ export const migrationDir = {
   AddContractEmissionDatetime,
   AddCommissionReceiptDate,
   AddTaxAndContractFieldsToInvoices,
-  AddReformaTributariaFieldsToInvoices
+  AddReformaTributariaFieldsToInvoices,
+  CreateAuditLog,
+  CreateLoginHistory,
+  CreateActiveSession,
 };

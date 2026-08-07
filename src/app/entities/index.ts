@@ -10,6 +10,9 @@ import { ProductTable } from "./ProductsTable";
 import { Tax } from "./Taxes";
 import { Invoice } from "./Invoices";
 import { Billing } from "./Billings";
+import { AuditLog } from "./AuditLog";
+import { LoginHistory } from "./LoginHistory";
+import { ActiveSession } from "./ActiveSession";
 
 export const entitiesDir = {
   User,
@@ -24,4 +27,7 @@ export const entitiesDir = {
   Tax,
   Invoice,
   Billing,
+  AuditLog,
+  LoginHistory,
+  ActiveSession,
 };
