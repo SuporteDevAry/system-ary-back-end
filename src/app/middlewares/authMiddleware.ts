@@ -21,7 +21,13 @@ export const authMiddleware = async (
 
   const token = authorization.split(" ")[1];
 
-  const { id } = jwt.verify(token, process.env.JWT_PWD) as JwtPayload;
+  let id: string;
+
+  try {
+    ({ id } = jwt.verify(token, process.env.JWT_PWD) as JwtPayload);
+  } catch (error) {
+    throw new UnauthorizedError("Sessão expirada, faça login novamente.");
+  }
 
   const user = await userRepository.findOneBy({ id });
 
