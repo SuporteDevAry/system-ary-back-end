@@ -77,6 +77,8 @@ interface FocusNfeRequest {
     valor_ipi: number;
     codigo_nbs: string;
     codigo_indicador_operacao: string;
+    codigo_municipio_prestacao?: string;
+    codigo_pais_prestacao?: string;
     ibs_cbs_classificacao_tributaria: string;
     valor_ir?: number;
     valor_iss?: number;
@@ -522,8 +524,8 @@ export class FocusNfeService {
                   )
                 : undefined;
 
-              const codigoCidadeIncidencia =
-                tipoTributacao === "P" ? "3550308" : undefined;
+              const codigoMunicipioPrestacao =
+                tipoTributacao === "P" ? "9999999" : undefined;
 
               const isExportacao = this.identificarExportacao(
                 rps,
@@ -819,8 +821,8 @@ export class FocusNfeService {
                   discriminacao: discriminacao,
                   item_lista_servico: codigoServico,
                   codigo_tributacao_municipio: codigoTribMun || codigoServico,
-                  ...(codigoCidadeIncidencia && {
-                    codigo_cidade_incidencia: codigoCidadeIncidencia,
+                  ...(codigoMunicipioPrestacao && {
+                    codigo_municipio_prestacao: codigoMunicipioPrestacao,
                   }),
                   valor_servicos: valorServicos,
                   valor_final_cobrado: valorFinalCobrado,
