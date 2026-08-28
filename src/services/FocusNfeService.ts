@@ -230,9 +230,13 @@ export class FocusNfeService {
     try {
       console.log(`❌ Cancelando NFS-e ${referencia} na Focus NFe...`);
 
-      return await this.fazerRequisicaoApi("DELETE", `/nfse/${encodeURIComponent(referencia)}`, {
-        justificativa,
-      });
+      return await this.fazerRequisicaoApi(
+        "DELETE",
+        `/nfse/${encodeURIComponent(referencia)}`,
+        {
+          justificativa,
+        },
+      );
     } catch (error: any) {
       console.error("❌ Erro ao cancelar NFS-e na Focus NFe:", error);
       throw new Error(`Falha no cancelamento: ${error.message}`);
@@ -511,17 +515,15 @@ export class FocusNfeService {
                 "Serviço não especificado";
 
               const tributacaoRps =
-                rps.TributacaoRPS ||
-                rps.tributacaoRps ||
-                "";
+                rps.TributacaoRPS || rps.tributacaoRps || "";
               const tipoTributacao = tributacaoRps
                 ? this.mapearTributacao(
-                  String(tributacaoRps).trim().toUpperCase(),
-                )
+                    String(tributacaoRps).trim().toUpperCase(),
+                  )
                 : undefined;
 
               const codigoCidadeIncidencia =
-                tipoTributacao === "P" ? "9999999" : undefined;
+                tipoTributacao === "P" ? "3550308" : undefined;
 
               const isExportacao = this.identificarExportacao(
                 rps,
@@ -533,9 +535,9 @@ export class FocusNfeService {
               const aliquotaPercentual = parseFloat(
                 rps.aliquota || rps.AliquotaServicos || "5",
               );
-              const valorIss = Math.round(
-                valorServicos * (aliquotaPercentual / 100) * 100,
-              ) / 100;
+              const valorIss =
+                Math.round(valorServicos * (aliquotaPercentual / 100) * 100) /
+                100;
               const valorIBS = Math.round(valorServicos * 0.01 * 100) / 100;
               const valorCBS = Math.round(valorServicos * 0.09 * 100) / 100;
               const valorIssXml = this.extrairNumeroOpcional(
@@ -759,9 +761,9 @@ export class FocusNfeService {
                 tipoTributacao === "P"
                   ? 2
                   : this.extrairNumero(
-                    rps.NaturezaOperacao || servicoXml.NaturezaOperacao,
-                    1,
-                  );
+                      rps.NaturezaOperacao || servicoXml.NaturezaOperacao,
+                      1,
+                    );
               const tipoOperacao = this.extrairNumero(
                 rps.TipoOperacao || servicoXml.TipoOperacao,
                 isExportacao ? 2 : 1,
@@ -809,8 +811,8 @@ export class FocusNfeService {
                     cep: this.formatarCEP(enderecTomador.CEP),
                     ...(isEstrangeiro &&
                       enderecTomador.CodigoPais && {
-                      codigo_pais: enderecTomador.CodigoPais,
-                    }),
+                        codigo_pais: enderecTomador.CodigoPais,
+                      }),
                   },
                 },
                 servico: {
@@ -1039,13 +1041,12 @@ export class FocusNfeService {
       .replace(/[^a-z0-9]/g, "");
   }
 
-  private buscarCampoRecursivo(
-    alvo: any,
-    nomes: string[],
-  ): any | undefined {
+  private buscarCampoRecursivo(alvo: any, nomes: string[]): any | undefined {
     if (alvo === undefined || alvo === null) return undefined;
 
-    const nomesNormalizados = nomes.map((nome) => this.normalizarChaveCampo(nome));
+    const nomesNormalizados = nomes.map((nome) =>
+      this.normalizarChaveCampo(nome),
+    );
 
     const procurar = (valor: any): any | undefined => {
       if (valor === undefined || valor === null) return undefined;
