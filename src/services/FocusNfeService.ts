@@ -25,329 +25,6 @@ async function buscarIbgePorCep(cep: string): Promise<string | null> {
 import https from "https";
 import { parseString } from "xml2js";
 
-/**
- * Tabela de códigos de países em ISO 3166-1 alpha-2 (ex: Uruguai = "UY").
- * Usada para preencher o campo servico.codigo_pais_prestacao (cPaisPrestacao) exigido pela
- * Focus NFe/prefeitura quando a classificação tributária for de exportação de serviços (erro 657).
- * Nomes em português mapeados a partir da tabela de países da Receita Federal (Anexo III), com o
- * código convertido para o padrão ISO alpha-2 esperado pela prefeitura.
- */
-const PAISES_ISO_ALPHA2: Array<[string, string]> = [
-    ["Afeganistão", "AF"],
-    ["Aland, Ilhas", "AX"],
-    ["Albânia, República da", "AL"],
-    ["Alemanha", "DE"],
-    ["Burkina Faso", "BF"],
-    ["Andorra", "AD"],
-    ["Angola", "AO"],
-    ["Anguilla", "AI"],
-    ["Antártica", "AQ"],
-    ["Antigua e Barbuda", "AG"],
-    ["Arábia Saudita", "SA"],
-    ["Argélia", "DZ"],
-    ["Argentina", "AR"],
-    ["Armênia, República da", "AM"],
-    ["Aruba", "AW"],
-    ["Austrália", "AU"],
-    ["Áustria", "AT"],
-    ["Azerbaijão, República do", "AZ"],
-    ["Bahamas, Ilhas", "BS"],
-    ["Bahrein, Ilhas", "BH"],
-    ["Bangladesh", "BD"],
-    ["Barbados", "BB"],
-    ["Belarus, República da", "BY"],
-    ["Bélgica", "BE"],
-    ["Belize", "BZ"],
-    ["Bermudas", "BM"],
-    ["Mianmar (Birmânia)", "MM"],
-    ["Bolívia, Estado Plurinacional da", "BO"],
-    ["Bosnia-Herzegovina (República da)", "BA"],
-    ["Bonaire, Saint Eustatius e Saba", "BQ"],
-    ["Botsuana", "BW"],
-    ["Bouvet, Ilha", "BV"],
-    ["Brasil", "BR"],
-    ["Brunei", "BN"],
-    ["Bulgária, República da", "BG"],
-    ["Burundi", "BI"],
-    ["Butão", "BT"],
-    ["Cabo Verde, República de", "CV"],
-    ["Cayman, Ilhas", "KY"],
-    ["Camboja", "KH"],
-    ["Camarões", "CM"],
-    ["Canadá", "CA"],
-    ["Cazaquistao, República do", "KZ"],
-    ["Catar", "QA"],
-    ["Chile", "CL"],
-    ["Formosa (Taiwan)", "TW"],
-    ["Chipre", "CY"],
-    ["Cocos-Keeling, Ilhas", "CC"],
-    ["Colômbia", "CO"],
-    ["Comores, Ilhas", "KM"],
-    ["Congo", "CG"],
-    ["Cook, Ilhas", "CK"],
-    ["Coréia (do Norte), Rep. Pop. Democrática", "KP"],
-    ["Coréia (do Sul), República da", "KR"],
-    ["Costa do Marfim", "CI"],
-    ["Croácia, República da", "HR"],
-    ["Costa Rica", "CR"],
-    ["Kuwait", "KW"],
-    ["Cuba", "CU"],
-    ["Curaçao", "CW"],
-    ["Benin", "BJ"],
-    ["Dinamarca", "DK"],
-    ["Dominica, Ilha", "DM"],
-    ["Equador", "EC"],
-    ["Egito", "EG"],
-    ["Eritreia", "ER"],
-    ["Emirados Árabes Unidos", "AE"],
-    ["Espanha", "ES"],
-    ["Eslovênia, República da", "SI"],
-    ["Eslovaca, República", "SK"],
-    ["Estados Unidos", "US"],
-    ["Estônia, República da", "EE"],
-    ["Etiópia", "ET"],
-    ["Falkland (Ilhas Malvinas)", "FK"],
-    ["Feroe, Ilhas", "FO"],
-    ["Filipinas", "PH"],
-    ["Finlândia", "FI"],
-    ["França", "FR"],
-    ["Gabão", "GA"],
-    ["Gambia", "GM"],
-    ["Gana", "GH"],
-    ["Geórgia, República da", "GE"],
-    ["Geórgia do Sul e Sandwich do Sul, Ilhas", "GS"],
-    ["Gibraltar", "GI"],
-    ["Granada", "GD"],
-    ["Grécia", "GR"],
-    ["Groenlândia", "GL"],
-    ["Guadalupe", "GP"],
-    ["Guam", "GU"],
-    ["Guatemala", "GT"],
-    ["Guernsey", "GG"],
-    ["Guiné", "GN"],
-    ["Guiné-Equatorial", "GQ"],
-    ["Guiné-Bissau", "GW"],
-    ["Guiana", "GY"],
-    ["Haiti", "HT"],
-    ["Heard e Ilhas McDonald, Ilha", "HM"],
-    ["Honduras", "HN"],
-    ["Hong Kong", "HK"],
-    ["Hungria, República da", "HU"],
-    ["Iemen", "YE"],
-    ["Man, Ilha de", "IM"],
-    ["Índia", "IN"],
-    ["Indonésia", "ID"],
-    ["Iraque", "IQ"],
-    ["Irã, República Islâmica do", "IR"],
-    ["Irlanda", "IE"],
-    ["Islândia", "IS"],
-    ["Israel", "IL"],
-    ["Itália", "IT"],
-    ["Jamaica", "JM"],
-    ["Jersey", "JE"],
-    ["Japão", "JP"],
-    ["Jordânia", "JO"],
-    ["Kiribati", "KI"],
-    ["Laos, Rep.Pop.Democr.do", "LA"],
-    ["Lesoto", "LS"],
-    ["Letônia, República da", "LV"],
-    ["Líbano", "LB"],
-    ["Libéria", "LR"],
-    ["Líbia", "LY"],
-    ["Liechtenstein", "LI"],
-    ["Lituânia, República da", "LT"],
-    ["Luxemburgo", "LU"],
-    ["Macau", "MO"],
-    ["Macedônia, Ant.Rep.Iugoslava", "MK"],
-    ["Madagascar", "MG"],
-    ["Malásia", "MY"],
-    ["Malavi", "MW"],
-    ["Maldivas", "MV"],
-    ["Mali", "ML"],
-    ["Malta", "MT"],
-    ["Marianas do Norte", "MP"],
-    ["Marrocos", "MA"],
-    ["Marshall, Ilhas", "MH"],
-    ["Martinica", "MQ"],
-    ["Maurício", "MU"],
-    ["Mauritânia", "MR"],
-    ["México", "MX"],
-    ["Moldavia, República da", "MD"],
-    ["Mônaco", "MC"],
-    ["Mongólia", "MN"],
-    ["Montenegro", "ME"],
-    ["Micronésia", "FM"],
-    ["Montserrat, Ilhas", "MS"],
-    ["Moçambique", "MZ"],
-    ["Namíbia", "NA"],
-    ["Nauru", "NR"],
-    ["Christmas, Ilhas (Navidad)", "CX"],
-    ["Nepal", "NP"],
-    ["Nicarágua", "NI"],
-    ["Niger", "NE"],
-    ["Nigéria", "NG"],
-    ["Niue, Ilha", "NU"],
-    ["Norfolk, Ilha", "NF"],
-    ["Noruega", "NO"],
-    ["Nova Caledônia", "NC"],
-    ["Papua Nova Guiné", "PG"],
-    ["Nova Zelândia", "NZ"],
-    ["Vanuatu", "VU"],
-    ["Omã", "OM"],
-    ["Pacífico, Ilhas do (possessão dos EUA)", "UM"],
-    ["Países Baixos (Holanda)", "NL"],
-    ["Palau", "PW"],
-    ["Paquistão", "PK"],
-    ["Palestina", "PS"],
-    ["Panamá", "PA"],
-    ["Paraguai", "PY"],
-    ["Peru", "PE"],
-    ["Pitcairn, Ilha De", "PN"],
-    ["Polinésia Francesa", "PF"],
-    ["Polônia, República da", "PL"],
-    ["Portugal", "PT"],
-    ["Porto Rico", "PR"],
-    ["Quênia", "KE"],
-    ["Quirguiz, República da", "KG"],
-    ["Reino Unido", "GB"],
-    ["República Centro-Africana", "CF"],
-    ["República Dominicana", "DO"],
-    ["Reunião, Ilha", "RE"],
-    ["Zimbabue", "ZW"],
-    ["Romênia", "RO"],
-    ["Ruanda", "RW"],
-    ["Rússia, Federação da", "RU"],
-    ["Salomão, Ilhas", "SB"],
-    ["El Salvador", "SV"],
-    ["Samoa", "WS"],
-    ["Samoa Americana", "AS"],
-    ["São Bartolomeu", "BL"],
-    ["São Cristovão e Neves, Ilhas", "KN"],
-    ["San Marino", "SM"],
-    ["São Martinho, Ilha de (parte francesa)", "MF"],
-    ["São Martinho, Ilha de (parte holandesa)", "SX"],
-    ["São Pedro e Miquelon", "PM"],
-    ["São Vicente e Granadinas", "VC"],
-    ["Santa Helena", "SH"],
-    ["Santa Lúcia", "LC"],
-    ["São Tomé e Príncipe, Ilhas", "ST"],
-    ["Senegal", "SN"],
-    ["Seychelles", "SC"],
-    ["Serra Leoa", "SL"],
-    ["Servia", "RS"],
-    ["Cingapura", "SG"],
-    ["Síria, República Árabe da", "SY"],
-    ["Somália", "SO"],
-    ["Sri Lanka", "LK"],
-    ["Essuatíni", "SZ"],
-    ["Svalbard e Jan Mayen", "SJ"],
-    ["África do Sul", "ZA"],
-    ["Sudão", "SD"],
-    ["Sudão do Sul", "SS"],
-    ["Suécia", "SE"],
-    ["Suíça", "CH"],
-    ["Suriname", "SR"],
-    ["Tadjiquistão, República do", "TJ"],
-    ["Tailândia", "TH"],
-    ["Tanzania, Rep. Unida da", "TZ"],
-    ["Terras Austrais e Antárticas Francesas", "TF"],
-    ["Território Britânico no Oceano Índico", "IO"],
-    ["Djibuti", "DJ"],
-    ["Chade", "TD"],
-    ["Tcheca, República", "CZ"],
-    ["Timor Leste", "TL"],
-    ["Togo", "TG"],
-    ["Toquelau, Ilhas", "TK"],
-    ["Tonga", "TO"],
-    ["Trinidad e Tobago", "TT"],
-    ["Tunísia", "TN"],
-    ["Turcas e Caicos, Ilhas", "TC"],
-    ["Turcomenistão, República do", "TM"],
-    ["Turquia", "TR"],
-    ["Ucrânia", "UA"],
-    ["Uganda", "UG"],
-    ["Uruguai", "UY"],
-    ["Uzbequistão, República do", "UZ"],
-    ["Vaticano, Est. da Cidade do", "VA"],
-    ["Venezuela", "VE"],
-    ["Vietnã", "VN"],
-    ["Virgens, Ilhas (Britânicas)", "VG"],
-    ["Virgens, Ilhas (E.U.A.)", "VI"],
-    ["Fiji", "FJ"],
-    ["Wallis e Futuna, Ilhas", "WF"],
-    ["Congo, República Democrática do", "CD"],
-    ["Zâmbia", "ZM"],
-    ["China, República Popular da", "CN"],
-];
-
-/** Apelidos/grafias alternativas (espanhol, inglês, sem acento) para países comumente citados em endereços de tomadores estrangeiros. */
-const APELIDOS_PAISES: Array<[string, string]> = [
-  ["URUGUAY", "Uruguai"],
-  ["PARAGUAY", "Paraguai"],
-  ["ARGENTINA", "Argentina"],
-  ["BOLIVIA", "Bolívia, Estado Plurinacional da"],
-  ["CHILE", "Chile"],
-  ["PERU", "Peru"],
-  ["COLOMBIA", "Colômbia"],
-  ["VENEZUELA", "Venezuela"],
-  ["ECUADOR", "Equador"],
-  ["MEXICO", "México"],
-  ["ESTADOS UNIDOS", "Estados Unidos"],
-  ["UNITED STATES", "Estados Unidos"],
-  ["USA", "Estados Unidos"],
-  ["ESPAÑA", "Espanha"],
-  ["SPAIN", "Espanha"],
-  ["PORTUGAL", "Portugal"],
-  ["CHINA", "China, República Popular da"],
-  ["GERMANY", "Alemanha"],
-];
-
-function normalizarNomePais(texto: string): string {
-  return texto
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toUpperCase()
-    .replace(/[^A-Z\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-const MAPA_PAISES_NORMALIZADO: Map<string, string> = (() => {
-  const mapa = new Map<string, string>();
-  for (const [nome, codigo] of PAISES_ISO_ALPHA2) {
-    mapa.set(normalizarNomePais(nome), codigo);
-  }
-  for (const [apelido, nomeOficial] of APELIDOS_PAISES) {
-    const codigo = mapa.get(normalizarNomePais(nomeOficial));
-    if (codigo) mapa.set(normalizarNomePais(apelido), codigo);
-  }
-  return mapa;
-})();
-
-/**
- * Tenta identificar o código do país (tabela Receita Federal) a partir de um texto livre
- * (nome do país, ou endereço completo contendo o nome do país).
- */
-function resolverCodigoPaisPorTexto(texto?: string): string | undefined {
-  if (!texto) return undefined;
-  const normalizado = normalizarNomePais(texto);
-  if (!normalizado) return undefined;
-
-  const direto = MAPA_PAISES_NORMALIZADO.get(normalizado);
-  if (direto) return direto;
-
-  let melhorMatch: { nome: string; codigo: string } | undefined;
-  for (const [nome, codigo] of MAPA_PAISES_NORMALIZADO) {
-    if (nome.length < 4) continue;
-    const regex = new RegExp(`(^|\\s)${nome}(\\s|$)`);
-    if (regex.test(normalizado)) {
-      if (!melhorMatch || nome.length > melhorMatch.nome.length) {
-        melhorMatch = { nome, codigo };
-      }
-    }
-  }
-  return melhorMatch?.codigo;
-}
 
 interface FocusNfeConfig {
   apiUrl: string;
@@ -373,7 +50,8 @@ interface FocusNfeRequest {
   tomador: {
     cpf?: string;
     cnpj?: string;
-    //motivo_ausencia_nif: string;
+    nif?: string;
+    motivo_ausencia_nif?: string;
     razao_social: string;
     email?: string;
     endereco: {
@@ -384,7 +62,6 @@ interface FocusNfeRequest {
       codigo_municipio: string;
       uf: string;
       cep: string;
-      codigo_pais?: string;
     };
   };
   servico: {
@@ -402,7 +79,6 @@ interface FocusNfeRequest {
     codigo_nbs: string;
     codigo_indicador_operacao: string;
     codigo_municipio_prestacao?: string;
-    codigo_pais_prestacao?: string;
     ibs_cbs_classificacao_tributaria: string;
     valor_ir?: number;
     valor_iss?: number;
@@ -746,6 +422,12 @@ export class FocusNfeService {
               const enderecTomador = { ...(rps.EnderecoTomador || {}) };
               let cnpjTomador = cpfCnpjTomador.CNPJ || "";
               let cpfTomador = cpfCnpjTomador.CPF || "";
+              const nifTomador = this.extrairTextoOpcional(
+                rps.NIF,
+                rps.Nif,
+                cpfCnpjTomador.NIF,
+                cpfCnpjTomador.Nif,
+              );
               const razaoSocialTomador =
                 rps.RazaoSocialTomador || rps.NomeFantasia || "Cliente";
               const emailTomador = rps.EmailTomador || "";
@@ -858,29 +540,6 @@ export class FocusNfeService {
                 isEstrangeiro,
                 tipoTributacao,
               );
-
-              let codigoPaisPrestacao: string | undefined;
-              if (isExportacao || tipoTributacao === "P") {
-                const codigoPaisXml = enderecTomador.CodigoPais
-                  ? String(enderecTomador.CodigoPais).trim()
-                  : "";
-                codigoPaisPrestacao =
-                  (/^[A-Za-z]{2}$/.test(codigoPaisXml)
-                    ? codigoPaisXml.toUpperCase()
-                    : undefined) ||
-                  resolverCodigoPaisPorTexto(codigoPaisXml) ||
-                  resolverCodigoPaisPorTexto(enderecTomador.Pais) ||
-                  resolverCodigoPaisPorTexto(enderecTomador.Logradouro);
-
-                if (!codigoPaisPrestacao) {
-                  console.warn(
-                    "⚠️  AVISO: Não foi possível identificar o código do país de prestação do serviço (servico.codigo_pais_prestacao) " +
-                      "a partir do XML recebido. O RPS é de exportação de serviços, mas EnderecoTomador não informa Pais/CodigoPais " +
-                      "de forma estruturada. Isso pode causar rejeição pela Focus NFe (erro 657 - local de prestação no exterior). " +
-                      "Recomenda-se ajustar o sistema que gera o XML para incluir <Pais> ou <CodigoPais> em EnderecoTomador.",
-                  );
-                }
-              }
 
               const aliquotaPercentual = parseFloat(
                 rps.aliquota || rps.AliquotaServicos || "5",
@@ -1142,6 +801,13 @@ export class FocusNfeService {
                 tomador: {
                   ...(cnpjTomador && { cnpj: cnpjTomador }),
                   ...(cpfTomador && { cpf: cpfTomador }),
+                  ...(nifTomador
+                    ? { nif: nifTomador }
+                    : !cnpjTomador &&
+                        !cpfTomador &&
+                        (isEstrangeiro || tipoTributacao === "P")
+                      ? { motivo_ausencia_nif: "2" }
+                      : {}),
                   razao_social: razaoSocialTomador,
                   ...(emailTomador && { email: emailTomador }),
                   endereco: {
@@ -1159,10 +825,6 @@ export class FocusNfeService {
                         : String(codigoMunicipioTomadorCorrigido),
                     uf: enderecTomador.UF,
                     cep: this.formatarCEP(enderecTomador.CEP),
-                    ...(isEstrangeiro &&
-                      enderecTomador.CodigoPais && {
-                        codigo_pais: enderecTomador.CodigoPais,
-                      }),
                   },
                 },
                 servico: {
@@ -1171,9 +833,6 @@ export class FocusNfeService {
                   codigo_tributacao_municipio: codigoTribMun || codigoServico,
                   ...(codigoMunicipioPrestacao && {
                     codigo_municipio_prestacao: codigoMunicipioPrestacao,
-                  }),
-                  ...(codigoPaisPrestacao && {
-                    codigo_pais_prestacao: codigoPaisPrestacao,
                   }),
                   valor_servicos: valorServicos,
                   valor_final_cobrado: valorFinalCobrado,
