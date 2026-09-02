@@ -222,7 +222,7 @@ const ContratoTemplateSoja: React.FC<ContratoTemplateProps> = ({
     return formattedLines.join("");
   }
 
-  const listProductsForMetricTon = ["O", "F", "OC", "OA", "SB", "EP"];
+  const listProductsForMetricTon = ["O", "F", "OC", "OA", "SB", "EP", "OX"];
   const validProductsForMetricTon = listProductsForMetricTon.includes(
     data.product,
   );
