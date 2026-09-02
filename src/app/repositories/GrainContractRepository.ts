@@ -8,7 +8,7 @@ export const grainContractRepository =
 const productTableRepository = AppDataSource.getRepository(ProductTable);
 
 export const generateNumberContract = async (
-  data: Partial<GrainContract>
+  data: Partial<GrainContract>,
 ): Promise<string> => {
   const { product, number_broker } = data;
   const currentYear = new Date().getFullYear().toString().slice(-2); // Pega os dois últimos dígitos do ano
@@ -30,7 +30,7 @@ export const generateNumberContract = async (
   const productsInGroup = productTable.product_types;
 
   // Só iremos remover essa regra das siglas, caso o cliente aceite a sugestão da reunião do dia 09/04/2025
-  const listProducts = ["O", "OC", "OA", "SB", "EP"];
+  const listProducts = ["O", "OC", "OA", "SB", "EP", "OX"];
   const validProducts = listProducts.includes(product);
   const siglaProduct = validProducts ? "O" : product;
 

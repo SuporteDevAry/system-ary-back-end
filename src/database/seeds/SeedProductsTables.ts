@@ -11,7 +11,7 @@ export async function seedProductTables(dataSource: DataSource) {
     },
     {
       name: "ÓLEO",
-      product_types: ["O", "OC", "OA", "SB", "EP"],
+      product_types: ["O", "OC", "OA", "SB", "EP", "OX"],
     },
     {
       name: "FARELO",

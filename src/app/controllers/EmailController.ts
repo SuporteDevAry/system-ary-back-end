@@ -56,7 +56,7 @@ export class EmailController {
       // Poderá ser mudado se criarem outras mesas além dessas.
       // Grupos de siglas
       const group1 = ["S", "T", "SG", "CN"];
-      const group2 = ["O", "OC", "OA", "SB", "EP"];
+      const group2 = ["O", "OC", "OA", "SB", "EP", "OX"];
       const group3 = ["F"];
 
       const isLocal = process.env.BLOCK_SENDER_EMAIL_LOCAL === "true";
