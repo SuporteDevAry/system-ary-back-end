@@ -10,6 +10,7 @@ import { GrainContractController } from "../controllers/GrainContractController"
 import { EmailController } from "../controllers/EmailController";
 import { ProductController } from "../controllers/ProductController";
 import { ProductTablesController } from "../controllers/ProductTablesController";
+import { BrokerController } from "../controllers/BrokerController";
 import { InvoiceController } from "../controllers/InvoicesController";
 import { NfseController } from "../controllers/NfseController";
 
@@ -152,6 +153,13 @@ routes.get("/api/tables-products", ProductTablesController.findTablesAll);
 routes.get("/api/tables-products/:id", ProductTablesController.findTableById);
 routes.patch("/api/tables-products/:id", ProductTablesController.updateTable);
 routes.delete("/api/tables-products/:id", ProductTablesController.deleteTable);
+
+// Broker
+routes.post("/api/brokers", BrokerController.createBroker);
+routes.get("/api/brokers", BrokerController.findAllBrokers);
+routes.get("/api/brokers/:id", BrokerController.findBrokerById);
+routes.patch("/api/brokers/:id", BrokerController.updateBroker);
+routes.delete("/api/brokers/:id", BrokerController.deleteBroker);
 
 // Invoices
 routes.post("/api/invoices", InvoiceController.createInvoice);
