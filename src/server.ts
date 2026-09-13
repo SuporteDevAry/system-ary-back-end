@@ -17,6 +17,9 @@ import { updateContractEmissionDatetime } from "./database/seeds/UpdateContractE
 const port = process.env.SERVER_PORT;
 const app = express();
 
+// Atrás de proxy reverso (EasyPanel/Traefik) - sem isso, req.ip pega o IP interno do proxy
+app.set("trust proxy", true);
+
 app.use(cors());
 app.use(express.json({ limit: "100mb" }));
 app.use(routes);
