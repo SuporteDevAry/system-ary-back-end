@@ -25,6 +25,7 @@ import { AddReformaTributariaFieldsToInvoices1780968445477 as AddReformaTributar
 import { CreateAuditLog1786139484074 as CreateAuditLog } from "./1786139484074-CreateAuditLog";
 import { CreateLoginHistory1786139484075 as CreateLoginHistory } from "./1786139484075-CreateLoginHistory";
 import { CreateActiveSession1786142899084 as CreateActiveSession } from "./1786142899084-CreateActiveSession";
+import { Broker1787511369747 as Broker } from "./1787511369747-Broker";
 
 export const migrationDir = {
   CreatePermissions,
@@ -54,4 +55,5 @@ export const migrationDir = {
   CreateAuditLog,
   CreateLoginHistory,
   CreateActiveSession,
+  Broker,
 };

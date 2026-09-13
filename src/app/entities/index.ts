@@ -13,6 +13,7 @@ import { Billing } from "./Billings";
 import { AuditLog } from "./AuditLog";
 import { LoginHistory } from "./LoginHistory";
 import { ActiveSession } from "./ActiveSession";
+import { Broker } from "./Broker";
 
 export const entitiesDir = {
   User,
@@ -30,4 +31,5 @@ export const entitiesDir = {
   AuditLog,
   LoginHistory,
   ActiveSession,
+  Broker,
 };
