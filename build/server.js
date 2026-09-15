@@ -18,6 +18,8 @@ const SeedProductsTables_1 = require("./database/seeds/SeedProductsTables");
 const UpdateContractEmissionDatetime_1 = require("./database/seeds/UpdateContractEmissionDatetime");
 const port = process.env.SERVER_PORT;
 const app = (0, express_1.default)();
+// Atrás de proxy reverso (EasyPanel/Traefik) - sem isso, req.ip pega o IP interno do proxy
+app.set("trust proxy", true);
 app.use((0, cors_1.default)());
 app.use(express_1.default.json({ limit: "100mb" }));
 app.use(routes_1.default);

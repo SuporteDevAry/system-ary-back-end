@@ -15,10 +15,13 @@ const GrainContractController_1 = require("../controllers/GrainContractControlle
 const EmailController_1 = require("../controllers/EmailController");
 const ProductController_1 = require("../controllers/ProductController");
 const ProductTablesController_1 = require("../controllers/ProductTablesController");
+const BrokerController_1 = require("../controllers/BrokerController");
 const InvoicesController_1 = require("../controllers/InvoicesController");
 const NfseController_1 = require("../controllers/NfseController");
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const BillingsController_1 = require("../controllers/BillingsController");
+const DevPanelController_1 = require("../controllers/DevPanelController");
+const devPanelMiddleware_1 = require("../middlewares/devPanelMiddleware");
 const routes = (0, express_1.Router)();
 // Utilizar futuramente para criar métricas de chamadas
 // routes.use("/api", (req, res, next) => {
@@ -47,6 +50,8 @@ routes.get("/api-cnpj/cnpj/:cnpj", async (req, res) => {
 routes.use(authMiddleware_1.authMiddleware); // comentar ao usar local
 routes.get("/api/profile", new UserController_1.UserController().getProfile);
 routes.post("/api/reset-password", new SessionController_1.SessionController().resetPassword);
+routes.post("/api/heartbeat", new SessionController_1.SessionController().heartbeat);
+routes.delete("/api/heartbeat", new SessionController_1.SessionController().endSession);
 // CRUD USERS
 routes.post("/api/user", new UserController_1.UserController().create);
 routes.get("/api/users", new UserController_1.UserController().getUsers);
@@ -96,6 +101,12 @@ routes.get("/api/tables-products", ProductTablesController_1.ProductTablesContro
 routes.get("/api/tables-products/:id", ProductTablesController_1.ProductTablesController.findTableById);
 routes.patch("/api/tables-products/:id", ProductTablesController_1.ProductTablesController.updateTable);
 routes.delete("/api/tables-products/:id", ProductTablesController_1.ProductTablesController.deleteTable);
+// Broker
+routes.post("/api/brokers", BrokerController_1.BrokerController.createBroker);
+routes.get("/api/brokers", BrokerController_1.BrokerController.findAllBrokers);
+routes.get("/api/brokers/:id", BrokerController_1.BrokerController.findBrokerById);
+routes.patch("/api/brokers/:id", BrokerController_1.BrokerController.updateBroker);
+routes.delete("/api/brokers/:id", BrokerController_1.BrokerController.deleteBroker);
 // Invoices
 routes.post("/api/invoices", InvoicesController_1.InvoiceController.createInvoice);
 routes.get("/api/invoices/nextrps", InvoicesController_1.InvoiceController.nextNumberRps);
@@ -121,5 +132,11 @@ routes.get("/api/billings/rps/:rps_number", BillingsController_1.BillingControll
 routes.get("/api/billings/nfs/:nfs_number", BillingsController_1.BillingController.findBillingByNfs_number);
 routes.patch("/api/billings/:id", BillingsController_1.BillingController.updateBilling);
 routes.delete("/api/billings/:id", BillingsController_1.BillingController.deleteBilling);
+// Dev Panel (login history, métricas de acesso, auditoria) - restrito por e-mail
+routes.use("/api/dev-panel", devPanelMiddleware_1.devPanelMiddleware);
+routes.get("/api/dev-panel/login-history", new DevPanelController_1.DevPanelController().getLoginHistory);
+routes.get("/api/dev-panel/user-metrics", new DevPanelController_1.DevPanelController().getUserMetrics);
+routes.get("/api/dev-panel/audit-log", new DevPanelController_1.DevPanelController().getAuditLog);
+routes.get("/api/dev-panel/online-users", new DevPanelController_1.DevPanelController().getOnlineUsers);
 exports.default = routes;
 //# sourceMappingURL=index.js.map
