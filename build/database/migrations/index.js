@@ -25,6 +25,10 @@ const _1769793476445_AddXmlFieldToInvoices_1 = require("./1769793476445-AddXmlFi
 const _1775849143332_AddCommissionReceitpDate_1 = require("./1775849143332-AddCommissionReceitpDate");
 const _1778624659540_AddTaxAndContractFieldsToInvoices_1 = require("./1778624659540-AddTaxAndContractFieldsToInvoices");
 const _1780968445477_AddReformaTributariaFieldsToInvoices_1 = require("./1780968445477-AddReformaTributariaFieldsToInvoices");
+const _1786139484074_CreateAuditLog_1 = require("./1786139484074-CreateAuditLog");
+const _1786139484075_CreateLoginHistory_1 = require("./1786139484075-CreateLoginHistory");
+const _1786142899084_CreateActiveSession_1 = require("./1786142899084-CreateActiveSession");
+const _1787511369747_Broker_1 = require("./1787511369747-Broker");
 exports.migrationDir = {
     CreatePermissions: _1697084968105_permissions_1.Permissions1697084968105,
     CreateUsers: _1694720577496_createUsers_1.CreateUsers1694720577496,
@@ -49,6 +53,10 @@ exports.migrationDir = {
     AddContractEmissionDatetime: _1756778999999_AddContractEmissionDatetime_1.AddContractEmissionDatetime1756778999999,
     AddCommissionReceiptDate: _1775849143332_AddCommissionReceitpDate_1.AddCommissionReceitpDate1775849143332,
     AddTaxAndContractFieldsToInvoices: _1778624659540_AddTaxAndContractFieldsToInvoices_1.AddTaxAndContractFieldsToInvoices1778624659540,
-    AddReformaTributariaFieldsToInvoices: _1780968445477_AddReformaTributariaFieldsToInvoices_1.AddReformaTributariaFieldsToInvoices1780968445477
+    AddReformaTributariaFieldsToInvoices: _1780968445477_AddReformaTributariaFieldsToInvoices_1.AddReformaTributariaFieldsToInvoices1780968445477,
+    CreateAuditLog: _1786139484074_CreateAuditLog_1.CreateAuditLog1786139484074,
+    CreateLoginHistory: _1786139484075_CreateLoginHistory_1.CreateLoginHistory1786139484075,
+    CreateActiveSession: _1786142899084_CreateActiveSession_1.CreateActiveSession1786142899084,
+    Broker: _1787511369747_Broker_1.Broker1787511369747,
 };
 //# sourceMappingURL=index.js.map

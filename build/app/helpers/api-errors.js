@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UnauthorizedError = exports.NotFoundError = exports.BadRequestError = exports.ApiError = void 0;
+exports.ForbiddenError = exports.UnauthorizedError = exports.NotFoundError = exports.BadRequestError = exports.ApiError = void 0;
 class ApiError extends Error {
     constructor(message, statusCode) {
         super(message);
@@ -26,4 +26,10 @@ class UnauthorizedError extends ApiError {
     }
 }
 exports.UnauthorizedError = UnauthorizedError;
+class ForbiddenError extends ApiError {
+    constructor(message) {
+        super(message, 403);
+    }
+}
+exports.ForbiddenError = ForbiddenError;
 //# sourceMappingURL=api-errors.js.map

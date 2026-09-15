@@ -253,13 +253,15 @@ class FocusNfeService {
                         const enderecTomador = Object.assign({}, (rps.EnderecoTomador || {}));
                         let cnpjTomador = cpfCnpjTomador.CNPJ || "";
                         let cpfTomador = cpfCnpjTomador.CPF || "";
+                        const nifTomador = this.extrairTextoOpcional(rps.NIF, rps.Nif, cpfCnpjTomador.NIF, cpfCnpjTomador.Nif);
                         const razaoSocialTomador = rps.RazaoSocialTomador || rps.NomeFantasia || "Cliente";
                         const emailTomador = rps.EmailTomador || "";
                         const isEstrangeiro = !cnpjTomador &&
                             !cpfTomador &&
                             (enderecTomador.UF === "EX" ||
                                 enderecTomador.Pais ||
-                                enderecTomador.CodigoPais);
+                                enderecTomador.CodigoPais ||
+                                enderecTomador.Cidade === "9999999");
                         let codigoMunicipioServico = rps.MunicipioPrestacao || "3550308";
                         let codigoMunicipioTomadorOriginal = enderecTomador.Cidade || codigoMunicipioServico;
                         let codigoMunicipioTomadorCorrigido = this.validarECorrigirCodigoMunicipio(codigoMunicipioTomadorOriginal, enderecTomador.UF, enderecTomador.CEP);
@@ -324,16 +326,15 @@ class FocusNfeService {
                         const discriminacao = rps.Discriminacao ||
                             servicoXml.Discriminacao ||
                             "Serviço não especificado";
-                        const tributacaoRps = rps.TributacaoRPS ||
-                            rps.tributacaoRps ||
-                            "";
+                        const tributacaoRps = rps.TributacaoRPS || rps.tributacaoRps || "";
                         const tipoTributacao = tributacaoRps
                             ? this.mapearTributacao(String(tributacaoRps).trim().toUpperCase())
                             : undefined;
-                        const codigoCidadeIncidencia = tipoTributacao === "P" ? "9999999" : undefined;
+                        const codigoMunicipioPrestacao = tipoTributacao === "P" ? "9999999" : undefined;
                         const isExportacao = this.identificarExportacao(rps, servicoXml, isEstrangeiro, tipoTributacao);
                         const aliquotaPercentual = parseFloat(rps.aliquota || rps.AliquotaServicos || "5");
-                        const valorIss = Math.round(valorServicos * (aliquotaPercentual / 100) * 100) / 100;
+                        const valorIss = Math.round(valorServicos * (aliquotaPercentual / 100) * 100) /
+                            100;
                         const valorIBS = Math.round(valorServicos * 0.01 * 100) / 100;
                         const valorCBS = Math.round(valorServicos * 0.09 * 100) / 100;
                         const valorIssXml = this.extrairNumeroOpcional(rps.ValorIss, rps.ValorISS, rps.valor_iss, servicoXml.ValorIss, servicoXml.ValorISS, servicoXml.valor_iss);
@@ -460,17 +461,20 @@ class FocusNfeService {
                         const tipoOperacao = this.extrairNumero(rps.TipoOperacao || servicoXml.TipoOperacao, isExportacao ? 2 : 1);
                         const issRetido = this.extrairBooleano(rps.ISSRetido || servicoXml.ISSRetido, false);
                         const referencia = `LOTE-${Date.now()}-${index + 1}-${numeroRps || "RPS"}`;
-                        const focusRequest = Object.assign(Object.assign({ serie_rps: "1", numero_rps: numeroRps, referencia, data_emissao: this.formatarData(rps.DataEmissao), natureza_operacao: naturezaOperacao, optante_simples_nacional: false, tipo_operacao_governamental: 1 }, (tipoTributacao && { tributacao_rps: tipoTributacao })), { prestador: Object.assign(Object.assign(Object.assign({}, (cnpjPrestador && { cnpj: cnpjPrestador })), (cpfPrestador && { cpf: cpfPrestador })), { inscricao_municipal: inscricaoPrestador, codigo_municipio: String("3550308") }), tomador: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (cnpjTomador && { cnpj: cnpjTomador })), (cpfTomador && { cpf: cpfTomador })), { razao_social: razaoSocialTomador }), (emailTomador && { email: emailTomador })), { endereco: Object.assign(Object.assign(Object.assign({ logradouro: (enderecTomador.Logradouro || "")
+                        const focusRequest = Object.assign(Object.assign({ serie_rps: "1", numero_rps: numeroRps, referencia, data_emissao: this.formatarData(rps.DataEmissao), natureza_operacao: naturezaOperacao, optante_simples_nacional: false, tipo_operacao_governamental: 1 }, (tipoTributacao && { tributacao_rps: tipoTributacao })), { prestador: Object.assign(Object.assign(Object.assign({}, (cnpjPrestador && { cnpj: cnpjPrestador })), (cpfPrestador && { cpf: cpfPrestador })), { inscricao_municipal: inscricaoPrestador, codigo_municipio: String("3550308") }), tomador: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (cnpjTomador && { cnpj: cnpjTomador })), (cpfTomador && { cpf: cpfTomador })), (nifTomador
+                                ? { nif: nifTomador }
+                                : !cnpjTomador &&
+                                    !cpfTomador &&
+                                    (isEstrangeiro || tipoTributacao === "P")
+                                    ? { motivo_ausencia_nif: "2" }
+                                    : {})), { razao_social: razaoSocialTomador }), (emailTomador && { email: emailTomador })), { endereco: Object.assign(Object.assign({ logradouro: (enderecTomador.Logradouro || "")
                                         .trim()
                                         .substring(0, 50), numero: enderecTomador.NumeroEndereco || "S/N" }, (enderecTomador.ComplementoEndereco && {
                                     complemento: enderecTomador.ComplementoEndereco,
                                 })), { bairro: enderecTomador.Bairro || "", codigo_municipio: tipoTributacao === "P"
                                         ? ""
-                                        : String(codigoMunicipioTomadorCorrigido), uf: enderecTomador.UF, cep: this.formatarCEP(enderecTomador.CEP) }), (isEstrangeiro &&
-                                    enderecTomador.CodigoPais && {
-                                    codigo_pais: enderecTomador.CodigoPais,
-                                })) }), servico: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ discriminacao: discriminacao, item_lista_servico: codigoServico, codigo_tributacao_municipio: codigoTribMun || codigoServico }, (codigoCidadeIncidencia && {
-                                codigo_cidade_incidencia: codigoCidadeIncidencia,
+                                        : String(codigoMunicipioTomadorCorrigido), uf: enderecTomador.UF, cep: this.formatarCEP(enderecTomador.CEP) }) }), servico: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ discriminacao: discriminacao, item_lista_servico: codigoServico, codigo_tributacao_municipio: codigoTribMun || codigoServico }, (codigoMunicipioPrestacao && {
+                                codigo_municipio_prestacao: codigoMunicipioPrestacao,
                             })), { valor_servicos: valorServicos, valor_final_cobrado: valorFinalCobrado, base_calculo: baseCalculo, aliquota: aliquotaParaEnvio, iss_retido: issRetido, valor_ipi: 0, codigo_nbs: "102010000", codigo_indicador_operacao: "100301", ibs_cbs_classificacao_tributaria: ibsCbsClassificacaoTributaria || "", valor_ir: irrfValue, valor_iss: valorIssXml !== null && valorIssXml !== void 0 ? valorIssXml : valorIss }), (tributacaoIssXml && { tributacao_iss: tributacaoIssXml })), (ibsCbsSituacaoTributariaXml && {
                                 ibs_cbs_situacao_tributaria: ibsCbsSituacaoTributariaXml,
                             })), { ibs_cbs_base_calculo: ibsCbsBaseCalculoXml !== null && ibsCbsBaseCalculoXml !== void 0 ? ibsCbsBaseCalculoXml : baseCalculo, ibs_uf_aliquota: ibsUfAliquotaXml !== null && ibsUfAliquotaXml !== void 0 ? ibsUfAliquotaXml : 1, ibs_uf_valor: ibsUfValorXml !== null && ibsUfValorXml !== void 0 ? ibsUfValorXml : valorIBS, ibs_mun_aliquota: ibsMunAliquotaXml !== null && ibsMunAliquotaXml !== void 0 ? ibsMunAliquotaXml : 0, ibs_mun_valor: ibsMunValorXml !== null && ibsMunValorXml !== void 0 ? ibsMunValorXml : 0, cbs_aliquota: cbsAliquotaXml !== null && cbsAliquotaXml !== void 0 ? cbsAliquotaXml : 9, cbs_valor: cbsValorXml !== null && cbsValorXml !== void 0 ? cbsValorXml : valorCBS }), exigibilidade_suspensa: 0, pagamento_parcelado_antecipado: 0, finalidade_emissao: 0, consumidor_final: 0, indicador_destinatario: 0 });

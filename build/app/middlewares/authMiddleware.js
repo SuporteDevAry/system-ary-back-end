@@ -17,6 +17,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authMiddleware = void 0;
 const api_errors_1 = require("../helpers/api-errors");
 const UserRepository_1 = require("../repositories/UserRepository");
+const requestContext_1 = require("../helpers/requestContext");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const authMiddleware = async (req, res, next) => {
     const { authorization } = req.headers;
@@ -24,14 +25,20 @@ const authMiddleware = async (req, res, next) => {
         throw new api_errors_1.UnauthorizedError("Não autorizado");
     }
     const token = authorization.split(" ")[1];
-    const { id } = jsonwebtoken_1.default.verify(token, process.env.JWT_PWD);
+    let id;
+    try {
+        ({ id } = jsonwebtoken_1.default.verify(token, process.env.JWT_PWD));
+    }
+    catch (error) {
+        throw new api_errors_1.UnauthorizedError("Sessão expirada, faça login novamente.");
+    }
     const user = await UserRepository_1.userRepository.findOneBy({ id });
     if (!user) {
         throw new api_errors_1.UnauthorizedError("Não autorizado");
     }
     const { password: _ } = user, loggedUser = __rest(user, ["password"]);
     req.user = loggedUser;
-    next();
+    (0, requestContext_1.runWithUserContext)({ id: user.id, email: user.email, name: user.name }, next);
 };
 exports.authMiddleware = authMiddleware;
 //# sourceMappingURL=authMiddleware.js.map

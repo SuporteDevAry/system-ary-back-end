@@ -22,7 +22,7 @@ const generateNumberContract = async (data) => {
     }
     const productsInGroup = productTable.product_types;
     // Só iremos remover essa regra das siglas, caso o cliente aceite a sugestão da reunião do dia 09/04/2025
-    const listProducts = ["O", "OC", "OA", "SB", "EP"];
+    const listProducts = ["O", "OC", "OA", "SB", "EP", "OX"];
     const validProducts = listProducts.includes(product);
     const siglaProduct = validProducts ? "O" : product;
     // Query para pegar o último número do contrato baseado no grupo

@@ -13,6 +13,10 @@ const ProductsTable_1 = require("./ProductsTable");
 const Taxes_1 = require("./Taxes");
 const Invoices_1 = require("./Invoices");
 const Billings_1 = require("./Billings");
+const AuditLog_1 = require("./AuditLog");
+const LoginHistory_1 = require("./LoginHistory");
+const ActiveSession_1 = require("./ActiveSession");
+const Broker_1 = require("./Broker");
 exports.entitiesDir = {
     User: User_1.User,
     Permission: Permission_1.Permission,
@@ -26,5 +30,9 @@ exports.entitiesDir = {
     Tax: Taxes_1.Tax,
     Invoice: Invoices_1.Invoice,
     Billing: Billings_1.Billing,
+    AuditLog: AuditLog_1.AuditLog,
+    LoginHistory: LoginHistory_1.LoginHistory,
+    ActiveSession: ActiveSession_1.ActiveSession,
+    Broker: Broker_1.Broker,
 };
 //# sourceMappingURL=index.js.map
