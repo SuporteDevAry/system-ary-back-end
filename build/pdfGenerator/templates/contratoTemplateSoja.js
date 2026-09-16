@@ -148,7 +148,7 @@ const ContratoTemplateSoja = ({ data, typeContract, modeSave, }) => {
         });
         return formattedLines.join("");
     }
-    const listProductsForMetricTon = ["O", "F", "OC", "OA", "SB", "EP"];
+    const listProductsForMetricTon = ["O", "F", "OC", "OA", "SB", "EP", "OX"];
     const validProductsForMetricTon = listProductsForMetricTon.includes(data.product);
     let formattedSafra = validProductsForMetricTon
         ? ` `

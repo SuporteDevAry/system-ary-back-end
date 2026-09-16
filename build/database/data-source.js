@@ -9,6 +9,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const typeorm_1 = require("typeorm");
 const migrations_1 = require("./migrations");
 const entities_1 = require("../app/entities");
+const AuditSubscriber_1 = require("../app/subscribers/AuditSubscriber");
 dotenv_1.default.config({ path: ".env" });
 const SSL_VALUE = process.env.TYPEORM_SSL === "false" ? false : { rejectUnauthorized: false };
 exports.AppDataSource = new typeorm_1.DataSource({
@@ -22,7 +23,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
     logging: false,
     entities: entities_1.entitiesDir,
     migrations: migrations_1.migrationDir,
-    subscribers: [],
+    subscribers: [AuditSubscriber_1.AuditSubscriber],
     ssl: SSL_VALUE,
     // Configurações para melhor resiliência
     connectTimeoutMS: 30000,

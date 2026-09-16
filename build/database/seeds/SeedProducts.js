@@ -114,6 +114,14 @@ Aflatoxina: Máx. 20PPB`,
             quality: "Estearina de palma refinada, branqueada e desodorizada. (Refined bleached deodorised Palm Stearin - RBD PS)",
             observation: "Mercadoria destinada a fabricação de biodiesel.",
         },
+        {
+            product_type: "OX",
+            name: "ÓLEO MIX",
+            commission_seller: "0,30",
+            type_commission_seller: "Percentual",
+            quality: "Óleo mix.",
+            observation: "Destinado a fabricação de Biodiesel.",
+        },
     ];
     for (const product of products) {
         const exists = await productRepository.findOneBy({
